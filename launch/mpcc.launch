@@ -3,7 +3,7 @@
   <!-- Load all parameters -->
   <rosparam command="load" file="$(find mpcc)/mpcc_params.yaml"/>
   <!-- Launch the MPCC -->
-  <node pkg="mpcc" name="mpcc" type="mpcc_node.cpp" output="screen">
+  <node pkg="mpcc" name="mpcc_node" type="mpcc_node" output="screen">
   </node>
 
 </launch>

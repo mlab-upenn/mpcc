@@ -61,9 +61,9 @@ void MPCC::getParameters(ros::NodeHandle& nh)
   nh.getParam("pose_topic", pose_topic);
 }
 
-void odometry_callback(const nav_msgs::Odometry::ConstPtr &odom_msg)
+void MPCC::odometry_callback(const nav_msgs::Odometry::ConstPtr &odom_msg)
 {
-  ROS_INFO("Position x: [%d], y: [%d] ", odom_msg->pose.pose.position.x, odom_msg->pose.pose.position.y);
+  ROS_INFO("Position x: [%f], y: [%f] ", odom_msg->pose.pose.position.x, odom_msg->pose.pose.position.y);
 }
 
 

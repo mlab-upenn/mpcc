@@ -209,5 +209,9 @@ add_dependencies(mpcc_node ${catkin_EXPORTED_TARGETS})
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
 
+
+find_package(catkin REQUIRED COMPONENTS roslaunch)
+roslaunch_add_file_check(launch)
+
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
