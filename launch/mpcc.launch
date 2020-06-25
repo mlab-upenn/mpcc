@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Load all parameters -->
+  <rosparam command="load" file="$(find mpcc)/mpcc_params.yaml"/>
+  <!-- Launch the MPCC -->
+  <node pkg="mpcc" name="mpcc" type="mpcc_node.cpp" output="screen">
+  </node>
+
+</launch>
