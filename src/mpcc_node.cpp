@@ -3,6 +3,8 @@
 #include <vector>
 #include <iostream>
 #include <string>
+
+#include <Eigen/Sparse>
 #include <nav_msgs/Odometry.h>
 
 
@@ -20,8 +22,21 @@ public:
 
 private:
    ros::NodeHandle nh_;
+
+   //subscribers
    ros::Subscriber odom_sub_;
+
+   //topics
    string pose_topic;
+
+   //Car states
+
+
+
+
+
+
+
    void odometry_callback(const nav_msgs::Odometry::ConstPtr &odom_msg);
    void getParameters(ros::NodeHandle& nh);
 
@@ -53,7 +68,7 @@ MPCC::MPCC(ros::NodeHandle& nh): nh_(nh)
 
 void MPCC::run()
 {
-  ROS_INFO("Yallah Let go\n");
+  ROS_INFO("MPCC node running\n");
 }
 
 void MPCC::getParameters(ros::NodeHandle& nh)

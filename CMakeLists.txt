@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(mpcc)
+set(acados_DIR "/home/acados/cmake")
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -19,7 +20,8 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-
+find_package(acados REQUIRED)
+find_package(Eigen3 REQUIRED)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -107,10 +109,10 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES MPCC
-#  CATKIN_DEPENDS geometry_msgs nav_msgs roscpp rospy tf2 tf2_geometry_msgs tf2_ros
-#  DEPENDS system_lib
+  INCLUDE_DIRS include
+  LIBRARIES MPCC
+  CATKIN_DEPENDS geometry_msgs nav_msgs roscpp rospy tf2 tf2_geometry_msgs tf2_ros
+  DEPENDS system_lib
 )
 
 ###########
@@ -122,6 +124,7 @@ catkin_package(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
+  ${EIGEN3_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
