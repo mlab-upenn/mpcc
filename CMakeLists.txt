@@ -159,6 +159,7 @@ include_directories(
 
 add_executable(mpcc_node src/mpcc_node.cpp)
 target_link_libraries(mpcc_node ${catkin_LIBRARIES})
+target_link_libraries(mpcc_node ${acados_DIR})
 add_dependencies(mpcc_node ${catkin_EXPORTED_TARGETS})
 #############
 ## Install ##
