@@ -1,6 +1,8 @@
 from casadi import *
+import
 
-def dynamic_model(track):
+
+def dynamic_model(Tf,N,track):
 
     # define casadi struct
     model = types.SimpleNamespace()
@@ -9,8 +11,9 @@ def dynamic_model(track):
     #loadparameters
     m = 2 #[kg]
     lf = 0.1 #[m]
+    lr = 0.1 #[m]
     Iz = 1 #[kg*m^3]
-    
+
     #pajecka and motor coefficients
     Bf = 1
     Br = 1
@@ -27,6 +30,9 @@ def dynamic_model(track):
 
 
     #single track model with pajecka tireforces as in  Optimization-Based Autonomous Racing of 1:43 Scale RC Cars Alexander Liniger, Alexander Domahidi and Manfred Morari
+    #pose
+    posx = MX.sym("posx")
+    posy = MX.sym("posy")
 
     #vel (long and lateral)
     vx = MX.sym("vx")
@@ -63,7 +69,16 @@ def dynamic_model(track):
     thetadot = MX.sym("thetadot")
     deltadot = MX.sym("deltadot")
 
-    #state Dynamics
+    #car state Dynamics
+    x = vertcat(
+        posxdot,
+        posydot,
+        phidot,
+        vxdot,
+        vydot,
+        omegadot,
+        )
+
     xdot = vertcat(
         posxdot,
         posydot,
@@ -90,7 +105,10 @@ def dynamic_model(track):
         omega,
         1/m * (Frx - Fry*sin(delta) + m*vy*omega),
         1/m * (Fry + Fry*cos(delta) - m*vx*omega),
-
-
-
+        1/Iz * (Ffy*lf*cos(delta) - Fry*lr),
         )
+
+    model.f_expl_expr = f_expl
+    model.f_impl_expr = xdot - f_expl
+    model.x = x
+    return model
