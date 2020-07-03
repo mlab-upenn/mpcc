@@ -122,7 +122,7 @@ def generatelookuptable(track):
     #load track
     waypoints = getwaypoints(track)
     #trackwidth
-    r = 0.2
+    r = 0.01
     #abez,bbez coeffs
     a, b = interpolate(waypoints)
     order_inverse = 8
@@ -137,14 +137,15 @@ def generatelookuptable(track):
     svals = np.linspace(0, smax, npoints)
     tvals = compute_t(coeffs, order_inverse, svals)
 
-    #  entries : [sval tval xtrack ytrack phitrack cos(phi) sin(phi)]
+    #  entries : [sval tval xtrack ytrack phitrack cos(phi) sin(phi) g_upper glower]
     table = []
     for idx in range(npoints):
         track_point = eval_raw(waypoints, a, b, tvals[idx])
         phi = getangle_raw(waypoints, a, b, tvals[idx])
         n = [-np.sin(phi), np.cos(phi)]
-        g = r + track_point[0]*n[0] + track_point[1]*n[1]
-        table.append([svals[idx], tvals[idx], track_point[0], track_point[1], phi, np.cos(phi), np.sin(phi), g])
+        g_upper = r + track_point[0]*n[0] + track_point[1]*n[1]
+        g_lower = -r + track_point[0]*n[0] + track_point[1]*n[1]
+        table.append([svals[idx], tvals[idx], track_point[0], track_point[1], phi, np.cos(phi), np.sin(phi), g_upper, g_lower])
 
     table = np.array(table)
     plot_track(table)
@@ -159,6 +160,8 @@ def plot_track (table):
     tvals = table[::downsampling, 1]
     cos_phi = table[::downsampling, 5]
     sin_phi = table[::downsampling, 6]
+    gvals = table[::downsampling, 7]
+
 
     dists = []
     npoints = len(coords)
@@ -177,6 +180,12 @@ def plot_track (table):
     len_indicator = 0.05
     plt.plot(table[:,2],table[:,3])
     for idx in range(npoints):
+        n = [-sin_phi[idx], cos_phi[idx]]
+        g = gvals[idx]
+        lm = 0.001
+        baseupper = [(coords[idx,0]-lm ), (g-n[0]*(coords[idx,0]-lm )) / n[1]]
+        endupper = [(coords[idx,0]+lm ), (g-n[0]*(coords[idx,0]+lm )) / n[1]]
         base = coords[idx,:]
         end = len_indicator * np.array([cos_phi[idx], sin_phi[idx]]) + base
         plt.plot([base[0], end[0]],[base[1], end[1]], color = 'r')
+        plt.plot([baseupper[0], endupper[0]],[baseupper[1], endupper[1]], color = 'g')
