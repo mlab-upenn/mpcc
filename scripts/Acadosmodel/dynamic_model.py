@@ -2,7 +2,7 @@ from casadi import *
 import Bezier
 
 
-def dynamic_model(Tf,N):
+def dynamic_model(modelparms):
     '''
     #load track
     waypoints = Bezier.getwaypoints(track)
@@ -74,6 +74,9 @@ def dynamic_model(Tf,N):
     #motorinput
     d = SX.sym("d")
 
+    #inputvector
+    u = vertcat(d, delta)
+
     #dynamic forces
     Frx = SX.sym("Frx")
     Fry = SX.sym("Fry")
@@ -113,8 +116,6 @@ def dynamic_model(Tf,N):
         omegadot,
         thetadot
         )
-
-
 
     #front lateral tireforce
     alphaf = -atan((omega*lf + vy)/vx) + delta
@@ -161,7 +162,3 @@ def dynamic_model(Tf,N):
     model.stage_cost = bilin(Q, error, error)
 
     return model, constraints
-
-
-if __name__=="__main__":
-    model = dynamic_model(0,0,0)
