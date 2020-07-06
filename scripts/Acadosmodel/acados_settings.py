@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 from acados_template import AcadosModel, AcadosOcp, AcadosOcpSolver
-from bycicle_model import bycicle_model
+from dynamic_model import dynamic_model
 import scipy.linalg
 import numpy as np
 
@@ -12,7 +12,6 @@ def acados_settings(Tf, N):
     # load model, (add in param file later)
     model, constraint = dynamic_model(0)
 
-    print("transferring model to acados")
     # define acados ODE
     model_ac = AcadosModel()
     model_ac.f_impl_expr = model.f_impl_expr
@@ -43,19 +42,10 @@ def acados_settings(Tf, N):
     ocp.dims.nbu = nu
     ocp.dims.nu = nu
     ocp.dims.N = N
-    ocp.dims.nsh = 2
-    ocp.dims.nh = constraint.expr.shape[0]
     ocp.dims.ns = 2
 
     # set cost
-    Q = np.diag([ 1e-1, 1e-8, 1e-8, 1e-8, 1e-3, 5e-3 ])
-
-    R = np.eye(nu)
-    R[0, 0] = 1e-3
-    R[1, 1] = 5e-3
-
-    Qe = np.diag([ 5e0, 1e1, 1e-8, 1e-8, 5e-3, 2e-3 ])
-
+    CHANGE THIS
     ocp.cost.cost_type = "LINEAR_LS"
     ocp.cost.cost_type_e = "LINEAR_LS"
     unscale = N / Tf
@@ -139,3 +129,13 @@ def acados_settings(Tf, N):
 
     print("solver created returning to main")
     return constraint, model, acados_solver
+
+def main():
+    """ Main program """
+    Tf = 1
+    N = 50
+    acados_settings(Tf, N)
+    return 0
+
+if __name__ == "__main__":
+    main()

@@ -48,7 +48,16 @@ def dynamic_model(modelparms):
     theta_hat = SX.sym("theta_hat")
     Qc = SX.sym("Qc")
     Ql = SX.sym("Ql")
-    R = SX.sym("R")
+    Q_theta = SX.sym("Q_theta")
+
+    #cost on smoothnes of motorinput
+    R_d = SX.sym("R_d")
+
+    #cost on smoothness of steering_angle
+    R_delta = SX.sym("R_delta")
+
+    p = vertcat(xt, yt, phit, sin_phit, cos_phit, gt_upper, gt_lower, theta_hat, Qc, Ql, Q_theta, R_d, R_delta)
+
 
     #single track model with pajecka tireforces as in  Optimization-Based Autonomous Racing of 1:43 Scale RC Cars Alexander Liniger, Alexander Domahidi and Manfred Morari
     #pose
@@ -70,9 +79,10 @@ def dynamic_model(modelparms):
 
     #steering_angle
     delta = SX.sym("delta")
-
+    deltadot = SX.sym("delta")
     #motorinput
     d = SX.sym("d")
+    ddot = SX.sym("ddot")
 
     #inputvector
     u = vertcat(d, delta)
@@ -104,7 +114,9 @@ def dynamic_model(modelparms):
         vx,
         vy,
         omega,
-        theta
+        theta,
+        d,
+        delta
         )
 
     xdot = vertcat(
@@ -114,7 +126,9 @@ def dynamic_model(modelparms):
         vxdot,
         vydot,
         omegadot,
-        thetadot
+        thetadot,
+        ddot,
+        deltadot
         )
 
     #front lateral tireforce
@@ -135,17 +149,29 @@ def dynamic_model(modelparms):
         1/m * (Frx - Fry*sin(delta) + m*vy*omega),
         1/m * (Fry + Fry*cos(delta) - m*vx*omega),
         1/Iz * (Ffy*lf*cos(delta) - Fry*lr),
-        vt
+        vt,
+        ddot,
+        deltadot
         )
 
 
     model.f_expl_expr = f_expl
     model.f_impl_expr = xdot - f_expl
     model.x = x
+    model.xdot = xdot
+    model.u = u
+    model.p = p
+    #boxconstraints
+    #for state d
+    model.throttle_min = -1.0
+    model.throttle_max = 1.0
 
-    #halfspace constraints on x capturing the track
+    model.delta_min = -0.40  # minimum steering angle [rad]
+    model.delta_max = 0.40  # maximum steering angle [rad]
+
+    #halfspace constraints on x capturing the track at each stage
     n = vertcat(-sin_phit, cos_phit)
-    constraints.C = np.matrix([[n[0], n[1], 0, 0, 0, 0, 0],  [-n[0], -n[1], 0, 0, 0, 0, 0]])
+    constraints.C = np.matrix([[n[0], n[1], 0, 0, 0, 0, 0, 0, 0],  [-n[0], -n[1], 0, 0, 0, 0, 0, 0, 0]])
     constraints.ge_upper = vertcat(gt_upper, -gt_lower)
 
 
@@ -159,6 +185,6 @@ def dynamic_model(modelparms):
     error = vertcat(e_cont, e_lag)
     #set up stage cost
     Q = diag(vertcat(Qc, Ql))
-    model.stage_cost = bilin(Q, error, error)
+    model.stage_cost = bilin(Q, error, error) - Q_theta * thetadot + bilin(R_d , ddot, ddot) + bilin(R_delta , deltadot, deltadot)
 
     return model, constraints

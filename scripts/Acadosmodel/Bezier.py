@@ -137,7 +137,8 @@ def generatelookuptable(track):
     svals = np.linspace(0, smax, npoints)
     tvals = compute_t(coeffs, order_inverse, svals)
 
-    #  entries : [sval tval xtrack ytrack phitrack cos(phi) sin(phi) g_upper glower]
+    #  entries :
+    names_table = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
     table = []
     for idx in range(npoints):
         track_point = eval_raw(waypoints, a, b, tvals[idx])
@@ -149,6 +150,7 @@ def generatelookuptable(track):
 
     table = np.array(table)
     plot_track(table)
+    print("stored as names_table = ", names_table)
     return table
 
 def plot_track (table):
@@ -188,4 +190,4 @@ def plot_track (table):
         base = coords[idx,:]
         end = len_indicator * np.array([cos_phi[idx], sin_phi[idx]]) + base
         plt.plot([base[0], end[0]],[base[1], end[1]], color = 'r')
-        plt.plot([baseupper[0], endupper[0]],[baseupper[1], endupper[1]], color = 'g')
+        #plt.plot([baseupper[0], endupper[0]],[baseupper[1], endupper[1]], color = 'g')
