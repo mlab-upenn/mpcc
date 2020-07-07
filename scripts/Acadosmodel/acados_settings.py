@@ -2,7 +2,7 @@
 from acados_template import AcadosModel, AcadosOcp, AcadosOcpSolver
 from dynamic_model import dynamic_model
 import scipy.linalg
-import numpy as np
+import numpy as npy
 
 
 def acados_settings(Tf, N):
@@ -10,7 +10,7 @@ def acados_settings(Tf, N):
     ocp = AcadosOcp()
 
     # load model, (add in param file later)
-    model, constraint = dynamic_model(0)
+    model, constraints = dynamic_model(0)
 
     # define acados ODE
     model_ac = AcadosModel()
@@ -22,93 +22,83 @@ def acados_settings(Tf, N):
     model_ac.u = model.u
     #parameter vector
     model_ac.p = model.p
+    #parameter vector
+    model_ac.z = model.z
+    #external cost function
+    model_ac.cost_expr_ext_cost = model.stage_cost
+    model_ac.cost_expr_ext_cost_e = 0
+    model_ac.con_h_expr = model.con_h_expr
     model_ac.name = model.name
     ocp.model = model_ac
 
 
 
     # set dimensions
-    nx = model.x.size()[0]
-    nu = model.u.size()[0]
-    ny = nx + nu
-    ny_e = nx
 
-    ocp.dims.nx = nx
-    ocp.dims.np = 0
-    ocp.dims.ny = ny
-    ocp.dims.ny_e = ny_e
+    nx  = model.x.size()[0]
+    nu  = model.u.size()[0]
+    nz  = model.z.size()[0]
+    np  = model.p.size()[0]
+    #ny  = nu + nx
+    #ny_e = nx
+
+
+    ocp.dims.nx   = nx
+    #ocp.dims.nz   = nz
+    #ocp.dims.ny   = ny
+    #ocp.dims.ny_e  = ny_e
+    ocp.dims.nu   = nu
+    ocp.dims.np   = 13
+    ocp.dims.nh = 2
+    #ocp.dims.ny = ny
+    #ocp.dims.ny_e = ny_e
     ocp.dims.nbx = 1
-    ocp.dims.nsbx = 0
+    #ocp.dims.nsbx = 0
     ocp.dims.nbu = nu
     ocp.dims.nu = nu
-    ocp.dims.N = N
-    ocp.dims.ns = 2
+    #number of soft on h constraints
+    ocp.dims.nsh = 2
 
-    # set cost
-    CHANGE THIS
-    ocp.cost.cost_type = "LINEAR_LS"
-    ocp.cost.cost_type_e = "LINEAR_LS"
+    ocp.dims.N = N
+
+
+    # set cost to casadi expression defined above
+    ocp.cost.cost_type = "EXTERNAL"
+    ocp.cost.cost_type_e = "EXTERNAL"
+
+    #not sure if needed
     unscale = N / Tf
 
-    ocp.cost.W = unscale * scipy.linalg.block_diag(Q, R)
-    ocp.cost.W_e = Qe / unscale
+    #constraints
+    #stagewise halfspace constraints for tracks with slack
+    ocp.constraints.uh = npy.zeros(2)
+    ocp.constraints.lh = -1e9*npy.ones(2)
+    #ocp.constraints.Jsh = 1
 
-    Vx = np.zeros((ny, nx))
-    Vx[:nx, :nx] = np.eye(nx)
-    ocp.cost.Vx = Vx
+    #ocp.constraints.C = constraints.C
+    #ocp.constraints.ug = constraints.g_upper
+    #ocp.constraints.Jsg = npy.eye(2)
+    #ocp.constraints.lsg = npy.array([0,0])
 
-    Vu = np.zeros((ny, nu))
-    Vu[6, 0] = 1.0
-    Vu[7, 1] = 1.0
-    ocp.cost.Vu = Vu
+    # boxconstraints
+    # change these later
+    ocp.constraints.lbx = npy.array([-12])
+    ocp.constraints.ubx = npy.array([12])
+    ocp.constraints.idxbx = npy.array([1])
 
-    Vx_e = np.zeros((ny_e, nx))
-    Vx_e[:nx, :nx] = np.eye(nx)
-    ocp.cost.Vx_e = Vx_e
+    ocp.constraints.lbu = npy.array([model.ddot_min, model.deltadot_min, model.thetadot_min])
+    ocp.constraints.ubu = npy.array([model.ddot_max, model.deltadot_max, model.thetadot_max])
+    ocp.constraints.idxbu = npy.array([0, 1, 2])
+    # ocp.constraints.lsbx=npy.zero s([1])
+    # ocp.constraints.usbx=npy.zeros([1])
+    # ocp.constraints.idxsbx=npy.array([1])
 
-    ocp.cost.zl = 100 * np.ones((ocp.dims.ns,))
-    ocp.cost.zu = 100 * np.ones((ocp.dims.ns,))
-    ocp.cost.Zl = 0 * np.ones((ocp.dims.ns,))
-    ocp.cost.Zu = 0 * np.ones((ocp.dims.ns,))
+    #ocp.constraints.lsh = npy.zeros(ocp.dims.nsh)
+    #ocp.constraints.ush = npy.zeros(ocp.dims.nsh)
+    #ocp.constraints.idxsh = npy.array([0, 2])
 
-    # set intial references
-    ocp.cost.yref = np.array([1, 0, 0, 0, 0, 0, 0, 0])
-    ocp.cost.yref_e = np.array([0, 0, 0, 0, 0, 0])
-
-    # setting constraints
-    ocp.constraints.lbx = np.array([-12])
-    ocp.constraints.ubx = np.array([12])
-    ocp.constraints.idxbx = np.array([1])
-    ocp.constraints.lbu = np.array([model.dthrottle_min, model.ddelta_min])
-    ocp.constraints.ubu = np.array([model.dthrottle_max, model.ddelta_max])
-    ocp.constraints.idxbu = np.array([0, 1])
-    # ocp.constraints.lsbx=np.zero s([1])
-    # ocp.constraints.usbx=np.zeros([1])
-    # ocp.constraints.idxsbx=np.array([1])
-    ocp.constraints.lh = np.array(
-        [
-            constraint.along_min,
-            constraint.alat_min,
-            model.n_min,
-            model.throttle_min,
-            model.delta_min,
-        ]
-    )
-    ocp.constraints.uh = np.array(
-        [
-            constraint.along_max,
-            constraint.alat_max,
-            model.n_max,
-            model.throttle_max,
-            model.delta_max,
-        ]
-    )
-    ocp.constraints.lsh = np.zeros(ocp.dims.nsh)
-    ocp.constraints.ush = np.zeros(ocp.dims.nsh)
-    ocp.constraints.idxsh = np.array([0, 2])
-
-    # set intial condition
-    ocp.constraints.x0 = model.x0
+    # set intial condition through constriants on x
+    #ocp.constraints.x0 = model.x0
 
     # set QP solver and integration
     ocp.solver_options.tf = Tf
@@ -117,18 +107,23 @@ def acados_settings(Tf, N):
     ocp.solver_options.nlp_solver_type = "SQP_RTI"
     ocp.solver_options.hessian_approx = "GAUSS_NEWTON"
     ocp.solver_options.integrator_type = "ERK"
-    ocp.solver_options.sim_method_num_stages = 4
-    ocp.solver_options.sim_method_num_steps = 3
+    ocp.parameter_values = npy.zeros(np)
+    #ocp.solver_options.sim_method_num_stages = 4
+    #ocp.solver_options.sim_method_num_steps = 3
     # ocp.solver_options.nlp_solver_step_length = 0.05
     # ocp.solver_options.nlp_solver_max_iter = 1000
     ocp.solver_options.tol = 1e-4
     # ocp.solver_options.nlp_solver_tol_comp = 1e-1
 
+    print("p size:" ,ocp.model.p.size())
+    print("np val:" ,ocp.dims.np)
+    print(model_ac.p)
+    print(ocp.model.p)
     # create solver
-    acados_solver = AcadosOcpSolver(ocp, json_file="acados_ocp.json")
+    acados_solver = AcadosOcpSolver(ocp, json_file="acados_ocp2.json")
 
     print("solver created returning to main")
-    return constraint, model, acados_solver
+    return constraints, model, acados_solver
 
 def main():
     """ Main program """

@@ -3,20 +3,13 @@ import Bezier
 
 
 def dynamic_model(modelparms):
-    '''
-    #load track
-    waypoints = Bezier.getwaypoints(track)
-    #abez,bbez coeffs
-    a_bez, b_bez = Bezier.interpolate(waypoints)
-    order_inverse = 4
-    norm_inverse = 2
-    coeffs = Bezier.fit_st(order_inverse, norm_inverse, waypoints)
-    '''
+    
     # define casadi struct
     model = types.SimpleNamespace()
     constraints = types.SimpleNamespace()
 
     model_name = "f110_dynamic_model"
+    model.name = model_name
     #loadparameters
     m = 2 #[kg]
     lf = 0.1 #[m]
@@ -69,23 +62,18 @@ def dynamic_model(modelparms):
     vx = SX.sym("vx")
     vy = SX.sym("vy")
 
+
     #body angular Rate
     omega = SX.sym("omega")
     #heading
     phi = SX.sym("phi")
-
-    #virtual input projected track velocity
-    vt = SX.sym("vt")
-
     #steering_angle
     delta = SX.sym("delta")
-    deltadot = SX.sym("delta")
     #motorinput
     d = SX.sym("d")
-    ddot = SX.sym("ddot")
 
-    #inputvector
-    u = vertcat(d, delta)
+
+
 
     #dynamic forces
     Frx = SX.sym("Frx")
@@ -103,8 +91,11 @@ def dynamic_model(modelparms):
     vydot = SX.sym("vydot")
     phidot = SX.sym("phidot")
     omegadot = SX.sym("omegadot")
-    thetadot = SX.sym("thetadot")
     deltadot = SX.sym("deltadot")
+    thetadot = SX.sym("thetadot")
+    ddot = SX.sym("ddot")
+    #inputvector
+    u = vertcat(ddot, deltadot, thetadot)
 
     #car state Dynamics
     x = vertcat(
@@ -149,11 +140,13 @@ def dynamic_model(modelparms):
         1/m * (Frx - Fry*sin(delta) + m*vy*omega),
         1/m * (Fry + Fry*cos(delta) - m*vx*omega),
         1/Iz * (Ffy*lf*cos(delta) - Fry*lr),
-        vt,
+        thetadot,
         ddot,
         deltadot
         )
 
+    # algebraic variables
+    z = vertcat([])
 
     model.f_expl_expr = f_expl
     model.f_impl_expr = xdot - f_expl
@@ -161,19 +154,29 @@ def dynamic_model(modelparms):
     model.xdot = xdot
     model.u = u
     model.p = p
+    model.z = z
     #boxconstraints
-    #for state d
-    model.throttle_min = -1.0
-    model.throttle_max = 1.0
+    model.d_min = -1.0
+    model.d_max = 1.0
+
+    model.ddot_min = -10.0
+    model.ddot_max = 10.0
 
     model.delta_min = -0.40  # minimum steering angle [rad]
     model.delta_max = 0.40  # maximum steering angle [rad]
 
+    model.deltadot_max = 2 # maximum steering angle cahgne[rad/s]
+    model.deltadot_min = -2  # minimum steering angle cahgne[rad/s]
+
+    model.thetadot_min = -2  # minimum adv param speed [m/s]
+    model.thetadot_max = 10 # maximum adv param speed [m/s]
+
     #halfspace constraints on x capturing the track at each stage
     n = vertcat(-sin_phit, cos_phit)
-    constraints.C = np.matrix([[n[0], n[1], 0, 0, 0, 0, 0, 0, 0],  [-n[0], -n[1], 0, 0, 0, 0, 0, 0, 0]])
-    constraints.ge_upper = vertcat(gt_upper, -gt_lower)
-
+    constraints.h_upper = vertcat(0,0)
+    g_upper = vertcat(gt_upper, -gt_lower)
+    #con_expr <= 0
+    model.con_h_expr = vertcat(n[0]*x[0]+n[1]*x[1]-g_upper[0], -n[0]*x[0]-n[1]*x[1]-g_upper[1])
 
     #compute approximate linearized contouring and lag error
     xt_hat = xt + cos_phit * ( theta - theta_hat)
