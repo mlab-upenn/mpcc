@@ -1,33 +1,40 @@
 from casadi import *
 import Bezier
+import yaml
 
 
-def dynamic_model(modelparms):
-    
+def dynamic_model(modelparams):
+
     # define casadi struct
     model = types.SimpleNamespace()
     constraints = types.SimpleNamespace()
 
     model_name = "f110_dynamic_model"
     model.name = model_name
+
+
     #loadparameters
-    m = 2 #[kg]
-    lf = 0.1 #[m]
-    lr = 0.1 #[m]
-    Iz = 1 #[kg*m^3]
+    with open(modelparams) as file:
+        params = yaml.load(file, Loader= yaml.FullLoader)
+
+    m = params['m'] #[kg]
+    lf = params['lf'] #[m]
+    lr = params['lr'] #[m]
+    Iz = params['Iz'] #[kg*m^3]
 
     #pajecka and motor coefficients
-    Bf = 1
-    Br = 1
-    Cf = 1
-    Cr = 1
-    Cm1 = 1
-    Cm2 = 2
-    Cr = 1
-    Cd = 1
-    Df = 1
-    Dr = 1
-
+    Bf = params['Bf']
+    Br = params['Br']
+    Cf = params['Cf']
+    Cr = params['Cr']
+    Cm1 = params['Cm1']
+    Cm2 = params['Cm2']
+    Cr = params['Cr']
+    Cd = params['Cd']
+    Df = params['Df']
+    Dr = params['Dr']
+    
+    print("CasADi model created with the following parameters: filename: ",modelparams,"\n values:", params)
 
     #parameter vector
     xt =  SX.sym("xt")

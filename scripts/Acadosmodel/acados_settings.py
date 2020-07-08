@@ -9,8 +9,9 @@ def acados_settings(Tf, N):
     # create render arguments
     ocp = AcadosOcp()
 
-    # load model, (add in param file later)
-    model, constraints = dynamic_model(0)
+    # load model
+    paramfile = "modelparams.yaml"
+    model, constraints = dynamic_model(paramfile)
 
     # define acados ODE
     model_ac = AcadosModel()
@@ -115,22 +116,9 @@ def acados_settings(Tf, N):
     ocp.solver_options.tol = 1e-4
     # ocp.solver_options.nlp_solver_tol_comp = 1e-1
 
-    print("p size:" ,ocp.model.p.size())
-    print("np val:" ,ocp.dims.np)
-    print(model_ac.p)
-    print(ocp.model.p)
+    
     # create solver
     acados_solver = AcadosOcpSolver(ocp, json_file="acados_ocp2.json")
 
     print("solver created returning to main")
     return constraints, model, acados_solver
-
-def main():
-    """ Main program """
-    Tf = 1
-    N = 50
-    acados_settings(Tf, N)
-    return 0
-
-if __name__ == "__main__":
-    main()

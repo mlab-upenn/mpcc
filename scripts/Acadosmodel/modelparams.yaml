@@ -1,0 +1,20 @@
+#Parameters named as in
+#Optimization-Based Autonomous Racingof 1:43 Scale RC Cars
+#Alexander Liniger, Alexander Domahidi and Manfred Morari
+# https://onlinelibrary.wiley.com/doi/abs/10.1002/oca.2123
+m: 2 #[kg]
+lf: 0.1 #[m]
+lr: 0.1 #[m]
+Iz:  1 #[kg*m^3]
+
+#pajecka and motor coefficients
+Bf: 1
+Br: 1
+Cf: 1
+Cr: 1
+Cm1: 1
+Cm2: 2
+Cr: 1
+Cd: 1
+Df: 1
+Dr: 1
