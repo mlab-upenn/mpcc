@@ -36,16 +36,11 @@ SOURCES = [ ...
             'f110_dynamic_model_model/f110_dynamic_model_expl_vde_forw.c ',...
             'f110_dynamic_model_cost/f110_dynamic_model_ext_cost_fun.c ',...
             'f110_dynamic_model_cost/f110_dynamic_model_ext_cost_fun_jac_hess.c ',...
-            'f110_dynamic_model_cost/f110_dynamic_model_ext_cost_e_fun.c ',...
-            'f110_dynamic_model_cost/f110_dynamic_model_ext_cost_e_fun_jac_hess.c ',...
-            'f110_dynamic_model_constraints/f110_dynamic_model_constr_h_fun.c ', ...
-            'f110_dynamic_model_constraints/f110_dynamic_model_constr_h_fun_jac_uxt_hess.c ', ...
-            'f110_dynamic_model_constraints/f110_dynamic_model_constr_h_fun_jac_uxt_zt.c ', ...
             'acados_solver_sfunction_f110_dynamic_model.c ', ...
             'acados_solver_f110_dynamic_model.c '
           ];
 
-INC_PATH = '/home/pw/acados//include';
+INC_PATH = '/home/pw/acados/include';
 
 INCS = [ ' -I', fullfile(INC_PATH, 'blasfeo', 'include'), ...
          ' -I', fullfile(INC_PATH, 'hpipm', 'include'), ...
@@ -57,7 +52,7 @@ CFLAGS  = ' -O';
 
 
 
-LIB_PATH = '/home/pw/acados//lib';
+LIB_PATH = '/home/pw/acados/lib';
 
 LIBS = '-lacados -lhpipm -lblasfeo';
 
@@ -77,17 +72,9 @@ i_in = 2;
 input_note = strcat(input_note, num2str(i_in), ') parameters - concatenated for all stages,',...
                     ' size [663]\n ');
 i_in = i_in + 1;
-input_note = strcat(input_note, num2str(i_in), ') lbx, size [1]\n ');
-i_in = i_in + 1;
-input_note = strcat(input_note, num2str(i_in), ') ubx, size [1]\n ');
-i_in = i_in + 1;
 input_note = strcat(input_note, num2str(i_in), ') lbu, size [3]\n ');
 i_in = i_in + 1;
 input_note = strcat(input_note, num2str(i_in), ') ubu, size [3]\n ');
-i_in = i_in + 1;
-input_note = strcat(input_note, num2str(i_in), ') lh, size [2]\n ');
-i_in = i_in + 1;
-input_note = strcat(input_note, num2str(i_in), ') uh, size [2]\n ');
 i_in = i_in + 1;
 
 fprintf(input_note)

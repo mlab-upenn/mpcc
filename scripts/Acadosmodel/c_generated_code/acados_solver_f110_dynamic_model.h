@@ -84,15 +84,8 @@ extern external_function_param_casadi * ext_cost_fun_jac;
 extern external_function_param_casadi * ext_cost_fun_jac_hess;
 
 
-extern external_function_param_casadi ext_cost_e_fun;
-extern external_function_param_casadi ext_cost_e_fun_jac;
-extern external_function_param_casadi ext_cost_e_fun_jac_hess;
 
 // constraints
-extern external_function_param_casadi * nl_constr_h_fun_jac;
-extern external_function_param_casadi * nl_constr_h_fun;
-extern external_function_param_casadi * nl_constr_h_fun_jac_hess;
-
 
 
 

@@ -56,10 +56,37 @@ int main()
     }
 
     // initial condition
-    int idxbx0[0];
+    int idxbx0[9];
+    idxbx0[0] = 0;
+    idxbx0[1] = 1;
+    idxbx0[2] = 2;
+    idxbx0[3] = 3;
+    idxbx0[4] = 4;
+    idxbx0[5] = 5;
+    idxbx0[6] = 6;
+    idxbx0[7] = 7;
+    idxbx0[8] = 8;
 
-    double lbx0[0];
-    double ubx0[0];
+    double lbx0[9];
+    double ubx0[9];
+    lbx0[0] = 0;
+    ubx0[0] = 0;
+    lbx0[1] = 0;
+    ubx0[1] = 0;
+    lbx0[2] = 0;
+    ubx0[2] = 0;
+    lbx0[3] = 0;
+    ubx0[3] = 0;
+    lbx0[4] = 0;
+    ubx0[4] = 0;
+    lbx0[5] = 0;
+    ubx0[5] = 0;
+    lbx0[6] = 0;
+    ubx0[6] = 0;
+    lbx0[7] = 0;
+    ubx0[7] = 0;
+    lbx0[8] = 0;
+    ubx0[8] = 0;
 
     ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, 0, "idxbx", idxbx0);
     ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, 0, "lbx", lbx0);
@@ -117,9 +144,6 @@ int main()
         forw_vde_casadi[ii].set_param(forw_vde_casadi+ii, p);
     }
     for (int ii = 0; ii < 50; ii++) {
-        nl_constr_h_fun_jac[ii].set_param(nl_constr_h_fun_jac+ii, p);
-        nl_constr_h_fun[ii].set_param(nl_constr_h_fun+ii, p);
-        
     }
   
 

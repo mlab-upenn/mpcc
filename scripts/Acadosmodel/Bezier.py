@@ -1,5 +1,6 @@
 import numpy as np
-import cvxpy as cp
+#import cvxpy as cp
+from scipy.interpolate import CubicSpline
 import matplotlib.pyplot as plt
 
 def interpolate(waypoints):
@@ -66,10 +67,10 @@ def fit_st(order, norm, waypoints, a, b):
 
     #fit  the s-t rel.
     nwp = len(waypoints)
-    npoints = 500
+    npoints = 20 * nwp
 
     #compute approx distance to arc param
-    tvals = np.linspace(0, nwp, npoints)
+    tvals = np.linspace(0, nwp, npoints+1)
 
     coords =[]
     for t in tvals:
@@ -77,28 +78,32 @@ def fit_st(order, norm, waypoints, a, b):
     coords = np.array(coords)
 
     dists = []
+    dists.append(0)
     for idx in range(npoints):
         dists.append(np.sqrt(np.sum(np.square(coords[idx,:]-coords[np.mod(idx+1,npoints-1),:]))))
 
     dists = np.cumsum(np.array(dists))
-    coef = cp.Variable((order,1))
-
+    #coef = cp.Variable((order,1))
     #create regressor
-    A = dists.reshape(-1,1)
-    for idx in range(order-1):
+    #A = dists.reshape(-1,1)
+    #for idx in range(order-1):
         #print('ord conc %f', idx+2)
-        A = np.concatenate((np.power(dists,idx+2).reshape(-1,1),A), axis =1)
-    y = tvals.reshape(-1,1)
+        #A = np.concatenate((np.power(dists,idx+2).reshape(-1,1),A), axis =1)
+    #y = tvals.reshape(-1,1)
 
-    objective = cp.Minimize(cp.norm(A@coef-y,norm))
-    constraint =[(A@coef)[-1] == y[-1]]
-    prob = cp.Problem(objective, constraint)
-    result = prob.solve(solver = 'ECOS', verbose=True)
+    #objective = cp.Minimize(cp.norm(A@coef-y,norm))
+    #constraint = []
+    #constriant.append([(A@coef)[-1] == y[-1]])
+    #prob = cp.Problem(objective, constraint)
+    #result = prob.solve(solver = 'ECOS', verbose=True)
 
-    coeffs = coef.value
+    #coeffs = coef.value
+    ts_inverse = CubicSpline(dists, tvals)
     smax = dists[-1]
     svals = np.linspace(0, smax, npoints)
-    t_corr = compute_t(coeffs,order,svals)
+    t_corr = ts_inverse(svals)
+    #t_corr = compute_t(coeffs,order,svals)
+
 
     plt.figure()
     plt.plot(tvals, dists)
@@ -106,13 +111,14 @@ def fit_st(order, norm, waypoints, a, b):
     plt.xlabel("t (Bezier param) [-]")
     plt.ylabel("s (approx. distance traveled) [m] ")
 
-    return coeffs, smax
+    return ts_inverse, smax
 
 def getwaypoints(track):
     #placeholder for now
-    trackx = np.array([0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.75, \
+    scaler = 10
+    trackx = scaler*np.array([0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.75, \
                   0.8 ,0.8 ,0.8 ,0.8, 0.75, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.05, 0.0, 0.0, 0.0, 0.0 ])
-    tracky = np.array([0.05, 0.3, 0.4, 0.2, 0.2, 0.0, 0.0, 0.0, 0.05, \
+    tracky = scaler*np.array([0.05, 0.3, 0.4, 0.2, 0.2, 0.0, 0.0, 0.0, 0.05, \
                     0.1, 0.2, 0.3, 0.4, 0.45, 0.5, 0.5, 0.3, 0.3, 0.5, 0.5, 0.5, 0.45, 0.4, 0.3, 0.2, 0.1 ])
     waypoints = np.vstack([trackx,tracky]).T
     return waypoints
@@ -122,12 +128,12 @@ def generatelookuptable(track):
     #load track
     waypoints = getwaypoints(track)
     #trackwidth
-    r = 0.01
+    r = 0.1
     #abez,bbez coeffs
     a, b = interpolate(waypoints)
     order_inverse = 8
-    norm_inverse = 2
-    coeffs, smax = fit_st(order_inverse, norm_inverse, waypoints, a, b)
+    norm_inverse = 'inf'
+    ts_inverse, smax = fit_st(order_inverse, norm_inverse, waypoints, a, b)
 
     lutable_density = 100 #[p/m]
 
@@ -135,7 +141,7 @@ def generatelookuptable(track):
 
 
     svals = np.linspace(0, smax, npoints)
-    tvals = compute_t(coeffs, order_inverse, svals)
+    tvals = ts_inverse(svals)
 
     #  entries :
     names_table = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
@@ -150,7 +156,8 @@ def generatelookuptable(track):
 
     table = np.array(table)
     plot_track(table)
-    print("stored as names_table = ", names_table)
+    print("Variables stored in following order = ", names_table)
+    np.savetxt(str(track) + '_lutab.csv', table, delimiter = ', ')
     return table
 
 def plot_track (table):
@@ -173,14 +180,16 @@ def plot_track (table):
 
     plt.figure()
     plt.plot(svals, dists)
-    plt.plot([0, 4], [0, 4])
+    plt.plot([0, svals[-1]], [0, svals[-1]])
     plt.xlabel("t (Bezier param corrected) [m]")
     plt.ylabel("s (approx. distance traveled) [m] ")
     plt.legend(["arclength vs t_corr","x=y"])
 
     plt.figure()
     len_indicator = 0.05
+    downsampling = 10
     plt.plot(table[:,2],table[:,3])
+    plt.scatter(table[::downsampling,2],table[::downsampling,3], marker = 'o' )
     for idx in range(npoints):
         n = [-sin_phi[idx], cos_phi[idx]]
         g = gvals[idx]
@@ -191,3 +200,5 @@ def plot_track (table):
         end = len_indicator * np.array([cos_phi[idx], sin_phi[idx]]) + base
         plt.plot([base[0], end[0]],[base[1], end[1]], color = 'r')
         #plt.plot([baseupper[0], endupper[0]],[baseupper[1], endupper[1]], color = 'g')
+    plt.show()
+    #block=False

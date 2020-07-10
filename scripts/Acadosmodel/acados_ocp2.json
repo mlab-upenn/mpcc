@@ -1,6 +1,6 @@
 {
-    "acados_include_path": "/home/pw/acados//include",
-    "acados_lib_path": "/home/pw/acados//lib",
+    "acados_include_path": "/home/pw/acados/include",
+    "acados_lib_path": "/home/pw/acados/lib",
     "constraints": {
         "C": [],
         "C_e": [],
@@ -12,12 +12,30 @@
             1,
             2
         ],
-        "idxbx": [
-            1
+        "idxbx": [],
+        "idxbx_0": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
         ],
-        "idxbx_0": [],
         "idxbx_e": [],
-        "idxbxe_0": [],
+        "idxbxe_0": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+        ],
         "idxsbu": [],
         "idxsbx": [],
         "idxsbx_e": [],
@@ -32,17 +50,22 @@
             -2.0,
             -2.0
         ],
-        "lbx": [
-            -12
+        "lbx": [],
+        "lbx_0": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
         ],
-        "lbx_0": [],
         "lbx_e": [],
         "lg": [],
         "lg_e": [],
-        "lh": [
-            -1000000000.0,
-            -1000000000.0
-        ],
+        "lh": [],
         "lh_e": [],
         "lphi": [],
         "lphi_e": [],
@@ -60,17 +83,22 @@
             2.0,
             10.0
         ],
-        "ubx": [
-            12
+        "ubx": [],
+        "ubx_0": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
         ],
-        "ubx_0": [],
         "ubx_e": [],
         "ug": [],
         "ug_e": [],
-        "uh": [
-            0.0,
-            0.0
-        ],
+        "uh": [],
         "uh_e": [],
         "uphi": [],
         "uphi_e": [],
@@ -96,7 +124,7 @@
         "Zu": [],
         "Zu_e": [],
         "cost_type": "EXTERNAL",
-        "cost_type_e": "EXTERNAL",
+        "cost_type_e": "LINEAR_LS",
         "yref": [],
         "yref_e": [],
         "zl": [],
@@ -107,13 +135,13 @@
     "dims": {
         "N": 50,
         "nbu": 3,
-        "nbx": 1,
-        "nbx_0": 0,
+        "nbx": 0,
+        "nbx_0": 9,
         "nbx_e": 0,
-        "nbxe_0": 0,
+        "nbxe_0": 9,
         "ng": 0,
         "ng_e": 0,
-        "nh": 2,
+        "nh": 0,
         "nh_e": 0,
         "np": 13,
         "nphi": 0,
@@ -168,7 +196,7 @@
         "levenberg_marquardt": 0.0,
         "model_external_shared_lib_dir": null,
         "model_external_shared_lib_name": null,
-        "nlp_solver_max_iter": 100,
+        "nlp_solver_max_iter": 1000,
         "nlp_solver_step_length": 1.0,
         "nlp_solver_tol_comp": 0.0001,
         "nlp_solver_tol_eq": 0.0001,

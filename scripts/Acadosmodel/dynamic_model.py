@@ -1,9 +1,8 @@
 from casadi import *
-import Bezier
 import yaml
 
 
-def dynamic_model(modelparams):
+def dynamic_model(modelparams, track_lu_table):
 
     # define casadi struct
     model = types.SimpleNamespace()
@@ -33,7 +32,7 @@ def dynamic_model(modelparams):
     Cd = params['Cd']
     Df = params['Df']
     Dr = params['Dr']
-    
+
     print("CasADi model created with the following parameters: filename: ",modelparams,"\n values:", params)
 
     #parameter vector
@@ -144,8 +143,8 @@ def dynamic_model(modelparams):
         vx*cos(phi) - vy * sin(phi),
         vx*sin(phi) + vy * cos(phi),
         omega,
-        1/m * (Frx - Fry*sin(delta) + m*vy*omega),
-        1/m * (Fry + Fry*cos(delta) - m*vx*omega),
+        1/m * (Frx - Ffy*sin(delta) + m*vy*omega),
+        1/m * (Fry + Ffy*cos(delta) - m*vx*omega),
         1/Iz * (Ffy*lf*cos(delta) - Fry*lr),
         thetadot,
         ddot,
@@ -172,11 +171,19 @@ def dynamic_model(modelparams):
     model.delta_min = -0.40  # minimum steering angle [rad]
     model.delta_max = 0.40  # maximum steering angle [rad]
 
-    model.deltadot_max = 2 # maximum steering angle cahgne[rad/s]
     model.deltadot_min = -2  # minimum steering angle cahgne[rad/s]
+    model.deltadot_max = 2 # maximum steering angle cahgne[rad/s]
 
     model.thetadot_min = -2  # minimum adv param speed [m/s]
     model.thetadot_max = 10 # maximum adv param speed [m/s]
+    '''
+    vars = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
+    xt0 = track_lu_table[0,vars.index('xtrack')]
+    yt0 = track_lu_table[0,vars.index('ytrack')]
+    phit0 = track_lu_table[0,vars.index('phitrack')]
+    theta_hat0 = track_lu_table[0,vars.index('sval')]
+    '''
+    model.x0 = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0])
 
     #halfspace constraints on x capturing the track at each stage
     n = vertcat(-sin_phit, cos_phit)
