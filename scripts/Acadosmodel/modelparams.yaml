@@ -8,13 +8,13 @@ lr: 0.1 #[m]
 Iz:  1 #[kg*m^3]
 
 #pajecka and motor coefficients
-Bf: 1
-Br: 1
+Bf: 0.5
+Br: 0.5
 Cf: 1
 Cr: 1
 Cm1: 1
 Cm2: 2
 Cr: 1
 Cd: 1
-Df: 1
-Dr: 1
+Df: 10
+Dr: 10

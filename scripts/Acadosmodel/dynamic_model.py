@@ -2,7 +2,7 @@ from casadi import *
 import yaml
 
 
-def dynamic_model(modelparams, track_lu_table):
+def dynamic_model(modelparams):
 
     # define casadi struct
     model = types.SimpleNamespace()
@@ -162,8 +162,8 @@ def dynamic_model(modelparams, track_lu_table):
     model.p = p
     model.z = z
     #boxconstraints
-    model.d_min = -1.0
-    model.d_max = 1.0
+    model.d_min = -3.0
+    model.d_max = 3.0
 
     model.ddot_min = -10.0
     model.ddot_max = 10.0
@@ -171,10 +171,10 @@ def dynamic_model(modelparams, track_lu_table):
     model.delta_min = -0.40  # minimum steering angle [rad]
     model.delta_max = 0.40  # maximum steering angle [rad]
 
-    model.deltadot_min = -2  # minimum steering angle cahgne[rad/s]
-    model.deltadot_max = 2 # maximum steering angle cahgne[rad/s]
+    model.deltadot_min = -10  # minimum steering angle cahgne[rad/s]
+    model.deltadot_max = 10 # maximum steering angle cahgne[rad/s]
 
-    model.thetadot_min = -2  # minimum adv param speed [m/s]
+    model.thetadot_min = 0  # minimum adv param speed [m/s]
     model.thetadot_max = 10 # maximum adv param speed [m/s]
     '''
     vars = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
@@ -183,7 +183,7 @@ def dynamic_model(modelparams, track_lu_table):
     phit0 = track_lu_table[0,vars.index('phitrack')]
     theta_hat0 = track_lu_table[0,vars.index('sval')]
     '''
-    model.x0 = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0])
+    model.x0 = np.array([0, 0, 0, 1, 0.01, 0, 0, 0, 0])
 
     #halfspace constraints on x capturing the track at each stage
     n = vertcat(-sin_phit, cos_phit)

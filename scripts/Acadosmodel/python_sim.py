@@ -1,14 +1,16 @@
 import numpy as np
 from acados_settings import *
+from python_sim_utils import   plotter
+import matplotlib.pyplot as plt
 import Bezier
 
 
 
 def main():
     """ Main program """
-    Tsim = 0.1
+    Tsim = 15
     Tf = 1
-    N = 50
+    N = 20
     Qc = 0.1
     Ql = 10
     Q_theta = 10
@@ -18,24 +20,34 @@ def main():
     Nsim = np.int(np.floor(N/Tf*Tsim))
 
     track_lu_table = Bezier.generatelookuptable("my_fav_track")
+    trk_plt = plotter(track_lu_table)
+    trk_plt.plot_track()
+
     constraints, model, acados_solver, ocp = acados_settings(Tf, N, track_lu_table)
 
+    startidx = 0
     vars = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
     smax = track_lu_table[-1,vars.index('sval')]
     car_soln = []
-    xt0 = track_lu_table[0,vars.index('xtrack')]
-    yt0 = track_lu_table[0,vars.index('ytrack')]
-    phit0 = track_lu_table[0,vars.index('phitrack')]
-    theta_hat0 = track_lu_table[0,vars.index('sval')]
-    x0 = np.array([xt0, yt0, phit0, 0, 0, 0, theta_hat0, 0, 0])
+    xt0 = track_lu_table[startidx,vars.index('xtrack')]
+    yt0 = track_lu_table[startidx,vars.index('ytrack')]
+    phit0 = track_lu_table[startidx,vars.index('phitrack')]
+    theta_hat0 = track_lu_table[startidx,vars.index('sval')]
+    x0 = np.array([xt0, yt0, phit0, 1, 0.01, 0, theta_hat0, 0, 0])
 
     initial_theta_spacing = 0.05
     index_lin_points = 100 * np.arange(0,N*initial_theta_spacing,initial_theta_spacing)
     index_lin_points = index_lin_points.astype(np.int32)
     track_lin_points = track_lu_table[index_lin_points,:]
 
-    for simidx in range(Nsim):
+    x0vals = []
+    x0vals.append(x0)
+    full_sol_x = []
+    full_sol_u = []
 
+    for simidx in range(Nsim):
+        step_sol_x = []
+        step_sol_u = []
         #set params
         for stageidx in range(N):
             p_val = np.array([track_lin_points[stageidx,vars.index('xtrack')],
@@ -63,11 +75,28 @@ def main():
         #for stageidx in range(N-1):
             #acados_solver
         status = acados_solver.solve()
-        acados_solver.print_statistics()
+        #acados_solver.print_statistics()
         print(status)
         print("xsol : ", acados_solver.get(0,"x"))
         print("usol : ", acados_solver.get(0,"u"))
+        x0 = acados_solver.get(1,"x")
+        x0vals.append(x0)
 
+        for idx_sol in range(N):
+            step_sol_x.append(acados_solver.get(idx_sol,"x"))
+            step_sol_u.append(acados_solver.get(idx_sol,"u"))
+
+        step_sol_x_arr = np.array(step_sol_x)
+        theta_vals = step_sol_x_arr[:, 6]
+        print("theta vals:", theta_vals)
+
+        index_lin_points = 100 * theta_vals
+        index_lin_points = index_lin_points.astype(np.int32)
+        print("track linearized around entries:", index_lin_points )
+        track_lin_points = track_lu_table[index_lin_points,:]
+
+    trk_plt.plot_traj(np.array(x0vals))
+    plt.show()
         #print(simidx)
     return 0
 

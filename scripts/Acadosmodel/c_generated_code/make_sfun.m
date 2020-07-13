@@ -70,7 +70,7 @@ fprintf('\n\nNote: Usage of Sfunction is as follows:\n')
 input_note = 'Inputs are:\n1) x0, initial state, size [9]\n ';
 i_in = 2;
 input_note = strcat(input_note, num2str(i_in), ') parameters - concatenated for all stages,',...
-                    ' size [663]\n ');
+                    ' size [273]\n ');
 i_in = i_in + 1;
 input_note = strcat(input_note, num2str(i_in), ') lbu, size [3]\n ');
 i_in = i_in + 1;

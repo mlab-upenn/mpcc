@@ -73,7 +73,7 @@
 #define NGN    0
 #define NY     0
 #define NYN    0
-#define N      50
+#define N      20
 #define NH     0
 #define NPHI   0
 #define NHN    0
@@ -113,7 +113,8 @@ int acados_create()
     *  plan & config
     ************************************************/
     nlp_solver_plan = ocp_nlp_plan_create(N);
-    nlp_solver_plan->nlp_solver = SQP_RTI;
+    nlp_solver_plan->nlp_solver = SQP;
+    
 
     nlp_solver_plan->ocp_qp_solver_plan.qp_solver = PARTIAL_CONDENSING_HPIPM;
     for (int i = 0; i < N; i++)
@@ -311,56 +312,26 @@ int acados_create()
     nlp_in = ocp_nlp_in_create(nlp_config, nlp_dims);
 
     double time_steps[N];
-    time_steps[0] = 0.02;
-    time_steps[1] = 0.02;
-    time_steps[2] = 0.02;
-    time_steps[3] = 0.02;
-    time_steps[4] = 0.02;
-    time_steps[5] = 0.02;
-    time_steps[6] = 0.02;
-    time_steps[7] = 0.02;
-    time_steps[8] = 0.02;
-    time_steps[9] = 0.02;
-    time_steps[10] = 0.02;
-    time_steps[11] = 0.02;
-    time_steps[12] = 0.02;
-    time_steps[13] = 0.02;
-    time_steps[14] = 0.02;
-    time_steps[15] = 0.02;
-    time_steps[16] = 0.02;
-    time_steps[17] = 0.02;
-    time_steps[18] = 0.02;
-    time_steps[19] = 0.02;
-    time_steps[20] = 0.02;
-    time_steps[21] = 0.02;
-    time_steps[22] = 0.02;
-    time_steps[23] = 0.02;
-    time_steps[24] = 0.02;
-    time_steps[25] = 0.02;
-    time_steps[26] = 0.02;
-    time_steps[27] = 0.02;
-    time_steps[28] = 0.02;
-    time_steps[29] = 0.02;
-    time_steps[30] = 0.02;
-    time_steps[31] = 0.02;
-    time_steps[32] = 0.02;
-    time_steps[33] = 0.02;
-    time_steps[34] = 0.02;
-    time_steps[35] = 0.02;
-    time_steps[36] = 0.02;
-    time_steps[37] = 0.02;
-    time_steps[38] = 0.02;
-    time_steps[39] = 0.02;
-    time_steps[40] = 0.02;
-    time_steps[41] = 0.02;
-    time_steps[42] = 0.02;
-    time_steps[43] = 0.02;
-    time_steps[44] = 0.02;
-    time_steps[45] = 0.02;
-    time_steps[46] = 0.02;
-    time_steps[47] = 0.02;
-    time_steps[48] = 0.02;
-    time_steps[49] = 0.02;
+    time_steps[0] = 0.05;
+    time_steps[1] = 0.05;
+    time_steps[2] = 0.05;
+    time_steps[3] = 0.05;
+    time_steps[4] = 0.05;
+    time_steps[5] = 0.05;
+    time_steps[6] = 0.05;
+    time_steps[7] = 0.05;
+    time_steps[8] = 0.05;
+    time_steps[9] = 0.05;
+    time_steps[10] = 0.05;
+    time_steps[11] = 0.05;
+    time_steps[12] = 0.05;
+    time_steps[13] = 0.05;
+    time_steps[14] = 0.05;
+    time_steps[15] = 0.05;
+    time_steps[16] = 0.05;
+    time_steps[17] = 0.05;
+    time_steps[18] = 0.05;
+    time_steps[19] = 0.05;
 
     for (int i = 0; i < N; i++)
     {
@@ -420,10 +391,10 @@ int acados_create()
     ubx0[1] = 0;
     lbx0[2] = 0;
     ubx0[2] = 0;
-    lbx0[3] = 0;
-    ubx0[3] = 0;
-    lbx0[4] = 0;
-    ubx0[4] = 0;
+    lbx0[3] = 1;
+    ubx0[3] = 1;
+    lbx0[4] = 0.01;
+    ubx0[4] = 0.01;
     lbx0[5] = 0;
     ubx0[5] = 0;
     lbx0[6] = 0;
@@ -468,9 +439,9 @@ int acados_create()
     
     lbu[0] = -10;
     ubu[0] = 10;
-    lbu[1] = -2;
-    ubu[1] = 2;
-    lbu[2] = -2;
+    lbu[1] = -10;
+    ubu[1] = 10;
+    lbu[2] = 0;
     ubu[2] = 10;
 
     for (int i = 0; i < N; i++)
@@ -554,6 +525,24 @@ int acados_create()
 
     int qp_solver_iter_max = 50;
     ocp_nlp_solver_opts_set(nlp_config, nlp_opts, "qp_iter_max", &qp_solver_iter_max);
+    // set SQP specific options
+    double nlp_solver_tol_stat = 0.0001;
+    ocp_nlp_solver_opts_set(nlp_config, nlp_opts, "tol_stat", &nlp_solver_tol_stat);
+
+    double nlp_solver_tol_eq = 0.0001;
+    ocp_nlp_solver_opts_set(nlp_config, nlp_opts, "tol_eq", &nlp_solver_tol_eq);
+
+    double nlp_solver_tol_ineq = 0.0001;
+    ocp_nlp_solver_opts_set(nlp_config, nlp_opts, "tol_ineq", &nlp_solver_tol_ineq);
+
+    double nlp_solver_tol_comp = 0.0001;
+    ocp_nlp_solver_opts_set(nlp_config, nlp_opts, "tol_comp", &nlp_solver_tol_comp);
+
+    int nlp_solver_max_iter = 10;
+    ocp_nlp_solver_opts_set(nlp_config, nlp_opts, "max_iter", &nlp_solver_max_iter);
+
+    int initialize_t_slacks = 0;
+    ocp_nlp_solver_opts_set(nlp_config, nlp_opts, "initialize_t_slacks", &initialize_t_slacks);
 
     int print_level = 0;
     ocp_nlp_solver_opts_set(nlp_config, nlp_opts, "print_level", &print_level);
@@ -577,8 +566,8 @@ int acados_create()
     x0[0] = 0;
     x0[1] = 0;
     x0[2] = 0;
-    x0[3] = 0;
-    x0[4] = 0;
+    x0[3] = 1;
+    x0[4] = 0.01;
     x0[5] = 0;
     x0[6] = 0;
     x0[7] = 0;
@@ -661,7 +650,7 @@ int acados_update_params(int stage, double *p, int np)
             " External function has %i parameters. Exiting.\n", np, casadi_np);
         exit(1);
     }
-    if (stage < 50)
+    if (stage < 20)
     {
         forw_vde_casadi[stage].set_param(forw_vde_casadi+stage, p);
         expl_ode_fun[stage].set_param(expl_ode_fun+stage, p);
@@ -712,7 +701,7 @@ int acados_free()
 
     /* free external function */
     // dynamics
-    for (int i = 0; i < 50; i++)
+    for (int i = 0; i < 20; i++)
     {
         external_function_param_casadi_free(&forw_vde_casadi[i]);
         external_function_param_casadi_free(&expl_ode_fun[i]);
@@ -721,7 +710,7 @@ int acados_free()
     free(expl_ode_fun);
 
     // cost
-    for (int i = 0; i < 50; i++)
+    for (int i = 0; i < 20; i++)
     {
         external_function_param_casadi_free(&ext_cost_fun[i]);
         external_function_param_casadi_free(&ext_cost_fun_jac[i]);
@@ -752,7 +741,7 @@ void acados_print_stats()
     ocp_nlp_get(nlp_config, nlp_solver, "stat_m", &stat_m);
 
     
-    double stat[10000];
+    double stat[100];
     ocp_nlp_get(nlp_config, nlp_solver, "statistics", stat);
 
     int nrow = sqp_iter+1 < stat_m ? sqp_iter+1 : stat_m;

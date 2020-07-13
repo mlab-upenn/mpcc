@@ -71,7 +71,7 @@ int f110_dynamic_model_acados_sim_create()
     int nz = 0;
 
     
-    double Tsim = 0.02;
+    double Tsim = 0.05;
 
     
     // explicit ode

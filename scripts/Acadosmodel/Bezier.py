@@ -155,7 +155,7 @@ def generatelookuptable(track):
         table.append([svals[idx], tvals[idx], track_point[0], track_point[1], phi, np.cos(phi), np.sin(phi), g_upper, g_lower])
 
     table = np.array(table)
-    plot_track(table)
+    #plot_track(table)
     print("Variables stored in following order = ", names_table)
     np.savetxt(str(track) + '_lutab.csv', table, delimiter = ', ')
     return table
@@ -200,5 +200,5 @@ def plot_track (table):
         end = len_indicator * np.array([cos_phi[idx], sin_phi[idx]]) + base
         plt.plot([base[0], end[0]],[base[1], end[1]], color = 'r')
         #plt.plot([baseupper[0], endupper[0]],[baseupper[1], endupper[1]], color = 'g')
-    plt.show()
+    plt.show(block=False)
     #block=False
