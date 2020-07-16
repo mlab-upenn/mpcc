@@ -2,6 +2,7 @@ import numpy as np
 #import cvxpy as cp
 from scipy.interpolate import CubicSpline
 import matplotlib.pyplot as plt
+import yaml
 
 def interpolate(waypoints):
     #interpolates with cubic bezier curves with cyclic boundary condition
@@ -44,9 +45,11 @@ def compute_t(coef, order, s):
     return res
 
 def eval_raw(waypoints, a, b, t):
+    n = len(waypoints)
+    t = np.mod(t, n)
     segment = np.floor(t)
     segment = np.int(segment)
-    n = len(waypoints)
+
     if segment>=n:
         t =n-0.0001
         segment = n-1
@@ -63,53 +66,52 @@ def getangle_raw(waypoints, a, b, t):
     phi = np.arctan2(der[1],der[0])
     return phi
 
-def fit_st(order, norm, waypoints, a, b):
+def fit_st(waypoints, a, b):
+    #using two revolutions to account for horizon overshooting end of lap
 
     #fit  the s-t rel.
     nwp = len(waypoints)
     npoints = 20 * nwp
-
-    #compute approx distance to arc param
+    #compute approx max distance
     tvals = np.linspace(0, nwp, npoints+1)
-
     coords =[]
     for t in tvals:
         coords.append(eval_raw(waypoints, a, b, t))
     coords = np.array(coords)
-
     dists = []
     dists.append(0)
     for idx in range(npoints):
         dists.append(np.sqrt(np.sum(np.square(coords[idx,:]-coords[np.mod(idx+1,npoints-1),:]))))
-
     dists = np.cumsum(np.array(dists))
-    #coef = cp.Variable((order,1))
-    #create regressor
-    #A = dists.reshape(-1,1)
-    #for idx in range(order-1):
-        #print('ord conc %f', idx+2)
-        #A = np.concatenate((np.power(dists,idx+2).reshape(-1,1),A), axis =1)
-    #y = tvals.reshape(-1,1)
-
-    #objective = cp.Minimize(cp.norm(A@coef-y,norm))
-    #constraint = []
-    #constriant.append([(A@coef)[-1] == y[-1]])
-    #prob = cp.Problem(objective, constraint)
-    #result = prob.solve(solver = 'ECOS', verbose=True)
-
-    #coeffs = coef.value
-    ts_inverse = CubicSpline(dists, tvals)
     smax = dists[-1]
-    svals = np.linspace(0, smax, npoints)
+
+    #--------fit  the s-t rel. to two track revolutions------
+    npoints = 2 * 20 * nwp
+
+    #compute approx distance to arc param
+    tvals = np.linspace(0, 2*nwp, npoints+1)
+
+    coords =[]
+    for t in tvals:
+        coords.append(eval_raw(waypoints, a, b, np.mod(t, nwp)))
+    coords = np.array(coords)
+
+    distsr = []
+    distsr.append(0)
+    for idx in range(npoints):
+        distsr.append(np.sqrt(np.sum(np.square(coords[idx,:]-coords[np.mod(idx+1,npoints-1),:]))))
+    dists = np.cumsum(np.array(distsr))
+
+    ts_inverse = CubicSpline(dists, tvals)
+    svals = np.linspace(0, 2*smax, npoints)
     t_corr = ts_inverse(svals)
     #t_corr = compute_t(coeffs,order,svals)
 
-
-    plt.figure()
-    plt.plot(tvals, dists)
-    plt.plot(t_corr, svals)
-    plt.xlabel("t (Bezier param) [-]")
-    plt.ylabel("s (approx. distance traveled) [m] ")
+    #plt.figure()
+    #plt.plot(tvals, dists, linestyle = '--')
+    #plt.plot(t_corr, svals)
+    #plt.xlabel("t (Bezier param) [-]")
+    #plt.ylabel("s (approx. distance traveled) [m] ")
 
     return ts_inverse, smax
 
@@ -121,26 +123,26 @@ def getwaypoints(track):
     tracky = scaler*np.array([0.05, 0.3, 0.4, 0.2, 0.2, 0.0, 0.0, 0.0, 0.05, \
                     0.1, 0.2, 0.3, 0.4, 0.45, 0.5, 0.5, 0.3, 0.3, 0.5, 0.5, 0.5, 0.45, 0.4, 0.3, 0.2, 0.1 ])
     waypoints = np.vstack([trackx,tracky]).T
+
+    waypoints = np.genfromtxt(track + '.csv', delimiter=',')
     return waypoints
 
 
 def generatelookuptable(track):
     #load track
     waypoints = getwaypoints(track)
+    #plt.scatter(waypoints[:,0], waypoints[:,1])
     #trackwidth
     r = 0.1
     #abez,bbez coeffs
     a, b = interpolate(waypoints)
-    order_inverse = 8
-    norm_inverse = 'inf'
-    ts_inverse, smax = fit_st(order_inverse, norm_inverse, waypoints, a, b)
+    ts_inverse, smax = fit_st(waypoints, a, b)
 
     lutable_density = 100 #[p/m]
 
-    npoints = np.int(np.floor(smax * lutable_density))
-
-
-    svals = np.linspace(0, smax, npoints)
+    npoints = np.int(np.floor(2 * smax * lutable_density))
+    print("table generated with npoints = ", npoints)
+    svals = np.linspace(0, 2*smax, npoints)
     tvals = ts_inverse(svals)
 
     #  entries :
@@ -158,12 +160,17 @@ def generatelookuptable(track):
     #plot_track(table)
     print("Variables stored in following order = ", names_table)
     np.savetxt(str(track) + '_lutab.csv', table, delimiter = ', ')
-    return table
+
+    dict = {'smax': float(smax), 'ppm' : lutable_density}
+    with open(r''+track+'_params.yaml', 'w') as file:
+        documents = yaml.dump(dict, file)
+    return table, smax
+
 
 def plot_track (table):
     #downsample
-    downsampling = 8
-    coords = table[::downsampling, 2:4]
+    downsampling = 20
+    coords = table[:, 2:4]
     phis = table[::downsampling, 4]
     svals = table[::downsampling, 0]
     tvals = table[::downsampling, 1]
@@ -173,10 +180,14 @@ def plot_track (table):
 
 
     dists = []
+    dists.append(0)
     npoints = len(coords)
-    for idx in range(npoints):
+    for idx in range(npoints-1):
         dists.append(np.sqrt(np.sum(np.square(coords[idx,:]-coords[np.mod(idx+1,npoints-1),:]))))
     dists = np.cumsum(np.array(dists))
+    dists = dists[::downsampling]
+    coords = coords[::downsampling]
+    npoints = len(coords)
 
     plt.figure()
     plt.plot(svals, dists)
@@ -200,5 +211,4 @@ def plot_track (table):
         end = len_indicator * np.array([cos_phi[idx], sin_phi[idx]]) + base
         plt.plot([base[0], end[0]],[base[1], end[1]], color = 'r')
         #plt.plot([baseupper[0], endupper[0]],[baseupper[1], endupper[1]], color = 'g')
-    plt.show(block=False)
-    #block=False
+    plt.show()

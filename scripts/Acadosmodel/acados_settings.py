@@ -5,13 +5,12 @@ import scipy.linalg
 import numpy as npy
 
 
-def acados_settings(Tf, N, track_lu_table):
+def acados_settings(Tf, N, track_lu_table, modelparams):
     # create render arguments
     ocp = AcadosOcp()
 
-    # load model
-    paramfile = "modelparams.yaml"
-    model, constraints = dynamic_model(paramfile)
+    #load model
+    model, constraints = dynamic_model(modelparams)
 
     # define acados ODE
     model_ac = AcadosModel()
@@ -101,7 +100,7 @@ def acados_settings(Tf, N, track_lu_table):
     ocp.solver_options.tf = Tf
     # ocp.solver_options.qp_solver = 'FULL_CONDENSING_QPOASES'
     ocp.solver_options.qp_solver = "PARTIAL_CONDENSING_HPIPM"
-    ocp.solver_options.nlp_solver_type ="SQP" #"SQP_RTI"
+    ocp.solver_options.nlp_solver_type ="SQP"#"SQP_RTI" #
     ocp.solver_options.hessian_approx = "GAUSS_NEWTON"
     ocp.solver_options.integrator_type = "ERK"
     ocp.parameter_values = npy.zeros(np)
@@ -110,6 +109,7 @@ def acados_settings(Tf, N, track_lu_table):
     #ocp.solver_options.nlp_solver_step_length = 0.05
     ocp.solver_options.nlp_solver_max_iter = 10
     ocp.solver_options.tol = 1e-4
+    ocp.solver_options.print_level = 1
     # ocp.solver_options.nlp_solver_tol_comp = 1e-1
 
 

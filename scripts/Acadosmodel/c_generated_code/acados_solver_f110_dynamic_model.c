@@ -437,12 +437,12 @@ int acados_create()
     double lbu[NBU];
     double ubu[NBU];
     
-    lbu[0] = -10;
+    lbu[0] = 0;
     ubu[0] = 10;
     lbu[1] = -10;
     ubu[1] = 10;
     lbu[2] = 0;
-    ubu[2] = 10;
+    ubu[2] = 3;
 
     for (int i = 0; i < N; i++)
     {
@@ -544,7 +544,7 @@ int acados_create()
     int initialize_t_slacks = 0;
     ocp_nlp_solver_opts_set(nlp_config, nlp_opts, "initialize_t_slacks", &initialize_t_slacks);
 
-    int print_level = 0;
+    int print_level = 1;
     ocp_nlp_solver_opts_set(nlp_config, nlp_opts, "print_level", &print_level);
 
 

@@ -1,29 +1,36 @@
 import numpy as np
 from acados_settings import *
-from python_sim_utils import   plotter
+from python_sim_utils import   plotter, plot_pajecka
 import matplotlib.pyplot as plt
 import Bezier
 
 
 
 def main():
-    """ Main program """
-    Tsim = 15
+    # model parameters
+    paramfile = "modelparams.yaml"
+    #sim parameters
+    Tsim = 2
     Tf = 1
     N = 20
-    Qc = 0.1
-    Ql = 10
-    Q_theta = 10
-    R_d = 0.01
-    R_delta = 0.01
+    Qc = 10
+    Ql = 100
+    Q_theta = 1
+    R_d = 0.1
+    R_delta = 0.1
 
     Nsim = np.int(np.floor(N/Tf*Tsim))
 
-    track_lu_table = Bezier.generatelookuptable("my_fav_track")
-    trk_plt = plotter(track_lu_table)
+    track_lu_table, smax = Bezier.generatelookuptable("tracks/simpleoval")
+    trk_plt = plotter(track_lu_table, smax)
     trk_plt.plot_track()
 
-    constraints, model, acados_solver, ocp = acados_settings(Tf, N, track_lu_table)
+    constraints, model, acados_solver, ocp = acados_settings(Tf, N, track_lu_table, paramfile)
+    plot_pajecka(paramfile)
+
+    plt.show(block=False)
+    plt.pause(0.001) # Pause for interval seconds.
+    input("hit [enter] to continue.")
 
     startidx = 0
     vars = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
@@ -35,7 +42,7 @@ def main():
     theta_hat0 = track_lu_table[startidx,vars.index('sval')]
     x0 = np.array([xt0, yt0, phit0, 1, 0.01, 0, theta_hat0, 0, 0])
 
-    initial_theta_spacing = 0.05
+    initial_theta_spacing = 0.01
     index_lin_points = 100 * np.arange(0,N*initial_theta_spacing,initial_theta_spacing)
     index_lin_points = index_lin_points.astype(np.int32)
     track_lin_points = track_lu_table[index_lin_points,:]
@@ -57,7 +64,7 @@ def main():
                                 track_lin_points[stageidx,vars.index('cos(phi)')],
                                 track_lin_points[stageidx,vars.index('g_upper')],
                                 track_lin_points[stageidx,vars.index('g_lower')],
-                                track_lin_points[stageidx,vars.index('sval')],
+                                track_lin_points[stageidx,vars.index('sval')],  #aka theta_hat
                                 Qc,
                                 Ql,
                                 Q_theta,
@@ -76,9 +83,10 @@ def main():
             #acados_solver
         status = acados_solver.solve()
         #acados_solver.print_statistics()
-        print(status)
-        print("xsol : ", acados_solver.get(0,"x"))
+        #print(status)
         print("usol : ", acados_solver.get(0,"u"))
+        print("xsol : ", acados_solver.get(0,"x"))
+
         x0 = acados_solver.get(1,"x")
         x0vals.append(x0)
 
@@ -87,16 +95,33 @@ def main():
             step_sol_u.append(acados_solver.get(idx_sol,"u"))
 
         step_sol_x_arr = np.array(step_sol_x)
-        theta_vals = step_sol_x_arr[:, 6]
-        print("theta vals:", theta_vals)
+        theta_vals = np.hstack((step_sol_x_arr[1:, 6], step_sol_x_arr[-1, 6]+0.1))
+
+
+        print("theta vals", theta_vals)
+        if theta_vals[0]>smax:
+            theta_vals = theta_vals-smax
+            print("#################################RESET###############################")
+
 
         index_lin_points = 100 * theta_vals
         index_lin_points = index_lin_points.astype(np.int32)
         print("track linearized around entries:", index_lin_points )
         track_lin_points = track_lu_table[index_lin_points,:]
 
+        trk_plt.plot_horizon(theta_vals, step_sol_x_arr[:, :2])
+        plt.pause(0.1)
+        input("hit [enter] to continue.")
+        plt.pause(0.1)
+        trk_plt.clear_horizion()
+
+
+
+
+
     trk_plt.plot_traj(np.array(x0vals))
     plt.show()
+    #np.savetxt("full_sol_x_log.csv", )
         #print(simidx)
     return 0
 

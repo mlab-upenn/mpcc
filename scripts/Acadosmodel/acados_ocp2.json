@@ -46,7 +46,7 @@
         "idxsphi": [],
         "idxsphi_e": [],
         "lbu": [
-            -10.0,
+            0.0,
             -10.0,
             0.0
         ],
@@ -81,7 +81,7 @@
         "ubu": [
             10.0,
             10.0,
-            10.0
+            3.0
         ],
         "ubx": [],
         "ubx_0": [
@@ -203,7 +203,7 @@
         "nlp_solver_tol_ineq": 0.0001,
         "nlp_solver_tol_stat": 0.0001,
         "nlp_solver_type": "SQP",
-        "print_level": 0,
+        "print_level": 1,
         "qp_solver": "PARTIAL_CONDENSING_HPIPM",
         "qp_solver_cond_N": null,
         "qp_solver_iter_max": 50,

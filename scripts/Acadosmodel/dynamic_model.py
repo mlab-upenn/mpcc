@@ -162,10 +162,10 @@ def dynamic_model(modelparams):
     model.p = p
     model.z = z
     #boxconstraints
-    model.d_min = -3.0
+    model.d_min = 0
     model.d_max = 3.0
 
-    model.ddot_min = -10.0
+    model.ddot_min = 0
     model.ddot_max = 10.0
 
     model.delta_min = -0.40  # minimum steering angle [rad]
@@ -174,8 +174,8 @@ def dynamic_model(modelparams):
     model.deltadot_min = -10  # minimum steering angle cahgne[rad/s]
     model.deltadot_max = 10 # maximum steering angle cahgne[rad/s]
 
-    model.thetadot_min = 0  # minimum adv param speed [m/s]
-    model.thetadot_max = 10 # maximum adv param speed [m/s]
+    model.thetadot_min = 0.00  # minimum adv param speed [m/s]
+    model.thetadot_max = 3 # maximum adv param speed [m/s]
     '''
     vars = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
     xt0 = track_lu_table[0,vars.index('xtrack')]
@@ -196,12 +196,12 @@ def dynamic_model(modelparams):
     xt_hat = xt + cos_phit * ( theta - theta_hat)
     yt_hat = yt + sin_phit * ( theta - theta_hat)
 
-    e_cont = sin_phit * (posx - xt_hat) - cos_phit * (posy - yt_hat)
-    e_lag = -cos_phit * (posx - xt_hat) - sin_phit * (posy - yt_hat)
+    e_cont = sin_phit * (xt_hat - posx) - cos_phit * (yt_hat - posy)
+    e_lag = cos_phit * (xt_hat - posx) + sin_phit * ( yt_hat - posy)
 
-    error = vertcat(e_cont, e_lag)
+    #error = vertcat(e_cont, e_lag)
     #set up stage cost
-    Q = diag(vertcat(Qc, Ql))
-    model.stage_cost = bilin(Q, error, error) - Q_theta * thetadot + bilin(R_d , ddot, ddot) + bilin(R_delta , deltadot, deltadot)
+    #Q = diag(vertcat(Qc, Ql))
+    model.stage_cost = e_cont * Qc * e_cont + e_lag * Qc * e_lag - Q_theta * thetadot + ddot * R_d * ddot + deltadot * R_delta * deltadot
 
     return model, constraints
