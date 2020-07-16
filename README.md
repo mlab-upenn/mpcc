@@ -6,7 +6,7 @@ This repo contains an inprogress implementation of model predictive contouring c
 1. Clone this repo
 
 2. Head to https://github.com/acados/acados and install acados following their instructions.
-   below is a brief summary.
+   Below is a brief summary.
    
 2.2 git clone git@github.com:acados/acados.git
 
