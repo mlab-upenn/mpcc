@@ -5,7 +5,7 @@
 m: 2 #[kg]
 lf: 0.1 #[m]
 lr: 0.1 #[m]
-Iz:  0.3 #[kg*m^3]
+Iz:  0.6 #[kg*m^3]
 
 #pajecka and motor coefficients
 Bf: 8

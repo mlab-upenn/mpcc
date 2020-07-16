@@ -35,7 +35,7 @@ def dynamic_model(modelparams):
 
     print("CasADi model created with the following parameters: filename: ",modelparams,"\n values:", params)
 
-    #parameter vector
+    #parameter vector, contains linearization poitns
     xt =  SX.sym("xt")
     yt =  SX.sym("yt")
     phit = SX.sym("phit")
@@ -68,7 +68,6 @@ def dynamic_model(modelparams):
     vx = SX.sym("vx")
     vy = SX.sym("vy")
 
-
     #body angular Rate
     omega = SX.sym("omega")
     #heading
@@ -77,9 +76,6 @@ def dynamic_model(modelparams):
     delta = SX.sym("delta")
     #motorinput
     d = SX.sym("d")
-
-
-
 
     #dynamic forces
     Frx = SX.sym("Frx")
@@ -100,6 +96,7 @@ def dynamic_model(modelparams):
     deltadot = SX.sym("deltadot")
     thetadot = SX.sym("thetadot")
     ddot = SX.sym("ddot")
+
     #inputvector
     u = vertcat(ddot, deltadot, thetadot)
 
@@ -176,28 +173,22 @@ def dynamic_model(modelparams):
 
     model.thetadot_min = 0.00  # minimum adv param speed [m/s]
     model.thetadot_max = 3 # maximum adv param speed [m/s]
-    '''
-    vars = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
-    xt0 = track_lu_table[0,vars.index('xtrack')]
-    yt0 = track_lu_table[0,vars.index('ytrack')]
-    phit0 = track_lu_table[0,vars.index('phitrack')]
-    theta_hat0 = track_lu_table[0,vars.index('sval')]
-    '''
+
     model.x0 = np.array([0, 0, 0, 1, 0.01, 0, 0, 0, 0])
 
     #halfspace constraints on x capturing the track at each stage
     n = vertcat(-sin_phit, cos_phit)
     constraints.h_upper = vertcat(0,0)
     g_upper = vertcat(gt_upper, -gt_lower)
-    #con_expr <= 0
+    #halfspace constriants for track boundaries, con_expr <= 0
     model.con_h_expr = vertcat(n[0]*x[0]+n[1]*x[1]-g_upper[0], -n[0]*x[0]-n[1]*x[1]-g_upper[1])
 
     #compute approximate linearized contouring and lag error
     xt_hat = xt + cos_phit * ( theta - theta_hat)
     yt_hat = yt + sin_phit * ( theta - theta_hat)
 
-    e_cont = sin_phit * (xt_hat - posx) - cos_phit * (yt_hat - posy)
-    e_lag = cos_phit * (xt_hat - posx) + sin_phit * ( yt_hat - posy)
+    e_cont = sin_phit * (xt_hat - posx) - cos_phit *(yt_hat - posy)
+    e_lag = cos_phit * (xt_hat - posx) + sin_phit *(yt_hat - posy)
 
     #error = vertcat(e_cont, e_lag)
     #set up stage cost

@@ -43,17 +43,26 @@ class plotter():
         #plt.close('all') # all open plots are correctly closed after each run
 
     def plot_horizon(self, thetavals, xval):
+        self.connect_horz = []
         idxp = 100 * thetavals
         idxp= idxp.astype(np.int32)
         x_theta_vals = self.coords_full[idxp,0]
         y_theta_vals = self.coords_full[idxp,1]
         self.theta_horz = self.ax.scatter(x_theta_vals, y_theta_vals, marker = 'x', color = 'g')
         self.pos_horz = self.ax.scatter(xval[:,0], xval[:,1], marker = 'D', color = 'b')
+        for idx in range(len(x_theta_vals)):
+            connector = self.ax.plot([x_theta_vals[idx], xval[idx,0]],\
+                                                [ y_theta_vals[idx],  xval[idx,1]],\
+                                                 linestyle = '--', color = 'gray')
+            self.connect_horz.append(connector)
         self.fig.canvas.draw()
 
     def clear_horizion(self):
         self.theta_horz.remove()
         self.pos_horz.remove()
+        for idx in range(len(self.connect_horz)):
+            connector = self.connect_horz[idx]
+            connector[0].remove()
         self.fig.canvas.draw()
 
 def plot_pajecka(modelparams):
@@ -93,3 +102,21 @@ def plot_pajecka(modelparams):
     ax2.plot(vy_vals, fry_vals)
     ax2.set_xlabel("lateral velocity vy [m/s]")
     ax2.set_ylabel("lateral tire force Fry [N]")
+
+def compute_objective(Ts, Qc, Ql, Q_theta, R_d, R_delta, theta, theta_hat, x, u, xt, phit):
+    xt_hat = xt[:,0] + np.multiply(np.cos(phit), (theta-theta_hat))
+    yt_hat = xt[:,1] + np.multiply(np.sin(phit), (theta-theta_hat))
+    e_cont = np.multiply(np.sin(phit), (xt_hat- x[:,0])) - np.multiply(np.cos(phit), (yt_hat- x[:,1]))
+    e_lag = np.multiply(np.cos(phit), (xt_hat- x[:,0])) + np.multiply(np.sin(phit), (yt_hat- x[:,1]))
+    thetadot = u[:,2]
+    deltadot = u[:,1]
+    ddot = u[:,0]
+
+    stages = len(x)
+    objective = 0
+    for stageidx in range(stages):
+        objective += (e_cont[stageidx]**2)*Qc + (e_lag[stageidx]**2)*Ql - Q_theta*thetadot[stageidx] +\
+                    (ddot[stageidx]**2)*R_d + (deltadot[stageidx]**2)*R_delta
+
+    objective = Ts * objective
+    return objective
