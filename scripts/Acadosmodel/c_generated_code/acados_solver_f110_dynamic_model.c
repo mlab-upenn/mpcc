@@ -439,8 +439,8 @@ int acados_create()
     
     lbu[0] = 0;
     ubu[0] = 10;
-    lbu[1] = -10;
-    ubu[1] = 10;
+    lbu[1] = -5;
+    ubu[1] = 5;
     lbu[2] = 0;
     ubu[2] = 3;
 

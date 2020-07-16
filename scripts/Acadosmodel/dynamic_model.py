@@ -168,8 +168,8 @@ def dynamic_model(modelparams):
     model.delta_min = -0.40  # minimum steering angle [rad]
     model.delta_max = 0.40  # maximum steering angle [rad]
 
-    model.deltadot_min = -10  # minimum steering angle cahgne[rad/s]
-    model.deltadot_max = 10 # maximum steering angle cahgne[rad/s]
+    model.deltadot_min = -5  # minimum steering angle cahgne[rad/s]
+    model.deltadot_max = 5 # maximum steering angle cahgne[rad/s]
 
     model.thetadot_min = 0.00  # minimum adv param speed [m/s]
     model.thetadot_max = 3 # maximum adv param speed [m/s]
@@ -181,7 +181,7 @@ def dynamic_model(modelparams):
     constraints.h_upper = vertcat(0,0)
     g_upper = vertcat(gt_upper, -gt_lower)
     #halfspace constriants for track boundaries, con_expr <= 0
-    model.con_h_expr = vertcat(n[0]*x[0]+n[1]*x[1]-g_upper[0], -n[0]*x[0]-n[1]*x[1]-g_upper[1])
+    #model.con_h_expr = vertcat(n[0]*x[0]+n[1]*x[1]-g_upper[0], -n[0]*x[0]-n[1]*x[1]-g_upper[1])
 
     #compute approximate linearized contouring and lag error
     xt_hat = xt + cos_phit * ( theta - theta_hat)

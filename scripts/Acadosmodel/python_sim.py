@@ -13,9 +13,9 @@ def main():
     Tsim = 2
     Tf = 1
     N = 20
-    Qc = 10
-    Ql = 100
-    Q_theta = 1
+    Qc = 100
+    Ql = 10000
+    Q_theta = 10
     R_d = 0.1
     R_delta = 0.1
 
@@ -26,7 +26,7 @@ def main():
     trk_plt.plot_track()
 
     constraints, model, acados_solver, ocp = acados_settings(Tf, N, track_lu_table, paramfile)
-    plot_pajecka(paramfile)
+    #plot_pajecka(paramfile)
 
     plt.show(block=False)
     plt.pause(0.001)
@@ -121,10 +121,12 @@ def main():
 
         print("objective value", objective)
         trk_plt.plot_horizon(theta_vals_sol, step_sol_x_arr[:, :2])
+        trk_plt.plot_input_state_traj(step_sol_x_arr, step_sol_u_arr)
         plt.pause(0.1)
         input("hit [enter] to continue.")
         plt.pause(0.1)
         trk_plt.clear_horizion()
+        trk_plt.clear_input_state_traj()
 
 
         #preparation for next timestep

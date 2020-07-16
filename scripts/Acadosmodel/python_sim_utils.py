@@ -5,7 +5,11 @@ import yaml
 class plotter():
 
     def __init__(self, table, smax):
-        self.fig, self.ax = plt.subplots(1, figsize=(20,20))
+        #trackplot
+        self.fig, self.ax = plt.subplots(1, figsize=(10,10))
+        #input and state plot
+        self.fig2, (self.ax1, self.ax2) = plt.subplots(nrows = 2, ncols = 1, figsize=(10,10))
+
         self.r = 0.3
         self.smax = smax
         maxidx = np.floor(smax * 100).astype(np.int32)
@@ -29,7 +33,9 @@ class plotter():
         self.coords[:,1]+ self.r * self.normaldir[:,1], linestyle = '--', color = 'k')
         self.ax.plot(self.coords[:,0] - self.r * self.normaldir[:,0] ,\
         self.coords[:,1]- self.r * self.normaldir[:,1], linestyle = '--', color = 'k')
-        plt.show(block=False)
+        self.ax.set_xlim([-1,5])
+        self.ax.set_ylim([-0.5,3])
+        #plt.show(block=False)
         #plt.pause(0.001) # Pause for interval seconds.
         #input("hit [enter] to continue.")
 
@@ -57,6 +63,33 @@ class plotter():
             self.connect_horz.append(connector)
         self.fig.canvas.draw()
 
+    def plot_input_state_traj(self, xval, uval):
+        #state trajectories
+        N = len(xval)
+        time = np.arange(N)
+        self.xplot = self.ax1.step(time, xval[:,0], where='post')
+        self.yplot = self.ax1.step(time, xval[:,1], where='post')
+        self.phiplot = self.ax1.step(time, xval[:,2], where='post')
+        self.vxplot = self.ax1.step(time, xval[:,3], where='post')
+        self.vyplot = self.ax1.step(time, xval[:,4], where='post')
+        self.omegaplot = self.ax1.step(time, xval[:,5], where='post')
+        self.thetaplot = self.ax1.step(time, xval[:,6], where='post')
+        self.ax1.legend(['x', 'y', 'phi','vx','vy', 'omega','theta'])
+        self.ax1.set_xlabel("time [t/Ts]")
+        max = np.max(xval[:,:7])
+        min = np.min(xval[:,:7])
+        self.ax1.set_ylim([min-0.1,max+0.1])
+
+        self.ddotplot = self.ax2.step(time, uval[:,0], where='post')
+        self.deltadotplot = self.ax2.step(time, uval[:,1], where='post')
+        self.thetadotplot = self.ax2.step(time, uval[:,2], where='post')
+        self.ax2.legend(['ddot', 'deltadot', 'thetadot'])
+        self.ax2.set_xlabel("time [t/Ts]")
+        max = np.max(uval)
+        min = np.min(uval)
+        self.ax2.set_ylim([min-0.1,max+0.1])
+        self.fig2.canvas.draw()
+
     def clear_horizion(self):
         self.theta_horz.remove()
         self.pos_horz.remove()
@@ -64,6 +97,19 @@ class plotter():
             connector = self.connect_horz[idx]
             connector[0].remove()
         self.fig.canvas.draw()
+
+    def clear_input_state_traj(self):
+        self.xplot[0].remove()
+        self.yplot[0].remove()
+        self.vxplot[0].remove()
+        self.vyplot[0].remove()
+        self.phiplot[0].remove()
+        self.omegaplot[0].remove()
+        self.thetaplot[0].remove()
+        self.ddotplot[0].remove()
+        self.deltadotplot[0].remove()
+        self.thetadotplot[0].remove()
+        self.fig2.canvas.draw()
 
 def plot_pajecka(modelparams):
     #loadparameters
