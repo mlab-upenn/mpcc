@@ -3,8 +3,8 @@
 #Alexander Liniger, Alexander Domahidi and Manfred Morari
 # https://onlinelibrary.wiley.com/doi/abs/10.1002/oca.2123
 m: 2 #[kg]
-lf: 0.1 #[m]
-lr: 0.1 #[m]
+lf: 0.05 #[m]
+lr: 0.05 #[m]
 Iz:  0.6 #[kg*m^3]
 
 #pajecka and motor coefficients

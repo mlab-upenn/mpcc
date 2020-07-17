@@ -439,8 +439,8 @@ int acados_create()
     
     lbu[0] = 0;
     ubu[0] = 10;
-    lbu[1] = -5;
-    ubu[1] = 5;
+    lbu[1] = -2;
+    ubu[1] = 2;
     lbu[2] = 0;
     ubu[2] = 3;
 
@@ -538,7 +538,7 @@ int acados_create()
     double nlp_solver_tol_comp = 0.0001;
     ocp_nlp_solver_opts_set(nlp_config, nlp_opts, "tol_comp", &nlp_solver_tol_comp);
 
-    int nlp_solver_max_iter = 3;
+    int nlp_solver_max_iter = 200;
     ocp_nlp_solver_opts_set(nlp_config, nlp_opts, "max_iter", &nlp_solver_max_iter);
 
     int initialize_t_slacks = 0;
@@ -741,7 +741,7 @@ void acados_print_stats()
     ocp_nlp_get(nlp_config, nlp_solver, "stat_m", &stat_m);
 
     
-    double stat[30];
+    double stat[2000];
     ocp_nlp_get(nlp_config, nlp_solver, "statistics", stat);
 
     int nrow = sqp_iter+1 < stat_m ? sqp_iter+1 : stat_m;

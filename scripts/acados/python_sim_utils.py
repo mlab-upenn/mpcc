@@ -1,12 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import cm
 import yaml
 
 class plotter():
 
     def __init__(self, table, smax):
         #trackplot
-        self.fig, self.ax = plt.subplots(1, figsize=(10,10))
+        self.fig, self.ax = plt.subplots(1, figsize=(20,20))
         #input and state plot
         self.fig2, (self.ax1, self.ax2) = plt.subplots(nrows = 2, ncols = 1, figsize=(10,10))
 
@@ -40,8 +41,11 @@ class plotter():
         #input("hit [enter] to continue.")
 
 
-    def plot_traj(self, waypoints):
-        self.ax.scatter(waypoints[:,0], waypoints[:,1], s = 10, color = 'r')
+    def plot_traj(self, xvals):
+
+        heatmap = self.ax.scatter(xvals[10:,0], xvals[10:,1], s = 10, c=xvals[10:,3], cmap=cm.rainbow, edgecolor='none', marker='o')
+        cbar = self.fig.colorbar(heatmap, fraction=0.035)
+        cbar.set_label("velocity in [m/s]")
         self.fig.canvas.draw()
         #plt.show(block=False)
         #plt.pause(0.001) # Pause for interval seconds.
@@ -74,7 +78,7 @@ class plotter():
         self.vyplot = self.ax1.step(time, xval[:,4], where='post')
         self.omegaplot = self.ax1.step(time, xval[:,5], where='post')
         self.thetaplot = self.ax1.step(time, xval[:,6], where='post')
-        self.ax1.legend(['x', 'y', 'phi','vx','vy', 'omega','theta'])
+        self.ax1.legend(['x', 'y', 'phi','vx','theta','d','delta'])
         self.ax1.set_xlabel("time [t/Ts]")
         max = np.max(xval[:,:7])
         min = np.min(xval[:,:7])
