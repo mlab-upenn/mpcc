@@ -61,14 +61,14 @@
 #define NBU    3
 #define NSBX   0
 #define NSBU   0
-#define NSH    1
+#define NSH    0
 #define NSG    0
 #define NSPHI  0
 #define NSHN   0
 #define NSGN   0
 #define NSPHIN 0
 #define NSBXN  0
-#define NS     1
+#define NS     0
 #define NSN    0
 #define NG     0
 #define NBXN   0
@@ -384,30 +384,6 @@ int acados_create()
 
 
 
-    double Zl[NS];
-    double Zu[NS];
-    double zl[NS];
-    double zu[NS];
-    
-    Zl[0] = 1000;
-
-    
-    Zu[0] = 1000;
-
-    
-    zl[0] = 1000;
-
-    
-    zu[0] = 1000;
-
-    for (int i = 0; i < N; i++)
-    {
-        ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, i, "Zl", Zl);
-        ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, i, "Zu", Zu);
-        ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, i, "zl", zl);
-        ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, i, "zu", zu);
-    }
-
 
     // terminal cost
 
@@ -498,23 +474,6 @@ int acados_create()
 
 
 
-
-    // set up soft bounds for nonlinear constraints
-    int idxsh[NSH];
-    
-    idxsh[0] = 0;
-    double lsh[NSH];
-    double ush[NSH];
-    
-    lsh[0] = 0.1;
-    ush[0] = 0.001;
-
-    for (int i = 0; i < N; i++)
-    {
-        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "idxsh", idxsh);
-        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "lsh", lsh);
-        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "ush", ush);
-    }
 
 
 
@@ -645,7 +604,7 @@ int acados_create()
     double nlp_solver_tol_comp = 0.0001;
     ocp_nlp_solver_opts_set(nlp_config, nlp_opts, "tol_comp", &nlp_solver_tol_comp);
 
-    int nlp_solver_max_iter = 10;
+    int nlp_solver_max_iter = 100;
     ocp_nlp_solver_opts_set(nlp_config, nlp_opts, "max_iter", &nlp_solver_max_iter);
 
     int initialize_t_slacks = 0;
@@ -861,7 +820,7 @@ void acados_print_stats()
     ocp_nlp_get(nlp_config, nlp_solver, "stat_m", &stat_m);
 
     
-    double stat[100];
+    double stat[1000];
     ocp_nlp_get(nlp_config, nlp_solver, "statistics", stat);
 
     int nrow = sqp_iter+1 < stat_m ? sqp_iter+1 : stat_m;

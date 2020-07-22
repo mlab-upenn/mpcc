@@ -159,7 +159,7 @@ def dynamic_model(modelparams):
     model.p = p
     model.z = z
     #boxconstraints
-    model.d_min = -3.0
+    model.d_min = -1.0
     model.d_max = 5.0
 
     model.ddot_min = -10.0
@@ -172,7 +172,7 @@ def dynamic_model(modelparams):
     model.deltadot_max = 2 # maximum steering angle cahgne[rad/s]
 
     model.thetadot_min = -0.1  # minimum adv param speed [m/s]
-    model.thetadot_max = 4 # maximum adv param speed [m/s]
+    model.thetadot_max = 5 # maximum adv param speed [m/s]
 
     model.theta_min = 0.00  # minimum adv param [m]
     model.theta_max = 100 # maximum adv param  [m]

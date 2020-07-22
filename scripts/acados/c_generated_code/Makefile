@@ -33,27 +33,27 @@
 
 ACADOS_FLAGS = -fPIC -std=c99 #-fno-diagnostics-show-line-numbers -g
 MODEL_OBJ=
-MODEL_OBJ+= f110_dynamic_model_model/f110_dynamic_model_expl_ode_fun.o
-MODEL_OBJ+= f110_dynamic_model_model/f110_dynamic_model_expl_vde_forw.o
+MODEL_OBJ+= f110_kinematic_model_model/f110_kinematic_model_expl_ode_fun.o
+MODEL_OBJ+= f110_kinematic_model_model/f110_kinematic_model_expl_vde_forw.o
 
 
 OCP_OBJ=
-OCP_OBJ+= f110_dynamic_model_constraints/f110_dynamic_model_constr_h_fun_jac_uxt_zt.o
-OCP_OBJ+= f110_dynamic_model_constraints/f110_dynamic_model_constr_h_fun.o
-OCP_OBJ+= f110_dynamic_model_cost/f110_dynamic_model_ext_cost_fun.c
-OCP_OBJ+= f110_dynamic_model_cost/f110_dynamic_model_ext_cost_fun_jac.c
-OCP_OBJ+= f110_dynamic_model_cost/f110_dynamic_model_ext_cost_fun_jac_hess.c
-OCP_OBJ+= acados_solver_f110_dynamic_model.o
+OCP_OBJ+= f110_kinematic_model_constraints/f110_kinematic_model_constr_h_fun_jac_uxt_zt.o
+OCP_OBJ+= f110_kinematic_model_constraints/f110_kinematic_model_constr_h_fun.o
+OCP_OBJ+= f110_kinematic_model_cost/f110_kinematic_model_ext_cost_fun.c
+OCP_OBJ+= f110_kinematic_model_cost/f110_kinematic_model_ext_cost_fun_jac.c
+OCP_OBJ+= f110_kinematic_model_cost/f110_kinematic_model_ext_cost_fun_jac_hess.c
+OCP_OBJ+= acados_solver_f110_kinematic_model.o
 
 
 SIM_OBJ=
-SIM_OBJ+= acados_sim_solver_f110_dynamic_model.o
+SIM_OBJ+= acados_sim_solver_f110_kinematic_model.o
 
 EX_OBJ=
-EX_OBJ+= main_f110_dynamic_model.o
+EX_OBJ+= main_f110_kinematic_model.o
 
 EX_SIM_OBJ=
-EX_SIM_OBJ+= main_sim_f110_dynamic_model.o
+EX_SIM_OBJ+= main_sim_f110_kinematic_model.o
 
 OBJ=
 OBJ+= $(MODEL_OBJ)
@@ -70,35 +70,35 @@ all: clean casadi_fun main main_sim ocp_solver sim_solver example example_sim
 shared_lib: bundled_shared_lib ocp_shared_lib sim_shared_lib
 
 CASADI_MODEL_SOURCE=
-CASADI_MODEL_SOURCE+= f110_dynamic_model_expl_ode_fun.c
-CASADI_MODEL_SOURCE+= f110_dynamic_model_expl_vde_forw.c
+CASADI_MODEL_SOURCE+= f110_kinematic_model_expl_ode_fun.c
+CASADI_MODEL_SOURCE+= f110_kinematic_model_expl_vde_forw.c
 CASADI_CON_H_SOURCE=
-CASADI_CON_H_SOURCE+= f110_dynamic_model_constr_h_fun_jac_uxt_zt.c
-CASADI_CON_H_SOURCE+= f110_dynamic_model_constr_h_fun.c
+CASADI_CON_H_SOURCE+= f110_kinematic_model_constr_h_fun_jac_uxt_zt.c
+CASADI_CON_H_SOURCE+= f110_kinematic_model_constr_h_fun.c
 
 
 casadi_fun:
-	( cd f110_dynamic_model_model; gcc $(ACADOS_FLAGS) -c  $(CASADI_MODEL_SOURCE))
-	( cd f110_dynamic_model_constraints; gcc $(ACADOS_FLAGS) -c  $(CASADI_CON_H_SOURCE))
+	( cd f110_kinematic_model_model; gcc $(ACADOS_FLAGS) -c  $(CASADI_MODEL_SOURCE))
+	( cd f110_kinematic_model_constraints; gcc $(ACADOS_FLAGS) -c  $(CASADI_CON_H_SOURCE))
 
 main:
-	gcc $(ACADOS_FLAGS) -c main_f110_dynamic_model.c -I $(INCLUDE_PATH)/blasfeo/include/ -I $(INCLUDE_PATH)/hpipm/include/ \
+	gcc $(ACADOS_FLAGS) -c main_f110_kinematic_model.c -I $(INCLUDE_PATH)/blasfeo/include/ -I $(INCLUDE_PATH)/hpipm/include/ \
 	-I $(INCLUDE_PATH) -I $(INCLUDE_PATH)/acados/ \
 
 main_sim:
-	gcc $(ACADOS_FLAGS) -c main_sim_f110_dynamic_model.c -I $(INCLUDE_PATH)/blasfeo/include/ -I $(INCLUDE_PATH)/hpipm/include/ \
+	gcc $(ACADOS_FLAGS) -c main_sim_f110_kinematic_model.c -I $(INCLUDE_PATH)/blasfeo/include/ -I $(INCLUDE_PATH)/hpipm/include/ \
 	-I $(INCLUDE_PATH) -I $(INCLUDE_PATH)/acados/
 
 ocp_solver:
-	gcc $(ACADOS_FLAGS) -c acados_solver_f110_dynamic_model.c -I $(INCLUDE_PATH)/blasfeo/include/ -I $(INCLUDE_PATH)/hpipm/include/ \
+	gcc $(ACADOS_FLAGS) -c acados_solver_f110_kinematic_model.c -I $(INCLUDE_PATH)/blasfeo/include/ -I $(INCLUDE_PATH)/hpipm/include/ \
 	-I $(INCLUDE_PATH) -I $(INCLUDE_PATH)/acados/ \
 
 sim_solver:
-	gcc $(ACADOS_FLAGS) -c acados_sim_solver_f110_dynamic_model.c -I $(INCLUDE_PATH)/blasfeo/include/ -I $(INCLUDE_PATH)/hpipm/include/ \
+	gcc $(ACADOS_FLAGS) -c acados_sim_solver_f110_kinematic_model.c -I $(INCLUDE_PATH)/blasfeo/include/ -I $(INCLUDE_PATH)/hpipm/include/ \
 	-I $(INCLUDE_PATH) -I $(INCLUDE_PATH)/acados/  \
 
 example:
-	gcc $(ACADOS_FLAGS) -o main_f110_dynamic_model $(EX_OBJ) $(OBJ) -L $(LIB_PATH) \
+	gcc $(ACADOS_FLAGS) -o main_f110_kinematic_model $(EX_OBJ) $(OBJ) -L $(LIB_PATH) \
 	-L $(LIB_PATH) \
 	-lacados -lhpipm -lblasfeo \
 	-lm \
@@ -109,7 +109,7 @@ example:
 
 
 example_sim: sim_solver main_sim
-	gcc $(ACADOS_FLAGS) -o main_sim_f110_dynamic_model $(EX_SIM_OBJ) $(MODEL_OBJ) $(SIM_OBJ) -L $(LIB_PATH) \
+	gcc $(ACADOS_FLAGS) -o main_sim_f110_kinematic_model $(EX_SIM_OBJ) $(MODEL_OBJ) $(SIM_OBJ) -L $(LIB_PATH) \
 	-L $(LIB_PATH) \
 	-lacados -lhpipm -lblasfeo \
 	-lm \
@@ -118,27 +118,27 @@ example_sim: sim_solver main_sim
 
 
 bundled_shared_lib: casadi_fun ocp_solver sim_solver
-	gcc $(ACADOS_FLAGS) -shared -o libacados_solver_f110_dynamic_model.so $(OBJ) \
+	gcc $(ACADOS_FLAGS) -shared -o libacados_solver_f110_kinematic_model.so $(OBJ) \
 	-L $(LIB_PATH) \
 	-lacados -lhpipm -lblasfeo \
 	-lm \
 
 ocp_shared_lib: casadi_fun ocp_solver
-	gcc $(ACADOS_FLAGS) -shared -o libacados_ocp_solver_f110_dynamic_model.so $(OCP_OBJ) $(MODEL_OBJ) \
+	gcc $(ACADOS_FLAGS) -shared -o libacados_ocp_solver_f110_kinematic_model.so $(OCP_OBJ) $(MODEL_OBJ) \
 	-L$(EXTERNAL_DIR) -l$(EXTERNAL_LIB) \
 	-L $(LIB_PATH) -lacados -lhpipm -lblasfeo \
 	-lm \
 
 sim_shared_lib: casadi_fun sim_solver
-	gcc $(ACADOS_FLAGS) -shared -o libacados_sim_solver_f110_dynamic_model.so $(SIM_OBJ) $(MODEL_OBJ) -L$(EXTERNAL_DIR) -l$(EXTERNAL_LIB)  \
+	gcc $(ACADOS_FLAGS) -shared -o libacados_sim_solver_f110_kinematic_model.so $(SIM_OBJ) $(MODEL_OBJ) -L$(EXTERNAL_DIR) -l$(EXTERNAL_LIB)  \
 	-L $(LIB_PATH) -lacados -lhpipm -lblasfeo \
 	-lm \
 
 clean:
 	rm -f *.o
 	rm -f *.so
-	rm -f main_f110_dynamic_model
+	rm -f main_f110_kinematic_model
 
 clean_ocp_shared_lib:
-	rm -f libacados_ocp_solver_f110_dynamic_model.so
-	rm -f acados_solver_f110_dynamic_model.o
+	rm -f libacados_ocp_solver_f110_kinematic_model.so
+	rm -f acados_solver_f110_kinematic_model.o

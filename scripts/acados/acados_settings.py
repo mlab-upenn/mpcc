@@ -56,8 +56,8 @@ def acados_settings_dyn(Tf, N, modelparams):
     ocp.dims.nbu = nu
 
     #number of soft on h constraints
-    ocp.dims.nsh = 0
-    ocp.dims.ns = 0
+    ocp.dims.nsh = 1
+    ocp.dims.ns = 1
 
     ocp.dims.N = N
 
@@ -65,10 +65,10 @@ def acados_settings_dyn(Tf, N, modelparams):
     # set cost to casadi expression defined above
     ocp.cost.cost_type = "EXTERNAL"
     #ocp.cost.cost_type_e = "EXTERNAL"
-    #ocp.cost.zu = 1000 * npy.ones((ocp.dims.ns,))
-    #ocp.cost.Zu = 1000 * npy.ones((ocp.dims.ns,))
-    #ocp.cost.zl = 1000 * npy.ones((ocp.dims.ns,))
-    #ocp.cost.Zl = 1000 * npy.ones((ocp.dims.ns,))
+    ocp.cost.zu = 1000 * npy.ones((ocp.dims.ns,))
+    ocp.cost.Zu = 1000 * npy.ones((ocp.dims.ns,))
+    ocp.cost.zl = 1000 * npy.ones((ocp.dims.ns,))
+    ocp.cost.Zl = 1000 * npy.ones((ocp.dims.ns,))
     #not sure if needed
     #unscale = N / Tf
 
@@ -76,9 +76,9 @@ def acados_settings_dyn(Tf, N, modelparams):
     #stagewise  constraints for tracks with slack
     ocp.constraints.uh = npy.array([0.00])
     ocp.constraints.lh = npy.array([-10])
-    #ocp.constraints.lsh = 0.0*npy.ones(ocp.dims.nsh)
-    #ocp.constraints.ush = 0.000*npy.ones(ocp.dims.nsh)
-    #ocp.constraints.idxsh = npy.array([0])
+    ocp.constraints.lsh = 0.1*npy.ones(ocp.dims.nsh)
+    ocp.constraints.ush = -0.1*npy.ones(ocp.dims.nsh)
+    ocp.constraints.idxsh = npy.array([0])
     #ocp.constraints.Jsh = 1
 
     # boxconstraints
@@ -169,12 +169,12 @@ def acados_settings_kin(Tf, N, modelparams):
     #ocp.dims.ny = ny
     #ocp.dims.ny_e = ny_e
     ocp.dims.nbx = 4
-    ocp.dims.nsbx = 4
+    #ocp.dims.nsbx = 4
     ocp.dims.nbu = nu
 
     #number of soft on h constraints
-    ocp.dims.nsh = 1
-    ocp.dims.ns = 1
+    #ocp.dims.nsh = 1
+    #ocp.dims.ns = 1
 
     ocp.dims.N = N
 
@@ -182,10 +182,10 @@ def acados_settings_kin(Tf, N, modelparams):
     # set cost to casadi expression defined above
     ocp.cost.cost_type = "EXTERNAL"
     #ocp.cost.cost_type_e = "EXTERNAL"
-    ocp.cost.zu = 1000 * npy.ones((ocp.dims.ns,))
-    ocp.cost.zl = 1000 * npy.ones((ocp.dims.ns,))
-    ocp.cost.Zu = 1000 * npy.ones((ocp.dims.ns,))
-    ocp.cost.Zl = 1000 * npy.ones((ocp.dims.ns,))
+    #ocp.cost.zu = 1000 * npy.ones((ocp.dims.ns,))
+    #ocp.cost.zl = 1000 * npy.ones((ocp.dims.ns,))
+    #ocp.cost.Zu = 1000 * npy.ones((ocp.dims.ns,))
+    #ocp.cost.Zl = 1000 * npy.ones((ocp.dims.ns,))
     #not sure if needed
     #unscale = N / Tf
 
@@ -193,9 +193,9 @@ def acados_settings_kin(Tf, N, modelparams):
     #stagewise  constraints for tracks with slack
     ocp.constraints.uh = npy.array([0.00])
     ocp.constraints.lh = npy.array([-10])
-    ocp.constraints.lsh = 0.1*npy.ones(ocp.dims.nsh)
-    ocp.constraints.ush = 0.001*npy.ones(ocp.dims.nsh)
-    ocp.constraints.idxsh = npy.array([0])
+    #ocp.constraints.lsh = 0.1*npy.ones(ocp.dims.nsh)
+    #ocp.constraints.ush = 0.001*npy.ones(ocp.dims.nsh)
+    #ocp.constraints.idxsh = npy.array([0])
     #ocp.constraints.Jsh = 1
 
     # boxconstraints
@@ -227,7 +227,7 @@ def acados_settings_kin(Tf, N, modelparams):
     #ocp.solver_options.sim_method_num_stages = 4
     #ocp.solver_options.sim_method_num_steps = 3
     ocp.solver_options.nlp_solver_step_length = 0.05
-    ocp.solver_options.nlp_solver_max_iter = 10
+    ocp.solver_options.nlp_solver_max_iter = 100
     ocp.solver_options.tol = 1e-4
     #ocp.solver_options.print_level = 1
     # ocp.solver_options.nlp_solver_tol_comp = 1e-1

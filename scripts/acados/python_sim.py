@@ -7,6 +7,7 @@ import sys
 
 
 def main_kin():
+    np.set_printoptions(precision=3)
     # model parameters
     paramfile = "modelparams.yaml"
     #sim parameters
@@ -26,19 +27,17 @@ def main_kin():
     trk_plt.plot_track()
 
     constraints, model, acados_solver, ocp = acados_settings_kin(Tf, N,  paramfile)
-    #plot_pajecka(paramfile)
 
-    startidx = 100
+    #starting position in track startidx = theta0[m] * 100 [pts/m]
+    startidx = 1050
+
     vars = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
     car_soln = []
     xt0 = track_lu_table[startidx,vars.index('xtrack')]
     yt0 = track_lu_table[startidx,vars.index('ytrack')]
     phit0 = track_lu_table[startidx,vars.index('phitrack')]
     theta_hat0 = track_lu_table[startidx,vars.index('sval')]
-    #x0_dyn = np.array([xt0, yt0, phit0, 1, 0.01, 0, theta_hat0, 0, 0])
-    x0_kin = np.array([xt0, yt0, phit0, 1, theta_hat0, 0, 0])
-
-    x0 = x0_kin
+    x0 = np.array([xt0, yt0, phit0, 1, theta_hat0, 0, 0])
 
     ############################################################################
     #initialization for theta values
@@ -105,14 +104,16 @@ def main_kin():
 
     #list storing visited states
     x0vals = []
+    laps = 0
     ##########################SIMULATION#######################################
     for simidx in range(Nsim):
+
         step_sol_x = []
         step_sol_u = []
 
         theta_old = theta_vals
         #get track linearization
-        index_lin_points = 100 * theta_old
+        index_lin_points = 100 * theta_old - 100*laps*smax
         index_lin_points = index_lin_points.astype(np.int32)
         print("track linearized around entries:", index_lin_points )
         track_lin_points = track_lu_table[index_lin_points,:]
@@ -127,14 +128,16 @@ def main_kin():
                                 track_lin_points[stageidx,vars.index('cos(phi)')],
                                 track_lin_points[stageidx,vars.index('g_upper')],
                                 track_lin_points[stageidx,vars.index('g_lower')],
-                                track_lin_points[stageidx,vars.index('sval')],  #aka theta_hat
+                                track_lin_points[stageidx,vars.index('sval')] + laps*smax,  #aka theta_hat
                                 Qc,
                                 Ql,
                                 Q_theta,
                                 R_d,
                                 R_delta
                                 ])
-            #print("stage idx: ",stageidx,"pval: ",p_val[:-6])
+            #print("stage idx: ",stageidx)
+            #print("pval: ",p_val[:-5])
+
             acados_solver.set(stageidx,"p", p_val)
             acados_solver.set(stageidx, "x", step_sol_x_arr[stageidx+1])
 
@@ -147,7 +150,7 @@ def main_kin():
                             track_lin_points[stageidx,vars.index('cos(phi)')],
                             track_lin_points[stageidx,vars.index('g_upper')],
                             track_lin_points[stageidx,vars.index('g_lower')],
-                            track_lin_points[stageidx,vars.index('sval')],  #aka theta_hat
+                            track_lin_points[stageidx,vars.index('sval')] + laps*smax,  #aka theta_hat
                             Qc,
                             Ql,
                             Q_theta,
@@ -213,10 +216,10 @@ def main_kin():
         #preparation for next timestep
         theta_vals = np.hstack((step_sol_x_arr[1:, 4], step_sol_x_arr[-1, 4]+0.1))
 
-        if theta_vals[0]-0.2 > smax:
-            theta_vals = theta_vals-smax
-            step_sol_x_arr[:,4] = theta_vals
+        if theta_vals[0] > (laps+1)*smax :
             print("#################################RESET###############################")
+            laps = laps + 1
+
 
     ###############################/SIMULATION##################################
     trk_plt.plot_traj(np.array(x0vals))
@@ -247,7 +250,9 @@ def main_dyn():
     constraints, model, acados_solver, ocp = acados_settings_dyn(Tf, N,  paramfile)
     #plot_pajecka(paramfile)
 
+    #starting position in track startidx = theta0[m] * 100 [pts/m]
     startidx = 1100
+
     vars = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
     car_soln = []
     xt0 = track_lu_table[startidx,vars.index('xtrack')]
@@ -299,7 +304,7 @@ def main_dyn():
             xsol = acados_solver.get(idx_sol,"x")
             x_current[idx_sol,:] = xsol
 
-        theta_current = x_current[:,4]
+        theta_current = x_current[:,6]
 
         #compute difference
         theta_diff = np.sum(np.abs(theta_current-theta_old))
@@ -322,6 +327,7 @@ def main_dyn():
 
     #list storing visited states
     x0vals = []
+    laps = 0
     ##########################SIMULATION#######################################
     for simidx in range(Nsim):
         step_sol_x = []
@@ -329,7 +335,7 @@ def main_dyn():
 
         theta_old = theta_vals
         #get track linearization
-        index_lin_points = 100 * theta_old
+        index_lin_points = 100 * theta_old - 100*laps*smax
         index_lin_points = index_lin_points.astype(np.int32)
         print("track linearized around entries:", index_lin_points )
         track_lin_points = track_lu_table[index_lin_points,:]
@@ -344,7 +350,7 @@ def main_dyn():
                                 track_lin_points[stageidx,vars.index('cos(phi)')],
                                 track_lin_points[stageidx,vars.index('g_upper')],
                                 track_lin_points[stageidx,vars.index('g_lower')],
-                                track_lin_points[stageidx,vars.index('sval')],  #aka theta_hat
+                                track_lin_points[stageidx,vars.index('sval')]+ laps*smax,  #aka theta_hat
                                 Qc,
                                 Ql,
                                 Q_theta,
@@ -364,7 +370,7 @@ def main_dyn():
                             track_lin_points[stageidx,vars.index('cos(phi)')],
                             track_lin_points[stageidx,vars.index('g_upper')],
                             track_lin_points[stageidx,vars.index('g_lower')],
-                            track_lin_points[stageidx,vars.index('sval')],  #aka theta_hat
+                            track_lin_points[stageidx,vars.index('sval')]+ laps*smax,  #aka theta_hat
                             Qc,
                             Ql,
                             Q_theta,
@@ -396,7 +402,7 @@ def main_dyn():
         step_sol_x_arr = np.array(step_sol_x)
         step_sol_u_arr = np.array(step_sol_u)
 
-        theta_vals = step_sol_x_arr[:, 4]
+        theta_vals = step_sol_x_arr[:, 6]
         print("theta vals", theta_vals)
 
         objective = compute_objective(Tf/float(N),
@@ -430,9 +436,8 @@ def main_dyn():
         #preparation for next timestep
         theta_vals = np.hstack((step_sol_x_arr[1:, 4], step_sol_x_arr[-1, 4]+0.1))
 
-        if theta_vals[0]-0.2 > smax:
-            theta_vals = theta_vals-smax
-            step_sol_x_arr[:,4] = theta_vals
+        if theta_vals[0] > smax:
+            laps = laps + 1
             print("#################################RESET###############################")
 
     ###############################/SIMULATION##################################
