@@ -11,9 +11,7 @@ This repo contains an inprogress implementation of model predictive contouring c
  > clone acados and unpack
  ```shell
  git clone git@github.com:acados/acados.git
-
  cd acados
-
  git submodule update --recursive --init
  ```
  > then build it
@@ -52,3 +50,5 @@ Note: I ended up putting the last two commands into my .bashrc
     try running "python3 python_sim.py kin" or "python3 python_sim.py dyn" 
     
 ## Debug
+
+Currently there are issues with the dynamic model. The solver is reporting error code 3, which corresponds to the minimal step size in the QP solver being reached.
