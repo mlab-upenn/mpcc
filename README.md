@@ -2,7 +2,7 @@
 
 This repo contains an inprogress implementation of model predictive contouring control based on the ACADOS solver. Currently the dynamic model is not working.
 
-##setup
+## Setup
 
 1. Clone this repo
 
@@ -36,7 +36,7 @@ This repo contains an inprogress implementation of model predictive contouring c
  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"<acados_root>/lib"
  export ACADOS_SOURCE_DIR=<acados_root>
  ```   
--Note: I ended up putting the last two commands into my .bashrc
+Note: I ended up putting the last two commands into my .bashrc
  >It should look something like this:
  ```shell
  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"/home/pw/acados/lib/"
@@ -48,5 +48,7 @@ This repo contains an inprogress implementation of model predictive contouring c
    python3 minimal_example_closed_loop.py 
    ```
 3.  All set up!
-    Currently i am working in mpcc/scripts/acadosmodel
+    Currently i am working in mpcc/scripts/acados
     try running "python3 python_sim.py kin" or "python3 python_sim.py dyn" 
+    
+## Debug
