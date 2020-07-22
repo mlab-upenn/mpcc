@@ -48,7 +48,7 @@
 #include "simstruc.h"
 
 //#define SAMPLINGTIME -1
-#define SAMPLINGTIME 0.05555555555555555
+#define SAMPLINGTIME 0.05
 
 static void mdlInitializeSizes (SimStruct *S)
 {
@@ -70,7 +70,7 @@ static void mdlInitializeSizes (SimStruct *S)
     // x0
     ssSetInputPortVectorDimension(S, 0, 7);
     // parameters
-    ssSetInputPortVectorDimension(S, 1, (90+1) * 13);
+    ssSetInputPortVectorDimension(S, 1, (20+1) * 13);
     // lbx
     ssSetInputPortVectorDimension(S, 2, 4);
     // ubx
@@ -167,7 +167,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     in_sign = ssGetInputPortRealSignalPtrs(S, 1);
 
     // update value of parameters
-    for (int ii = 0; ii <= 90; ii++) 
+    for (int ii = 0; ii <= 20; ii++) 
     {
         for (int jj = 0; jj < 13; jj++)
             buffer[jj] = (double)(*in_sign[ii*13+jj]);
@@ -182,7 +182,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     for (int i = 0; i < 4; i++)
         buffer[i] = (double)(*in_sign[i]);
 
-    for (int ii = 1; ii < 90; ii++)
+    for (int ii = 1; ii < 20; ii++)
         ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "lbx", buffer);
 
     // ubx
@@ -191,7 +191,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     for (int i = 0; i < 4; i++)
         buffer[i] = (double)(*in_sign[i]);
 
-    for (int ii = 1; ii < 90; ii++)
+    for (int ii = 1; ii < 20; ii++)
         ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "ubx", buffer);
 
 
@@ -201,7 +201,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     for (int i = 0; i < 3; i++)
         buffer[i] = (double)(*in_sign[i]);
 
-    for (int ii = 0; ii < 90; ii++)
+    for (int ii = 0; ii < 20; ii++)
         ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "lbu", buffer);
 
     // ubu
@@ -210,7 +210,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     for (int i = 0; i < 3; i++)
         buffer[i] = (double)(*in_sign[i]);
 
-    for (int ii = 0; ii < 90; ii++)
+    for (int ii = 0; ii < 20; ii++)
         ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "ubu", buffer);
 
 
@@ -222,7 +222,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     for (int i = 0; i < 1; i++)
         buffer[i] = (double)(*in_sign[i]);
 
-    for (int ii = 0; ii < 90; ii++)
+    for (int ii = 0; ii < 20; ii++)
         ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "lh", buffer);
 
     // uh
@@ -231,7 +231,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     for (int i = 0; i < 1; i++)
         buffer[i] = (double)(*in_sign[i]);
 
-    for (int ii = 0; ii < 90; ii++)
+    for (int ii = 0; ii < 20; ii++)
         ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "uh", buffer);
 
     /* call solver */

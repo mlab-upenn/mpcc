@@ -130,12 +130,12 @@ int main()
     
     p[12] = 0;
     
-    for (int ii = 0; ii < 90; ii++)
+    for (int ii = 0; ii < 20; ii++)
     {
         expl_ode_fun[ii].set_param(expl_ode_fun+ii, p);
         forw_vde_casadi[ii].set_param(forw_vde_casadi+ii, p);
     }
-    for (int ii = 0; ii < 90; ii++) {
+    for (int ii = 0; ii < 20; ii++) {
         nl_constr_h_fun_jac[ii].set_param(nl_constr_h_fun_jac+ii, p);
         nl_constr_h_fun[ii].set_param(nl_constr_h_fun+ii, p);
         
@@ -149,8 +149,8 @@ int main()
     double elapsed_time;
     int sqp_iter;
 
-    double xtraj[7 * (90+1)];
-    double utraj[3 * (90)];
+    double xtraj[7 * (20+1)];
+    double utraj[3 * (20)];
 
 
     // solve ocp in loop
@@ -177,9 +177,9 @@ int main()
         ocp_nlp_out_get(nlp_config, nlp_dims, nlp_out, ii, "u", &utraj[ii*3]);
 
     printf("\n--- xtraj ---\n");
-    d_print_exp_tran_mat( 7, 90+1, xtraj, 7 );
+    d_print_exp_tran_mat( 7, 20+1, xtraj, 7 );
     printf("\n--- utraj ---\n");
-    d_print_exp_tran_mat( 3, 90, utraj, 3 );
+    d_print_exp_tran_mat( 3, 20, utraj, 3 );
     // ocp_nlp_out_print(nlp_solver->dims, nlp_out);
 
     printf("\nsolved ocp %d times, solution printed above\n\n", NTIMINGS);

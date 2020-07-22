@@ -144,6 +144,9 @@ int main()
         forw_vde_casadi[ii].set_param(forw_vde_casadi+ii, p);
     }
     for (int ii = 0; ii < 20; ii++) {
+        nl_constr_h_fun_jac[ii].set_param(nl_constr_h_fun_jac+ii, p);
+        nl_constr_h_fun[ii].set_param(nl_constr_h_fun+ii, p);
+        
     }
   
 

@@ -44,6 +44,8 @@
 
 
 
+#include "f110_dynamic_model_constraints/f110_dynamic_model_h_constraint.h"
+
 
 #include "f110_dynamic_model_cost/f110_dynamic_model_external_cost.h"
 
@@ -54,7 +56,7 @@
 #define NZ     0
 #define NU     3
 #define NP     13
-#define NBX    0
+#define NBX    3
 #define NBX0   9
 #define NBU    3
 #define NSBX   0
@@ -74,7 +76,7 @@
 #define NY     0
 #define NYN    0
 #define N      20
-#define NH     0
+#define NH     1
 #define NPHI   0
 #define NHN    0
 #define NPHIN  0
@@ -228,6 +230,8 @@ int acados_create()
 
     for (int i = 0; i < N; i++)
     {
+        ocp_nlp_dims_set_constraints(nlp_config, nlp_dims, i, "nh", &nh[i]);
+        ocp_nlp_dims_set_constraints(nlp_config, nlp_dims, i, "nsh", &nsh[i]);
     }
     ocp_nlp_dims_set_constraints(nlp_config, nlp_dims, N, "nh", &nh[N]);
     ocp_nlp_dims_set_constraints(nlp_config, nlp_dims, N, "nsh", &nsh[N]);
@@ -238,6 +242,28 @@ int acados_create()
     /************************************************
     *  external functions
     ************************************************/
+    nl_constr_h_fun_jac = (external_function_param_casadi *) malloc(sizeof(external_function_param_casadi)*N);
+    for (int i = 0; i < N; i++) {
+        nl_constr_h_fun_jac[i].casadi_fun = &f110_dynamic_model_constr_h_fun_jac_uxt_zt;
+        nl_constr_h_fun_jac[i].casadi_n_in = &f110_dynamic_model_constr_h_fun_jac_uxt_zt_n_in;
+        nl_constr_h_fun_jac[i].casadi_n_out = &f110_dynamic_model_constr_h_fun_jac_uxt_zt_n_out;
+        nl_constr_h_fun_jac[i].casadi_sparsity_in = &f110_dynamic_model_constr_h_fun_jac_uxt_zt_sparsity_in;
+        nl_constr_h_fun_jac[i].casadi_sparsity_out = &f110_dynamic_model_constr_h_fun_jac_uxt_zt_sparsity_out;
+        nl_constr_h_fun_jac[i].casadi_work = &f110_dynamic_model_constr_h_fun_jac_uxt_zt_work;
+        external_function_param_casadi_create(&nl_constr_h_fun_jac[i], 13);
+    }
+    nl_constr_h_fun = (external_function_param_casadi *) malloc(sizeof(external_function_param_casadi)*N);
+    for (int i = 0; i < N; i++) {
+        nl_constr_h_fun[i].casadi_fun = &f110_dynamic_model_constr_h_fun;
+        nl_constr_h_fun[i].casadi_n_in = &f110_dynamic_model_constr_h_fun_n_in;
+        nl_constr_h_fun[i].casadi_n_out = &f110_dynamic_model_constr_h_fun_n_out;
+        nl_constr_h_fun[i].casadi_sparsity_in = &f110_dynamic_model_constr_h_fun_sparsity_in;
+        nl_constr_h_fun[i].casadi_sparsity_out = &f110_dynamic_model_constr_h_fun_sparsity_out;
+        nl_constr_h_fun[i].casadi_work = &f110_dynamic_model_constr_h_fun_work;
+        external_function_param_casadi_create(&nl_constr_h_fun[i], 13);
+    }
+    
+    
 
 
     // explicit ode
@@ -437,12 +463,12 @@ int acados_create()
     double lbu[NBU];
     double ubu[NBU];
     
-    lbu[0] = 0;
+    lbu[0] = -10;
     ubu[0] = 10;
     lbu[1] = -2;
     ubu[1] = 2;
-    lbu[2] = 0;
-    ubu[2] = 3;
+    lbu[2] = -0.1;
+    ubu[2] = 4;
 
     for (int i = 0; i < N; i++)
     {
@@ -461,9 +487,54 @@ int acados_create()
 
 
 
+    // x
+    int idxbx[NBX];
+    
+    idxbx[0] = 6;
+    idxbx[1] = 7;
+    idxbx[2] = 8;
+    double lbx[NBX];
+    double ubx[NBX];
+    
+    lbx[0] = 0;
+    ubx[0] = 100;
+    lbx[1] = -3;
+    ubx[1] = 5;
+    lbx[2] = -0.4;
+    ubx[2] = 0.4;
+
+    for (int i = 1; i < N; i++)
+    {
+        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "idxbx", idxbx);
+        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "lbx", lbx);
+        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "ubx", ubx);
+    }
 
 
 
+
+
+    // set up nonlinear constraints for stage 0 to N-1 
+    double lh[NH];
+    double uh[NH];
+
+    
+    lh[0] = -10;
+
+    
+    uh[0] = 0;
+    
+    for (int i = 0; i < N; i++)
+    {
+        // nonlinear constraints for stages 0 to N-1
+        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "nl_constr_h_fun_jac",
+                                     &nl_constr_h_fun_jac[i]);
+        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "nl_constr_h_fun",
+                                    &nl_constr_h_fun[i]);
+        
+        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "lh", lh);
+        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "uh", uh);
+    }
 
 
 
@@ -510,7 +581,7 @@ int acados_create()
     for (int i = 0; i < N; i++)
         ocp_nlp_solver_opts_set_at_stage(nlp_config, nlp_opts, i, "dynamics_jac_reuse", &tmp_bool);
 
-    double nlp_solver_step_length = 1;
+    double nlp_solver_step_length = 0.05;
     ocp_nlp_solver_opts_set(nlp_config, nlp_opts, "step_length", &nlp_solver_step_length);
 
     double levenberg_marquardt = 0;
@@ -538,7 +609,7 @@ int acados_create()
     double nlp_solver_tol_comp = 0.0001;
     ocp_nlp_solver_opts_set(nlp_config, nlp_opts, "tol_comp", &nlp_solver_tol_comp);
 
-    int nlp_solver_max_iter = 200;
+    int nlp_solver_max_iter = 100;
     ocp_nlp_solver_opts_set(nlp_config, nlp_opts, "max_iter", &nlp_solver_max_iter);
 
     int initialize_t_slacks = 0;
@@ -628,6 +699,12 @@ int acados_create()
 
     // constraints
 
+    for (int ii = 0; ii < N; ii++)
+    {
+        nl_constr_h_fun_jac[ii].set_param(nl_constr_h_fun_jac+ii, p);
+        nl_constr_h_fun[ii].set_param(nl_constr_h_fun+ii, p);
+    }
+
     status = ocp_nlp_precompute(nlp_solver, nlp_in, nlp_out);
 
     if (status != ACADOS_SUCCESS)
@@ -658,6 +735,8 @@ int acados_update_params(int stage, double *p, int np)
 
         // constraints
     
+        nl_constr_h_fun_jac[stage].set_param(nl_constr_h_fun_jac+stage, p);
+        nl_constr_h_fun[stage].set_param(nl_constr_h_fun+stage, p);
 
         // cost
         ext_cost_fun[stage].set_param(ext_cost_fun+stage, p);
@@ -720,6 +799,13 @@ int acados_free()
     free(ext_cost_fun_jac_hess);
 
     // constraints
+    for (int i = 0; i < 20; i++)
+    {
+        external_function_param_casadi_free(&nl_constr_h_fun_jac[i]);
+        external_function_param_casadi_free(&nl_constr_h_fun[i]);
+    }
+    free(nl_constr_h_fun_jac);
+    free(nl_constr_h_fun);
 
     return 0;
 }
@@ -741,7 +827,7 @@ void acados_print_stats()
     ocp_nlp_get(nlp_config, nlp_solver, "stat_m", &stat_m);
 
     
-    double stat[2000];
+    double stat[1000];
     ocp_nlp_get(nlp_config, nlp_solver, "statistics", stat);
 
     int nrow = sqp_iter+1 < stat_m ? sqp_iter+1 : stat_m;

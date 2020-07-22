@@ -159,29 +159,27 @@ def dynamic_model(modelparams):
     model.p = p
     model.z = z
     #boxconstraints
-    model.d_min = 0
-    model.d_max = 3.0
+    model.d_min = -3.0
+    model.d_max = 5.0
 
-    model.ddot_min = 0
+    model.ddot_min = -10.0
     model.ddot_max = 10.0
 
     model.delta_min = -0.40  # minimum steering angle [rad]
     model.delta_max = 0.40  # maximum steering angle [rad]
 
-    model.deltadot_min = -5  # minimum steering angle cahgne[rad/s]
-    model.deltadot_max = 5 # maximum steering angle cahgne[rad/s]
+    model.deltadot_min = -2  # minimum steering angle cahgne[rad/s]
+    model.deltadot_max = 2 # maximum steering angle cahgne[rad/s]
 
-    model.thetadot_min = 0.00  # minimum adv param speed [m/s]
-    model.thetadot_max = 3 # maximum adv param speed [m/s]
+    model.thetadot_min = -0.1  # minimum adv param speed [m/s]
+    model.thetadot_max = 4 # maximum adv param speed [m/s]
+
+    model.theta_min = 0.00  # minimum adv param [m]
+    model.theta_max = 100 # maximum adv param  [m]
+
 
     model.x0 = np.array([0, 0, 0, 1, 0.01, 0, 0, 0, 0])
 
-    #halfspace constraints on x capturing the track at each stage
-    n = vertcat(-sin_phit, cos_phit)
-    constraints.h_upper = vertcat(0,0)
-    g_upper = vertcat(gt_upper, -gt_lower)
-    #halfspace constriants for track boundaries, con_expr <= 0
-    #model.con_h_expr = vertcat(n[0]*x[0]+n[1]*x[1]-g_upper[0], -n[0]*x[0]-n[1]*x[1]-g_upper[1])
 
     #compute approximate linearized contouring and lag error
     xt_hat = xt + cos_phit * ( theta - theta_hat)
@@ -193,6 +191,7 @@ def dynamic_model(modelparams):
     #error = vertcat(e_cont, e_lag)
     #set up stage cost
     #Q = diag(vertcat(Qc, Ql))
+    model.con_h_expr = e_cont**2+e_lag**2-(0.2)**2-0.01
     model.stage_cost = e_cont * Qc * e_cont + e_lag * Qc * e_lag - Q_theta * thetadot + ddot * R_d * ddot + deltadot * R_delta * deltadot
 
     return model, constraints

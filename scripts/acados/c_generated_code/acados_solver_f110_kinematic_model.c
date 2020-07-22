@@ -61,21 +61,21 @@
 #define NBU    3
 #define NSBX   0
 #define NSBU   0
-#define NSH    0
+#define NSH    1
 #define NSG    0
 #define NSPHI  0
 #define NSHN   0
 #define NSGN   0
 #define NSPHIN 0
 #define NSBXN  0
-#define NS     0
+#define NS     1
 #define NSN    0
 #define NG     0
 #define NBXN   0
 #define NGN    0
 #define NY     0
 #define NYN    0
-#define N      90
+#define N      20
 #define NH     1
 #define NPHI   0
 #define NHN    0
@@ -338,96 +338,26 @@ int acados_create()
     nlp_in = ocp_nlp_in_create(nlp_config, nlp_dims);
 
     double time_steps[N];
-    time_steps[0] = 0.05555555555555555;
-    time_steps[1] = 0.05555555555555555;
-    time_steps[2] = 0.05555555555555555;
-    time_steps[3] = 0.05555555555555555;
-    time_steps[4] = 0.05555555555555555;
-    time_steps[5] = 0.05555555555555555;
-    time_steps[6] = 0.05555555555555555;
-    time_steps[7] = 0.05555555555555555;
-    time_steps[8] = 0.05555555555555555;
-    time_steps[9] = 0.05555555555555555;
-    time_steps[10] = 0.05555555555555555;
-    time_steps[11] = 0.05555555555555555;
-    time_steps[12] = 0.05555555555555555;
-    time_steps[13] = 0.05555555555555555;
-    time_steps[14] = 0.05555555555555555;
-    time_steps[15] = 0.05555555555555555;
-    time_steps[16] = 0.05555555555555555;
-    time_steps[17] = 0.05555555555555555;
-    time_steps[18] = 0.05555555555555555;
-    time_steps[19] = 0.05555555555555555;
-    time_steps[20] = 0.05555555555555555;
-    time_steps[21] = 0.05555555555555555;
-    time_steps[22] = 0.05555555555555555;
-    time_steps[23] = 0.05555555555555555;
-    time_steps[24] = 0.05555555555555555;
-    time_steps[25] = 0.05555555555555555;
-    time_steps[26] = 0.05555555555555555;
-    time_steps[27] = 0.05555555555555555;
-    time_steps[28] = 0.05555555555555555;
-    time_steps[29] = 0.05555555555555555;
-    time_steps[30] = 0.05555555555555555;
-    time_steps[31] = 0.05555555555555555;
-    time_steps[32] = 0.05555555555555555;
-    time_steps[33] = 0.05555555555555555;
-    time_steps[34] = 0.05555555555555555;
-    time_steps[35] = 0.05555555555555555;
-    time_steps[36] = 0.05555555555555555;
-    time_steps[37] = 0.05555555555555555;
-    time_steps[38] = 0.05555555555555555;
-    time_steps[39] = 0.05555555555555555;
-    time_steps[40] = 0.05555555555555555;
-    time_steps[41] = 0.05555555555555555;
-    time_steps[42] = 0.05555555555555555;
-    time_steps[43] = 0.05555555555555555;
-    time_steps[44] = 0.05555555555555555;
-    time_steps[45] = 0.05555555555555555;
-    time_steps[46] = 0.05555555555555555;
-    time_steps[47] = 0.05555555555555555;
-    time_steps[48] = 0.05555555555555555;
-    time_steps[49] = 0.05555555555555555;
-    time_steps[50] = 0.05555555555555555;
-    time_steps[51] = 0.05555555555555555;
-    time_steps[52] = 0.05555555555555555;
-    time_steps[53] = 0.05555555555555555;
-    time_steps[54] = 0.05555555555555555;
-    time_steps[55] = 0.05555555555555555;
-    time_steps[56] = 0.05555555555555555;
-    time_steps[57] = 0.05555555555555555;
-    time_steps[58] = 0.05555555555555555;
-    time_steps[59] = 0.05555555555555555;
-    time_steps[60] = 0.05555555555555555;
-    time_steps[61] = 0.05555555555555555;
-    time_steps[62] = 0.05555555555555555;
-    time_steps[63] = 0.05555555555555555;
-    time_steps[64] = 0.05555555555555555;
-    time_steps[65] = 0.05555555555555555;
-    time_steps[66] = 0.05555555555555555;
-    time_steps[67] = 0.05555555555555555;
-    time_steps[68] = 0.05555555555555555;
-    time_steps[69] = 0.05555555555555555;
-    time_steps[70] = 0.05555555555555555;
-    time_steps[71] = 0.05555555555555555;
-    time_steps[72] = 0.05555555555555555;
-    time_steps[73] = 0.05555555555555555;
-    time_steps[74] = 0.05555555555555555;
-    time_steps[75] = 0.05555555555555555;
-    time_steps[76] = 0.05555555555555555;
-    time_steps[77] = 0.05555555555555555;
-    time_steps[78] = 0.05555555555555555;
-    time_steps[79] = 0.05555555555555555;
-    time_steps[80] = 0.05555555555555555;
-    time_steps[81] = 0.05555555555555555;
-    time_steps[82] = 0.05555555555555555;
-    time_steps[83] = 0.05555555555555555;
-    time_steps[84] = 0.05555555555555555;
-    time_steps[85] = 0.05555555555555555;
-    time_steps[86] = 0.05555555555555555;
-    time_steps[87] = 0.05555555555555555;
-    time_steps[88] = 0.05555555555555555;
-    time_steps[89] = 0.05555555555555555;
+    time_steps[0] = 0.05;
+    time_steps[1] = 0.05;
+    time_steps[2] = 0.05;
+    time_steps[3] = 0.05;
+    time_steps[4] = 0.05;
+    time_steps[5] = 0.05;
+    time_steps[6] = 0.05;
+    time_steps[7] = 0.05;
+    time_steps[8] = 0.05;
+    time_steps[9] = 0.05;
+    time_steps[10] = 0.05;
+    time_steps[11] = 0.05;
+    time_steps[12] = 0.05;
+    time_steps[13] = 0.05;
+    time_steps[14] = 0.05;
+    time_steps[15] = 0.05;
+    time_steps[16] = 0.05;
+    time_steps[17] = 0.05;
+    time_steps[18] = 0.05;
+    time_steps[19] = 0.05;
 
     for (int i = 0; i < N; i++)
     {
@@ -453,6 +383,30 @@ int acados_create()
     }
 
 
+
+    double Zl[NS];
+    double Zu[NS];
+    double zl[NS];
+    double zu[NS];
+    
+    Zl[0] = 1000;
+
+    
+    Zu[0] = 1000;
+
+    
+    zl[0] = 1000;
+
+    
+    zu[0] = 1000;
+
+    for (int i = 0; i < N; i++)
+    {
+        ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, i, "Zl", Zl);
+        ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, i, "Zu", Zu);
+        ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, i, "zl", zl);
+        ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, i, "zu", zu);
+    }
 
 
     // terminal cost
@@ -545,6 +499,23 @@ int acados_create()
 
 
 
+    // set up soft bounds for nonlinear constraints
+    int idxsh[NSH];
+    
+    idxsh[0] = 0;
+    double lsh[NSH];
+    double ush[NSH];
+    
+    lsh[0] = 0.1;
+    ush[0] = 0.001;
+
+    for (int i = 0; i < N; i++)
+    {
+        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "idxsh", idxsh);
+        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "lsh", lsh);
+        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "ush", ush);
+    }
+
 
 
 
@@ -584,10 +555,10 @@ int acados_create()
     double uh[NH];
 
     
-    lh[0] = -1000;
+    lh[0] = -10;
 
     
-    uh[0] = 0.01;
+    uh[0] = 0;
     
     for (int i = 0; i < N; i++)
     {
@@ -674,7 +645,7 @@ int acados_create()
     double nlp_solver_tol_comp = 0.0001;
     ocp_nlp_solver_opts_set(nlp_config, nlp_opts, "tol_comp", &nlp_solver_tol_comp);
 
-    int nlp_solver_max_iter = 5;
+    int nlp_solver_max_iter = 10;
     ocp_nlp_solver_opts_set(nlp_config, nlp_opts, "max_iter", &nlp_solver_max_iter);
 
     int initialize_t_slacks = 0;
@@ -790,7 +761,7 @@ int acados_update_params(int stage, double *p, int np)
             " External function has %i parameters. Exiting.\n", np, casadi_np);
         exit(1);
     }
-    if (stage < 90)
+    if (stage < 20)
     {
         forw_vde_casadi[stage].set_param(forw_vde_casadi+stage, p);
         expl_ode_fun[stage].set_param(expl_ode_fun+stage, p);
@@ -843,7 +814,7 @@ int acados_free()
 
     /* free external function */
     // dynamics
-    for (int i = 0; i < 90; i++)
+    for (int i = 0; i < 20; i++)
     {
         external_function_param_casadi_free(&forw_vde_casadi[i]);
         external_function_param_casadi_free(&expl_ode_fun[i]);
@@ -852,7 +823,7 @@ int acados_free()
     free(expl_ode_fun);
 
     // cost
-    for (int i = 0; i < 90; i++)
+    for (int i = 0; i < 20; i++)
     {
         external_function_param_casadi_free(&ext_cost_fun[i]);
         external_function_param_casadi_free(&ext_cost_fun_jac[i]);
@@ -862,7 +833,7 @@ int acados_free()
     free(ext_cost_fun_jac_hess);
 
     // constraints
-    for (int i = 0; i < 90; i++)
+    for (int i = 0; i < 20; i++)
     {
         external_function_param_casadi_free(&nl_constr_h_fun_jac[i]);
         external_function_param_casadi_free(&nl_constr_h_fun[i]);
@@ -890,7 +861,7 @@ void acados_print_stats()
     ocp_nlp_get(nlp_config, nlp_solver, "stat_m", &stat_m);
 
     
-    double stat[50];
+    double stat[100];
     ocp_nlp_get(nlp_config, nlp_solver, "statistics", stat);
 
     int nrow = sqp_iter+1 < stat_m ? sqp_iter+1 : stat_m;
