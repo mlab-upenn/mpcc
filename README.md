@@ -46,8 +46,8 @@ Note: I ended up putting the last two commands into my .bashrc
    python3 minimal_example_closed_loop.py 
    ```
 3.  All set up!
-    Currently i am working in mpcc/scripts/acados
-    try running "python3 python_sim.py kin" or "python3 python_sim.py dyn" 
+    Currently, I am working in mpcc/scripts/acados
+    try running "$python3 python_sim.py kin" or "$python3 python_sim.py dyn" 
     
 ## Debug
 
