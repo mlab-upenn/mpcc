@@ -52,3 +52,5 @@ Note: I ended up putting the last two commands into my .bashrc
 ## Debug
 
 Currently there are issues with the dynamic model. The solver is reporting error code 3, which corresponds to the minimal step size in the QP solver being reached.
+
+The system equations are described using CasADi in models.py (in the function dynamic_model()). The solver is set up in acados_settings.py (in the function acados_settings_dyn())
