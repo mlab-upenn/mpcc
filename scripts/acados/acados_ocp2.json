@@ -42,7 +42,9 @@
         "idxsbx_e": [],
         "idxsg": [],
         "idxsg_e": [],
-        "idxsh": [],
+        "idxsh": [
+            0
+        ],
         "idxsh_e": [],
         "idxsphi": [],
         "idxsphi_e": [],
@@ -80,7 +82,9 @@
         "lsbx_e": [],
         "lsg": [],
         "lsg_e": [],
-        "lsh": [],
+        "lsh": [
+            0.1
+        ],
         "lsh_e": [],
         "lsphi": [],
         "lsphi_e": [],
@@ -118,7 +122,9 @@
         "usbx_e": [],
         "usg": [],
         "usg_e": [],
-        "ush": [],
+        "ush": [
+            0.001
+        ],
         "ush_e": [],
         "usphi": [],
         "usphi_e": []
@@ -130,17 +136,25 @@
         "Vz": [],
         "W": [],
         "W_e": [],
-        "Zl": [],
+        "Zl": [
+            1000.0
+        ],
         "Zl_e": [],
-        "Zu": [],
+        "Zu": [
+            1000.0
+        ],
         "Zu_e": [],
         "cost_type": "EXTERNAL",
         "cost_type_e": "LINEAR_LS",
         "yref": [],
         "yref_e": [],
-        "zl": [],
+        "zl": [
+            1000.0
+        ],
         "zl_e": [],
-        "zu": [],
+        "zu": [
+            1000.0
+        ],
         "zu_e": []
     },
     "dims": {
@@ -159,14 +173,14 @@
         "nphi_e": 0,
         "nr": 0,
         "nr_e": 0,
-        "ns": 0,
+        "ns": 1,
         "ns_e": 0,
         "nsbu": 0,
         "nsbx": 0,
         "nsbx_e": 0,
         "nsg": 0,
         "nsg_e": 0,
-        "nsh": 0,
+        "nsh": 1,
         "nsh_e": 0,
         "nsphi": 0,
         "nsphi_e": 0,

@@ -61,14 +61,14 @@
 #define NBU    3
 #define NSBX   0
 #define NSBU   0
-#define NSH    0
+#define NSH    1
 #define NSG    0
 #define NSPHI  0
 #define NSHN   0
 #define NSGN   0
 #define NSPHIN 0
 #define NSBXN  0
-#define NS     0
+#define NS     1
 #define NSN    0
 #define NG     0
 #define NBXN   0
@@ -384,6 +384,30 @@ int acados_create()
 
 
 
+    double Zl[NS];
+    double Zu[NS];
+    double zl[NS];
+    double zu[NS];
+    
+    Zl[0] = 1000;
+
+    
+    Zu[0] = 1000;
+
+    
+    zl[0] = 1000;
+
+    
+    zu[0] = 1000;
+
+    for (int i = 0; i < N; i++)
+    {
+        ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, i, "Zl", Zl);
+        ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, i, "Zu", Zu);
+        ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, i, "zl", zl);
+        ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, i, "zu", zu);
+    }
+
 
     // terminal cost
 
@@ -474,6 +498,23 @@ int acados_create()
 
 
 
+
+    // set up soft bounds for nonlinear constraints
+    int idxsh[NSH];
+    
+    idxsh[0] = 0;
+    double lsh[NSH];
+    double ush[NSH];
+    
+    lsh[0] = 0.1;
+    ush[0] = 0.001;
+
+    for (int i = 0; i < N; i++)
+    {
+        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "idxsh", idxsh);
+        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "lsh", lsh);
+        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "ush", ush);
+    }
 
 
 
