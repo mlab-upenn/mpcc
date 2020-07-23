@@ -40,7 +40,7 @@ Note: I ended up putting the last two commands into my .bashrc
  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"/home/pw/acados/lib/"
  export ACADOS_SOURCE_DIR=/home/pw/acados
  ```
-2.8 test installation:
+>Test installation:
    ```shell
    cd <acados_root>/examples/acados_python/getting_started
    python3 minimal_example_closed_loop.py 
