@@ -1,17 +1,19 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import matplotlib
 from matplotlib import cm
 import yaml
 
 class plotter():
 
-    def __init__(self, table, smax):
+    def __init__(self, table, smax, r):
         #trackplot
-        self.fig, self.ax = plt.subplots(1, figsize=(20,20))
+        self.fig, self.ax = plt.subplots(1, figsize=(20,12))
         #input and state plot
         self.fig2, (self.ax1, self.ax2) = plt.subplots(nrows = 2, ncols = 1, figsize=(10,10))
 
-        self.r = 0.3
+        self.r = r
         self.smax = smax
         maxidx = np.floor(smax * 100).astype(np.int32)
         #downsample
@@ -25,9 +27,9 @@ class plotter():
         self.sin_phi = table[:maxidx:self.downsampling, 6]
         self.gvals = table[:maxidx:self.downsampling, 7]
         self.normaldir = np.vstack((-self.sin_phi, self.cos_phi)).T
+        self.trajplots = []
 
     def plot_track(self):
-        print
         self.ax.plot(self.coords[:,0],self.coords[:,1], color = 'k')
         self.ax.scatter(self.coords[::4,0],self.coords[::4,1], color = 'r')
         self.ax.plot(self.coords[:,0] + self.r * self.normaldir[:,0] ,\
@@ -37,7 +39,7 @@ class plotter():
         self.ax.set_xlim([-1,5])
         self.ax.set_ylim([-0.5,3])
         #plt.show(block=False)
-        #plt.pause(0.001) # Pause for interval seconds.
+        #plt.pause(2) # Pause for interval seconds.
         #input("hit [enter] to continue.")
 
 
@@ -58,6 +60,20 @@ class plotter():
         idxp= idxp.astype(np.int32)
         x_theta_vals = self.coords_full[idxp,0]
         y_theta_vals = self.coords_full[idxp,1]
+        width = 0.1
+        height = 0.05
+
+
+        phi0 = xval[0,2]
+        #define transform
+        tr = matplotlib.transforms.Affine2D().rotate_deg_around(xval[0,0], xval[0,1], phi0*180/3.14159)
+        ts = self.ax.transData
+        t = tr + ts
+
+        carrect = patches.Rectangle((xval[0,0]-width/2, xval[0,1]-height/2),width, height,\
+        linewidth=1,edgecolor='k',facecolor='none', transform= t)
+        self.car = self.ax.add_patch(carrect)
+
         self.theta_horz = self.ax.scatter(x_theta_vals, y_theta_vals, marker = 'x', color = 'g')
         self.pos_horz = self.ax.scatter(xval[:,0], xval[:,1], marker = 'D', color = 'b')
         for idx in range(len(x_theta_vals)):
@@ -66,28 +82,29 @@ class plotter():
                                                  linestyle = '--', color = 'gray')
             self.connect_horz.append(connector)
         self.fig.canvas.draw()
+        
 
-    def plot_input_state_traj(self, xval, uval):
+    def plot_input_state_traj(self, zval, varnames):
+
+        uval = zval[:,:3]
         #state trajectories
-        N = len(xval)
+        N = len(zval)
         time = np.arange(N)
-        self.xplot = self.ax1.step(time, xval[:,0], where='post')
-        self.yplot = self.ax1.step(time, xval[:,1], where='post')
-        self.phiplot = self.ax1.step(time, xval[:,2], where='post')
-        self.vxplot = self.ax1.step(time, xval[:,3], where='post')
-        self.vyplot = self.ax1.step(time, xval[:,4], where='post')
-        self.omegaplot = self.ax1.step(time, xval[:,5], where='post')
-        self.thetaplot = self.ax1.step(time, xval[:,6], where='post')
-        self.ax1.legend(['x', 'y', 'phi','vx','theta','d','delta'])
+        for idx in range(zval.shape[1]-3):
+            temp = self.ax1.step(time, zval[:,idx + 3], label = varnames[idx + 3], where='post')
+            self.trajplots.append(temp)
+        self.ax1.legend()
+        self.ax1.set_title("State Trajectories")
         self.ax1.set_xlabel("time [t/Ts]")
-        max = np.max(xval[:,:7])
-        min = np.min(xval[:,:7])
+        max = np.max(zval[:,3:])
+        min = np.min(zval[:,3:])
         self.ax1.set_ylim([min-0.1,max+0.1])
 
-        self.ddotplot = self.ax2.step(time, uval[:,0], where='post')
-        self.deltadotplot = self.ax2.step(time, uval[:,1], where='post')
-        self.thetadotplot = self.ax2.step(time, uval[:,2], where='post')
-        self.ax2.legend(['ddot', 'deltadot', 'thetadot'])
+        for idx in range(3):
+            temp = self.ax2.step(time, uval[:,idx], label = varnames[idx], where='post')
+            self.trajplots.append(temp)
+        self.ax2.legend()
+        self.ax2.set_title("Input Trajectories")
         self.ax2.set_xlabel("time [t/Ts]")
         max = np.max(uval)
         min = np.min(uval)
@@ -100,19 +117,14 @@ class plotter():
         for idx in range(len(self.connect_horz)):
             connector = self.connect_horz[idx]
             connector[0].remove()
+        #self.car.remove()
         self.fig.canvas.draw()
 
     def clear_input_state_traj(self):
-        self.xplot[0].remove()
-        self.yplot[0].remove()
-        self.vxplot[0].remove()
-        self.vyplot[0].remove()
-        self.phiplot[0].remove()
-        self.omegaplot[0].remove()
-        self.thetaplot[0].remove()
-        self.ddotplot[0].remove()
-        self.deltadotplot[0].remove()
-        self.thetadotplot[0].remove()
+        nrtraj = len(self.trajplots)
+        for idxtraj in range(nrtraj):
+            self.trajplots[idxtraj][0].remove()
+        self.trajplots = []
         self.fig2.canvas.draw()
 
 def plot_pajecka(modelparams):

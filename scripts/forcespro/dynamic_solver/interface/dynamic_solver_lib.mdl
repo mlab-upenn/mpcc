@@ -1,5 +1,5 @@
 Model {
-  Name			  "kinematic_solver"
+  Name			  "dynamic_solver"
   Version		  8.0
   MdlSubVersion		  0
   GraphicalInterface {
@@ -60,13 +60,13 @@ Model {
       }
     }
   }
-  Created		  "7/28/2020 2:38:51 PM"
+  Created		  "7/28/2020 2:25:23 PM"
   Creator		  "embotech AG"
   UpdateHistory		  "UpdateHistoryNever"
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "embotech AG"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "7/28/2020 2:38:51 PM"
+  LastModifiedDate	  "7/28/2020 2:25:23 PM"
   RTWModifiedTimeStamp	  315310195
   ModelVersionFormat	  "1.%<AutoIncrement:2>"
   ConfigurationManager	  "None"
@@ -747,7 +747,7 @@ Model {
     }
   }
   System {
-    Name		    "kinematic_solver"
+    Name		    "dynamic_solver"
     Location		    [385, 84, 1201, 623]
     Open		    on
     ModelBrowserVisibility  on
@@ -765,21 +765,21 @@ Model {
     SIDHighWatermark	    "1"
     Block {
       BlockType		      S-Function
-      Name		      "kinematic_solver"
+      Name		      "dynamic_solver"
       SID		      "1"
-      Ports		      [3, 1]
-      Position		      [170, 99, 650, 180]
+      Ports		      [3, 20]
+      Position		      [170, 99, 650, 340]
       ZOrder		      1
-      FunctionName	      "kinematic_solver_simulinkBlockcompact"
-	  SFunctionModules	      "kinematic_solver kinematic_solver_simulinkBlockcompact"
+      FunctionName	      "dynamic_solver_simulinkBlock"
+	  SFunctionModules	      "dynamic_solver dynamic_solver_simulinkBlock"
       EnableBusSupport	      off
       Object {
 	$PropName		"MaskObject"
 	$ObjectID		19
 	$ClassName		"Simulink.Mask"
-	Type			"kinematic_solver_simulinkBlockcompact"
-	Description		" ---- Simulink block encapsulating your customized solver kinematic_solver ---- \n\n"
-				"kinematic_solver : A fast customized optimization solver.\n"
+	Type			"dynamic_solver_simulinkBlock"
+	Description		" ---- Simulink block encapsulating your customized solver dynamic_solver ---- \n\n"
+				"dynamic_solver : A fast customized optimization solver.\n"
 "\n"
 "Copyright (C) 2013-2020 EMBOTECH AG [info@embotech.com]. All rights reserved.\n"
 "\n"
@@ -801,23 +801,61 @@ Model {
 "jurisdiction in case of any dispute.\n"
 "\n"
 
-	Help			"kinematic_solver_simulinkBlockcompact provides an easy Simulink interface for simulating your customized solver.  \n"
-	"\nOUTPUTS = kinematic_solver(INPUTS) solves an optimization problem where:\n\n"
+	Help			"dynamic_solver_simulinkBlock provides an easy Simulink interface for simulating your customized solver.  \n"
+	"\nOUTPUTS = dynamic_solver(INPUTS) solves an optimization problem where:\n\n"
 	"INPUTS:\n"
-	" - x0 - column vector of length 180\n "
-" - xinit - column vector of length 6\n "
+	" - x0 - column vector of length 240\n "
+" - xinit - column vector of length 9\n "
 " - all_parameters - column vector of length 240\n "
 
 	"\nOUTPUTS:\n"
-	" - outputs - column vector of length 180\n "
+	" - x01 - column vector of length 12\n "
+" - x02 - column vector of length 12\n "
+" - x03 - column vector of length 12\n "
+" - x04 - column vector of length 12\n "
+" - x05 - column vector of length 12\n "
+" - x06 - column vector of length 12\n "
+" - x07 - column vector of length 12\n "
+" - x08 - column vector of length 12\n "
+" - x09 - column vector of length 12\n "
+" - x10 - column vector of length 12\n "
+" - x11 - column vector of length 12\n "
+" - x12 - column vector of length 12\n "
+" - x13 - column vector of length 12\n "
+" - x14 - column vector of length 12\n "
+" - x15 - column vector of length 12\n "
+" - x16 - column vector of length 12\n "
+" - x17 - column vector of length 12\n "
+" - x18 - column vector of length 12\n "
+" - x19 - column vector of length 12\n "
+" - x20 - column vector of length 12\n "
 
 	"\n For more information, see https://www.embotech.com/FORCES-Pro/How-to-use/Simulink-Interface/Simulink-Block \n "
 
 	Display			"port_label('input', 1, 'x0') \n  "
 "port_label('input', 2, 'xinit') \n  "
 "port_label('input', 3, 'all_parameters') \n  "
-"port_label('output', 1, 'outputs') \n "
-"if( exist('FORCES_PRO_Logo.jpg','file') ), image(imread('FORCES_PRO_Logo.jpg'),'center','on'); elseif( exist(['interface',filesep,'FORCES_PRO_Logo.jpg'],'file') ), image(imread(['interface',filesep,'FORCES_PRO_Logo.jpg']),'center','on'); elseif( exist(['kinematic_solver',filesep,'interface',filesep,'FORCES_PRO_Logo.jpg'],'file') ), image(imread(['kinematic_solver',filesep,'interface',filesep,'FORCES_PRO_Logo.jpg']),'center','on'); end \n "
+"port_label('output', 1, 'x01') \n "
+"port_label('output', 2, 'x02') \n "
+"port_label('output', 3, 'x03') \n "
+"port_label('output', 4, 'x04') \n "
+"port_label('output', 5, 'x05') \n "
+"port_label('output', 6, 'x06') \n "
+"port_label('output', 7, 'x07') \n "
+"port_label('output', 8, 'x08') \n "
+"port_label('output', 9, 'x09') \n "
+"port_label('output', 10, 'x10') \n "
+"port_label('output', 11, 'x11') \n "
+"port_label('output', 12, 'x12') \n "
+"port_label('output', 13, 'x13') \n "
+"port_label('output', 14, 'x14') \n "
+"port_label('output', 15, 'x15') \n "
+"port_label('output', 16, 'x16') \n "
+"port_label('output', 17, 'x17') \n "
+"port_label('output', 18, 'x18') \n "
+"port_label('output', 19, 'x19') \n "
+"port_label('output', 20, 'x20') \n "
+"if( exist('FORCES_PRO_Logo.jpg','file') ), image(imread('FORCES_PRO_Logo.jpg'),'center','on'); elseif( exist(['interface',filesep,'FORCES_PRO_Logo.jpg'],'file') ), image(imread(['interface',filesep,'FORCES_PRO_Logo.jpg']),'center','on'); elseif( exist(['dynamic_solver',filesep,'interface',filesep,'FORCES_PRO_Logo.jpg'],'file') ), image(imread(['dynamic_solver',filesep,'interface',filesep,'FORCES_PRO_Logo.jpg']),'center','on'); end \n "
 
       }
     }

@@ -1,5 +1,5 @@
 Model {
-  Name			  "kinematic_solver"
+  Name			  "dynamic_solver"
   Version		  8.0
   MdlSubVersion		  0
   GraphicalInterface {
@@ -60,13 +60,13 @@ Model {
       }
     }
   }
-  Created		  "7/28/2020 2:38:51 PM"
+  Created		  "7/28/2020 2:25:23 PM"
   Creator		  "embotech AG"
   UpdateHistory		  "UpdateHistoryNever"
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "embotech AG"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "7/28/2020 2:38:51 PM"
+  LastModifiedDate	  "7/28/2020 2:25:23 PM"
   RTWModifiedTimeStamp	  315310195
   ModelVersionFormat	  "1.%<AutoIncrement:2>"
   ConfigurationManager	  "None"
@@ -747,7 +747,7 @@ Model {
     }
   }
   System {
-    Name		    "kinematic_solver"
+    Name		    "dynamic_solver"
     Location		    [385, 84, 1201, 623]
     Open		    on
     ModelBrowserVisibility  on
@@ -765,21 +765,21 @@ Model {
     SIDHighWatermark	    "1"
     Block {
       BlockType		      S-Function
-      Name		      "kinematic_solver"
+      Name		      "dynamic_solver"
       SID		      "1"
       Ports		      [3, 1]
       Position		      [170, 99, 650, 180]
       ZOrder		      1
-      FunctionName	      "kinematic_solver_simulinkBlockcompact"
-	  SFunctionModules	      "kinematic_solver kinematic_solver_simulinkBlockcompact"
+      FunctionName	      "dynamic_solver_simulinkBlockcompact"
+	  SFunctionModules	      "dynamic_solver dynamic_solver_simulinkBlockcompact"
       EnableBusSupport	      off
       Object {
 	$PropName		"MaskObject"
 	$ObjectID		19
 	$ClassName		"Simulink.Mask"
-	Type			"kinematic_solver_simulinkBlockcompact"
-	Description		" ---- Simulink block encapsulating your customized solver kinematic_solver ---- \n\n"
-				"kinematic_solver : A fast customized optimization solver.\n"
+	Type			"dynamic_solver_simulinkBlockcompact"
+	Description		" ---- Simulink block encapsulating your customized solver dynamic_solver ---- \n\n"
+				"dynamic_solver : A fast customized optimization solver.\n"
 "\n"
 "Copyright (C) 2013-2020 EMBOTECH AG [info@embotech.com]. All rights reserved.\n"
 "\n"
@@ -801,15 +801,15 @@ Model {
 "jurisdiction in case of any dispute.\n"
 "\n"
 
-	Help			"kinematic_solver_simulinkBlockcompact provides an easy Simulink interface for simulating your customized solver.  \n"
-	"\nOUTPUTS = kinematic_solver(INPUTS) solves an optimization problem where:\n\n"
+	Help			"dynamic_solver_simulinkBlockcompact provides an easy Simulink interface for simulating your customized solver.  \n"
+	"\nOUTPUTS = dynamic_solver(INPUTS) solves an optimization problem where:\n\n"
 	"INPUTS:\n"
-	" - x0 - column vector of length 180\n "
-" - xinit - column vector of length 6\n "
+	" - x0 - column vector of length 240\n "
+" - xinit - column vector of length 9\n "
 " - all_parameters - column vector of length 240\n "
 
 	"\nOUTPUTS:\n"
-	" - outputs - column vector of length 180\n "
+	" - outputs - column vector of length 240\n "
 
 	"\n For more information, see https://www.embotech.com/FORCES-Pro/How-to-use/Simulink-Interface/Simulink-Block \n "
 
@@ -817,7 +817,7 @@ Model {
 "port_label('input', 2, 'xinit') \n  "
 "port_label('input', 3, 'all_parameters') \n  "
 "port_label('output', 1, 'outputs') \n "
-"if( exist('FORCES_PRO_Logo.jpg','file') ), image(imread('FORCES_PRO_Logo.jpg'),'center','on'); elseif( exist(['interface',filesep,'FORCES_PRO_Logo.jpg'],'file') ), image(imread(['interface',filesep,'FORCES_PRO_Logo.jpg']),'center','on'); elseif( exist(['kinematic_solver',filesep,'interface',filesep,'FORCES_PRO_Logo.jpg'],'file') ), image(imread(['kinematic_solver',filesep,'interface',filesep,'FORCES_PRO_Logo.jpg']),'center','on'); end \n "
+"if( exist('FORCES_PRO_Logo.jpg','file') ), image(imread('FORCES_PRO_Logo.jpg'),'center','on'); elseif( exist(['interface',filesep,'FORCES_PRO_Logo.jpg'],'file') ), image(imread(['interface',filesep,'FORCES_PRO_Logo.jpg']),'center','on'); elseif( exist(['dynamic_solver',filesep,'interface',filesep,'FORCES_PRO_Logo.jpg'],'file') ), image(imread(['dynamic_solver',filesep,'interface',filesep,'FORCES_PRO_Logo.jpg']),'center','on'); end \n "
 
       }
     }

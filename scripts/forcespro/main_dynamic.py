@@ -1,5 +1,5 @@
 import numpy as np
-from generate_solver_kinematic import get_forces_solver_kinematic
+from generate_solver_dynamic import get_forces_solver_dynamic
 import forcespro.nlp
 from python_sim_utils import   plotter, plot_pajecka, compute_objective
 import matplotlib.pyplot as plt
@@ -7,7 +7,7 @@ import Bezier
 import sys
 
 
-def main_kin():
+def main_dyn():
     np.set_printoptions(precision=4)
     np.set_printoptions(threshold=sys.maxsize)
     # model parameters
@@ -24,17 +24,17 @@ def main_kin():
     Nsim = np.int(np.floor(N/Tf*Tsim))
     r = 0.3 #trackwidth
 
-    solver = get_forces_solver_kinematic(N, Tf, paramfile)
+    solver = get_forces_solver_dynamic(N, Tf, paramfile)
 
     track_lu_table, smax = Bezier.generatelookuptable("tracks/simpleoval")
     trk_plt = plotter(track_lu_table, smax, r)
+    plot_pajecka(paramfile)
     trk_plt.plot_track()
 
     #starting position in track startidx = theta0[m] * 100 [pts/m]
     startidx = 10
 
     vars = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
-    zvars = ['vxdot', 'deltadot', 'thetadot', 'posx', 'posy', 'phi', 'vx', 'delta', 'theta']
     car_soln = []
     xt0 = track_lu_table[startidx,vars.index('xtrack')]
     yt0 = track_lu_table[startidx,vars.index('ytrack')]
@@ -42,15 +42,16 @@ def main_kin():
     theta_hat0 = track_lu_table[startidx,vars.index('sval')]
 
     #initial condition
-    xinit = np.array([xt0, yt0, phit0, 1, 0, theta_hat0])
-    zinit = np.concatenate([np.array([0,0,0]),xinit])
+    zvars = ['ddot', 'deltadot', 'thetadot', 'posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
+    xinit = np.array([xt0, yt0, phit0, 1, 0.1, 0, 0, 0, theta_hat0])
+    zinit = np.concatenate([np.array([0,0,0]), xinit])
     ############################################################################
     #initialization for theta values
     iter = 100
     z_current = np.tile(zinit,(N,1))
     #arbitrarily set theta  values and
     theta_old = theta_hat0*np.ones((N,)) + 0.1*np.arange(N)
-    z_current[:,8] = theta_old
+    z_current[:,11] = theta_old
     index_lin_points = 100 * theta_old
     index_lin_points = index_lin_points.astype(np.int32)
     track_lin_points = track_lu_table[index_lin_points,:]
@@ -80,7 +81,7 @@ def main_kin():
                                 Q_theta,
                                 R_d,
                                 R_delta,
-                                r-0.05
+                                r
                                 ])
             all_parameters.append(p_val)
 
@@ -105,18 +106,21 @@ def main_kin():
             z_current[idx_sol,:] = zsol
             idx_sol = idx_sol+1
 
-        theta_current = z_current[:,8]
+        theta_current = z_current[:, 11]
 
         #compute difference
         theta_diff = np.sum(np.abs(theta_current-theta_old))
         print("theta init difference: ", theta_diff)
         print("theta values", theta_current)
         theta_old = theta_current
+
     ############################################################################
     #setup using estimated initial trajectory
     theta_vals = theta_current
 
     step_sol_z_arr = z_current
+    print("resulting z:")
+    print(step_sol_z_arr)
 
     print("plotting initialization")
     trk_plt.plot_horizon(theta_vals, step_sol_z_arr[:, 3:6])
@@ -126,6 +130,7 @@ def main_kin():
     plt.pause(0.1)
     trk_plt.clear_horizion()
     trk_plt.clear_input_state_traj()
+
 
     #list storing visited states
     zinit_vals = []
@@ -155,7 +160,7 @@ def main_kin():
                                 Q_theta,
                                 R_d,
                                 R_delta,
-                                r-0.05
+                                r
                                 ])
             #create parameter matrix
             all_parameters.append(p_val)
@@ -198,7 +203,7 @@ def main_kin():
             step_sol_z_arr[idx_sol,:] = zsol
             idx_sol = idx_sol+1
 
-        theta_vals = step_sol_z_arr[:,8]
+        theta_vals = step_sol_z_arr[:,11]
         zinit = step_sol_z_arr[1,:]
         xinit = zinit[3:]
         zinit_vals.append(zinit)
@@ -234,7 +239,7 @@ def main_kin():
         trk_plt.clear_input_state_traj()
 
         #preparation for next timestep
-        theta_vals = np.hstack((step_sol_z_arr[1:, 8], step_sol_z_arr[-1, 8]+0.1))
+        theta_vals = np.hstack((step_sol_z_arr[1:, 11], step_sol_z_arr[-1, 11]+0.1))
 
         if theta_vals[0] > (laps+1)*smax :
             print("#################################RESET###############################")
@@ -248,19 +253,6 @@ def main_kin():
         #print(simidx)
     return 0
 
-def main_dyn():
-    print("inactive")
-    return 0
-
 if __name__ == "__main__":
-    arg = sys.argv[1]
 
-    if arg == "kin":
-        print("executing with kinematic_model")
-        main_kin()
-    elif arg == "dyn":
-        print("executing with dynamic_model")
-        main_dyn()
-    else:
-        print("Please run model with valid modeltype: [kin, dyn]")
-        print("e.g. python3 python_sim.py kin")
+    main_dyn()

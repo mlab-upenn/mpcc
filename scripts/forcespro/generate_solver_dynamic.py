@@ -29,14 +29,18 @@ def get_forces_solver_dynamic(N, Tf, modelparams = "modelparams.yaml"):
     #forces model
     model = forcespro.nlp.SymbolicModel()
 
+    #compute sampling time for integration of continuous dynamics
+    Ts = Tf/N
+
     #set dimensions
     model.N = N
     model.nvar = 12 #stage variables z = [u, x]'
     model.neq = 9 #number of equality constraints
     model.nh = 1 #number of inequality constraints
     model.npar = 12 #
+    ninputs = 3
 
-    #let z = [u, x] = [vxdot, deltadot, thetadot, posx, posy, phi, vx, delta, theta]
+    #let z = [u, x] = [vxdot, deltadot, thetadot, posx, posy, phi, vx, vy, omega, d, delta, theta]
     zvars = ['ddot', 'deltadot', 'thetadot', 'posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
     pvars = ['xt', 'yt', 'phit', 'sin_phit', 'cos_phit', 'theta_hat', 'Qc', 'Ql', 'Q_theta', 'R_d', 'R_delta', 'r']
 
@@ -72,22 +76,29 @@ def get_forces_solver_dynamic(N, Tf, modelparams = "modelparams.yaml"):
         e_cont = sin_phit * (xt_hat - posx) - cos_phit *(yt_hat - posy)
         e_lag = cos_phit * (xt_hat - posx) + sin_phit *(yt_hat - posy)
 
-        cost = e_cont * Qc * e_cont + e_lag * Qc * e_lag - Q_theta * thetadot + vxdot * R_d * vxdot + deltadot * R_delta * deltadot
+        cost = e_cont * Qc * e_cont + e_lag * Qc * e_lag - Q_theta * thetadot + ddot * R_d * ddot + deltadot * R_delta * deltadot
 
         return cost
 
-    def continuous_dynamics(x, u, p):
-        #extract
-        posx = z[zvars.index('posx')]
-        posy = z[zvars.index('posy')]
-        phi = z[zvars.index('phi')]
-        vx = z[zvars.index('vx')]
-        vy = z[zvars.index('vy')]
-        omega = z[zvars.index('omega')]
-        d = z[zvars.index('d')]
-        delta = z[zvars.index('delta')]
-        theta = z[zvars.index('theta')]
+    model.objective = lambda z, p: stage_cost(z,p)
 
+    def continuous_dynamics(x, u, p):
+        #extract states and inputs
+        posx = x[zvars.index('posx')-ninputs]
+        posy = x[zvars.index('posy')-ninputs]
+        phi = x[zvars.index('phi')-ninputs]
+        vx = x[zvars.index('vx')-ninputs]
+        vy = x[zvars.index('vy')-ninputs]
+        omega = x[zvars.index('omega')-ninputs]
+        d = x[zvars.index('d')-ninputs]
+        delta = x[zvars.index('delta')-ninputs]
+        theta = x[zvars.index('theta')-ninputs]
+
+        ddot = u[zvars.index('ddot')]
+        deltadot = u[zvars.index('deltadot')]
+        thetadot = u[zvars.index('thetadot')]
+
+        #build CasADi expressions for dynamic model
         #front lateral tireforce
         alphaf = -casadi.atan((omega*lf + vy)/ vx) + delta
         Ffy = Df*casadi.sin(Cf*casadi.atan(Bf*alphaf))
@@ -100,12 +111,12 @@ def get_forces_solver_dynamic(N, Tf, modelparams = "modelparams.yaml"):
         Frx = (Cm1-Cm2*vx) * d - Cr -Cd*vx**2
 
         statedot = np.array([
-                vx*cos(phi) - vy * sin(phi), #posxdot
-                vx*sin(phi) + vy * cos(phi), #posxdot
+                vx * casadi.cos(phi) - vy * casadi.sin(phi), #posxdot
+                vx * casadi.sin(phi) + vy * casadi.cos(phi), #posxdot
                 omega,                       #phidot
-                1/m * (Frx - Ffy*sin(delta) + m*vy*omega), #vxdot
-                1/m * (Fry + Ffy*cos(delta) - m*vx*omega), #vydot
-                1/Iz * (Ffy*lf*cos(delta) - Fry*lr),       #omegadot
+                1/m * (Frx - Ffy*casadi.sin(delta) + m*vy*omega), #vxdot
+                1/m * (Fry + Ffy*casadi.cos(delta) - m*vx*omega), #vydot
+                1/Iz * (Ffy*lf*casadi.cos(delta) - Fry*lr),       #omegadot
                 ddot,
                 deltadot,
                 thetadot
@@ -148,13 +159,19 @@ def get_forces_solver_dynamic(N, Tf, modelparams = "modelparams.yaml"):
     ddot_min = -10.0 #min change in d [-]
     ddot_max = 10.0  #max change in d [-]
 
+    d_min = -1 #min d [-]
+    d_max = 1 #max d [-]
+
     delta_min = -0.40  # minimum steering angle [rad]
     delta_max = 0.40  # maximum steering angle [rad]
 
     deltadot_min = -2  # minimum steering angle cahgne[rad/s]
     deltadot_max = 2 # maximum steering angle cahgne[rad/s]
 
-    thetadot_min = 0.1  # minimum adv param speed [m/s]
+    omega_min = -100 # minimum yawrate [rad/sec]
+    omega_max = 100 # maximum yawrate [rad/sec]
+
+    thetadot_min = 0.01  # minimum adv param speed [m/s]
     thetadot_max = 5 # maximum adv param speed [m/s]
 
     theta_min = 0.00  # minimum adv param [m]
@@ -163,8 +180,32 @@ def get_forces_solver_dynamic(N, Tf, modelparams = "modelparams.yaml"):
     vx_max = 2 # max long vel [m/s]
     vx_min = -1 # min long vel [m/s]
 
-    model.ub = np.array([ddot_max, deltadot_max, thetadot_max, 100, 100, 1000, vx_max, delta_max, theta_max])
-    model.lb = np.array([ddot_min, deltadot_min, thetadot_min , -100, -100, -1000, vx_min, delta_min, theta_min])
+    vy_max = 2 # max lat vel [m/s]
+    vy_min = -2 # min lat vel [m/s]
+
+    #Note: z = [u, x] = [vxdot, deltadot, thetadot, posx, posy, phi, vx, vy, omega, d, delta, theta]
+    model.ub = np.array([ddot_max, deltadot_max, thetadot_max, 100, 100, 1000, vx_max, vy_max, omega_max, d_max, delta_max, theta_max])
+    model.lb = np.array([ddot_min, deltadot_min, thetadot_min , -100, -100, -1000, vx_min, vy_min, omega_min, d_min, delta_min, theta_min])
 
     #put initial condition on all state variables x
     model.xinitidx = 3 + np.arange(model.nvar -3)
+    # Set solver options
+    codeoptions = forcespro.CodeOptions("dynamic_solver")
+    codeoptions.nlp.integrator.type = 'ERK4'
+    codeoptions.nlp.integrator.Ts = Ts
+    codeoptions.nlp.integrator.nodes = 3 #intermediate integration nodes
+
+    codeoptions.maxit = 80  # Maximum number of iterations
+    codeoptions.printlevel = 2  # Use printlevel = 2 to print progress (but not for timings)
+    codeoptions.optlevel = 1  # 0 no optimization, 1 optimize for size, 2 optimize for speed, 3 optimize for size & speed
+    codeoptions.nlp.stack_parambounds = 1
+    #codeoptions.noVariableElimination = True
+    # Creates code for symbolic model formulation given above, then contacts server to generate new solver
+    solver = model.generate_solver(codeoptions)
+    return solver
+
+if __name__ == "__main__":
+    N = 20
+    Tf = 1
+
+    solver = get_forces_solver_dynamic(N, Tf)

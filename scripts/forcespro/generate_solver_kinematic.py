@@ -16,6 +16,7 @@ def get_forces_solver_kinematic(N, Tf, modelparams = "modelparams.yaml"):
     #initial example with kinematic_model
     model = forcespro.nlp.SymbolicModel()
 
+    #compute sampling time for integration of continuous dynamics
     Ts = Tf/N
 
     #set dimensions
@@ -169,4 +170,4 @@ if __name__ == "__main__":
     N = 20
     Tf = 1
 
-    solver = get_forces_solver(N, Tf)
+    solver = get_forces_solver_kinematic(N, Tf)
