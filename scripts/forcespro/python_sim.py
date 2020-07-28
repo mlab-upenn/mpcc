@@ -1,5 +1,5 @@
 import numpy as np
-from generate_solver import get_forces_solver
+from generate_solver_kinematic import get_forces_solver_kinematic
 import forcespro.nlp
 from python_sim_utils import   plotter, plot_pajecka, compute_objective
 import matplotlib.pyplot as plt
@@ -24,7 +24,7 @@ def main_kin():
     Nsim = np.int(np.floor(N/Tf*Tsim))
     r = 0.3 #trackwidth
 
-    solver = get_forces_solver(N, Tf, paramfile)
+    solver = get_forces_solver_kinematic(N, Tf, paramfile)
 
     track_lu_table, smax = Bezier.generatelookuptable("tracks/simpleoval")
     trk_plt = plotter(track_lu_table, smax)
@@ -98,7 +98,7 @@ def main_kin():
         #extract theta values
         idx_sol = 0
         for key in output:
-            print(key)
+            #print(key)
             zsol = output[key]
             usol = zsol[0:3]
             z_current[idx_sol,:] = zsol
