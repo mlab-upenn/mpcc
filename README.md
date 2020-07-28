@@ -1,4 +1,4 @@
-# Model Predictive Contouring Control using ACADOS
+# Model Predictive Contouring Control using ACADOS or ForcesPRO
 
 This repo contains an inprogress implementation of model predictive contouring control based on the ACADOS solver. Currently the dynamic model is not working.
 
