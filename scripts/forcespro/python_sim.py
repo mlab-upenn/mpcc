@@ -11,7 +11,14 @@ def main_kin():
     np.set_printoptions(precision=4)
     np.set_printoptions(threshold=sys.maxsize)
     # model parameters
+    # model parameters
     paramfile = "modelparams.yaml"
+    #load global constant model parameters
+    with open(paramfile) as file:
+        params = yaml.load(file, Loader= yaml.FullLoader)
+    lf = params['lf'] #[m]
+    lr = params['lr'] #[m]
+    lencar = lf+lr
     #sim parameters
     Tsim = 4
     Tf = 1
@@ -27,7 +34,7 @@ def main_kin():
     solver = get_forces_solver_kinematic(N, Tf, paramfile)
 
     track_lu_table, smax = Bezier.generatelookuptable("tracks/simpleoval")
-    trk_plt = plotter(track_lu_table, smax, r)
+    trk_plt = plotter(track_lu_table, smax, r, lencar)
     trk_plt.plot_track()
 
     #starting position in track startidx = theta0[m] * 100 [pts/m]

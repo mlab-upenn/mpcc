@@ -170,7 +170,7 @@ static int casadi_f0(const casadi_real** arg, casadi_real** res, casadi_int* iw,
   a5=8.3333333333333332e-03;
   a11=(a5*a16);
   a11=(a2+a11);
-  a12=1.0000000000000001e-01;
+  a12=6.3000000000000000e-02;
   a7=(a2/a12);
   a14=arg[0]? arg[0][7] : 0;
   a21=tan(a14);
@@ -443,7 +443,7 @@ static int casadi_f0(const casadi_real** arg, casadi_real** res, casadi_int* iw,
   a3=(a4*a3);
   a67=(a5*a27);
   a15=sin(a26);
-  a19=8.3333333333333329e-02;
+  a19=1.3227513227513227e-01;
   a16=(a19*a24);
   a10=(a5*a16);
   a91=(a15*a10);
@@ -465,7 +465,7 @@ static int casadi_f0(const casadi_real** arg, casadi_real** res, casadi_int* iw,
   a16=(a4*a16);
   a19=(a4*a19);
   a16=(a16+a19);
-  a19=1.6666666666666666e-01;
+  a19=2.6455026455026454e-01;
   a97=(a19*a36);
   a16=(a16+a97);
   a16=(a0*a16);
@@ -485,7 +485,7 @@ static int casadi_f0(const casadi_real** arg, casadi_real** res, casadi_int* iw,
   a67=(a67+a98);
   a98=(a97*a52);
   a101=sin(a51);
-  a102=2.5000000000000000e-01;
+  a102=3.9682539682539686e-01;
   a103=(a102*a49);
   a104=(a5*a103);
   a104=(a16+a104);
@@ -512,7 +512,7 @@ static int casadi_f0(const casadi_real** arg, casadi_real** res, casadi_int* iw,
   a19=(a19+a103);
   a102=(a4*a102);
   a19=(a19+a102);
-  a102=3.3333333333333331e-01;
+  a102=5.2910052910052907e-01;
   a103=(a102*a60);
   a19=(a19+a103);
   a19=(a0*a19);
@@ -533,7 +533,7 @@ static int casadi_f0(const casadi_real** arg, casadi_real** res, casadi_int* iw,
   a67=(a67+a108);
   a108=(a103*a76);
   a111=sin(a75);
-  a112=4.1666666666666663e-01;
+  a112=6.6137566137566139e-01;
   a113=(a112*a73);
   a114=(a5*a113);
   a114=(a19+a114);
@@ -630,7 +630,7 @@ static int casadi_f0(const casadi_real** arg, casadi_real** res, casadi_int* iw,
   a102=(a102+a113);
   a112=(a4*a112);
   a102=(a102+a112);
-  a112=5.0000000000000000e-01;
+  a112=7.9365079365079372e-01;
   a112=(a112*a74);
   a102=(a102+a112);
   a102=(a0*a102);
@@ -869,7 +869,7 @@ static int casadi_f0(const casadi_real** arg, casadi_real** res, casadi_int* iw,
   a2=(a2+a1);
   if (res[5]!=0) res[5][12]=a2;
   if (res[5]!=0) res[5][13]=a108;
-  a2=10.;
+  a2=1.5873015873015873e+01;
   a21=(a2*a21);
   a1=(a5*a21);
   a67=(a98*a1);

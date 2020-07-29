@@ -7,13 +7,14 @@ import yaml
 
 class plotter():
 
-    def __init__(self, table, smax, r):
+    def __init__(self, table, smax, r, lencar):
         #trackplot
         self.fig, self.ax = plt.subplots(1, figsize=(20,12))
         #input and state plot
         self.fig2, (self.ax1, self.ax2) = plt.subplots(nrows = 2, ncols = 1, figsize=(10,10))
 
         self.r = r
+        self.lencar = lencar
         self.smax = smax
         maxidx = np.floor(smax * 100).astype(np.int32)
         #downsample
@@ -37,7 +38,7 @@ class plotter():
         self.ax.plot(self.coords[:,0] - self.r * self.normaldir[:,0] ,\
         self.coords[:,1]- self.r * self.normaldir[:,1], linestyle = '--', color = 'k')
         self.ax.set_xlim([-1,5])
-        self.ax.set_ylim([-0.5,3])
+        self.ax.set_ylim([-0.5,3.1])
         #plt.show(block=False)
         #plt.pause(2) # Pause for interval seconds.
         #input("hit [enter] to continue.")
@@ -45,7 +46,7 @@ class plotter():
 
     def plot_traj(self, xvals):
 
-        heatmap = self.ax.scatter(xvals[10:,0], xvals[10:,1], s = 10, c=xvals[10:,3], cmap=cm.rainbow, edgecolor='none', marker='o')
+        heatmap = self.ax.scatter(xvals[:,0], xvals[:,1], s = 40, c=xvals[:,3], cmap=cm.jet, edgecolor='none', marker='o')
         cbar = self.fig.colorbar(heatmap, fraction=0.035)
         cbar.set_label("velocity in [m/s]")
         self.fig.canvas.draw()
@@ -60,8 +61,8 @@ class plotter():
         idxp= idxp.astype(np.int32)
         x_theta_vals = self.coords_full[idxp,0]
         y_theta_vals = self.coords_full[idxp,1]
-        width = 0.1
-        height = 0.05
+        width = self.lencar
+        height = width/2
 
 
         phi0 = xval[0,2]
@@ -73,6 +74,9 @@ class plotter():
         carrect = patches.Rectangle((xval[0,0]-width/2, xval[0,1]-height/2),width, height,\
         linewidth=1,edgecolor='k',facecolor='none', transform= t)
         self.car = self.ax.add_patch(carrect)
+        center = np.array([xval[0,0], xval[0,1]])
+        front = center + width/2*np.array([np.cos(phi0), np.sin(phi0)])
+        self.cardir = self.ax.plot([center[0], front[0]], [center[1], front[1]], linewidth = 1, color = 'r')
 
         self.theta_horz = self.ax.scatter(x_theta_vals, y_theta_vals, marker = 'x', color = 'g')
         self.pos_horz = self.ax.scatter(xval[:,0], xval[:,1], marker = 'D', color = 'b')
@@ -82,7 +86,9 @@ class plotter():
                                                  linestyle = '--', color = 'gray')
             self.connect_horz.append(connector)
         self.fig.canvas.draw()
-        
+        plt.show(block = False)
+        plt.pause(0.01)
+
 
     def plot_input_state_traj(self, zval, varnames):
 

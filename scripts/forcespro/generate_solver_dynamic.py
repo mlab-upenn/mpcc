@@ -21,7 +21,7 @@ def get_forces_solver_dynamic(N, Tf, modelparams = "modelparams.yaml"):
     Cr = params['Cr']
     Cm1 = params['Cm1']
     Cm2 = params['Cm2']
-    Cr = params['Cr']
+    Croll = params['Croll']
     Cd = params['Cd']
     Df = params['Df']
     Dr = params['Dr']
@@ -40,7 +40,7 @@ def get_forces_solver_dynamic(N, Tf, modelparams = "modelparams.yaml"):
     model.npar = 12 #
     ninputs = 3
 
-    #let z = [u, x] = [vxdot, deltadot, thetadot, posx, posy, phi, vx, vy, omega, d, delta, theta]
+    #let z = [u, x] = [ddot, deltadot, thetadot, posx, posy, phi, vx, vy, omega, d, delta, theta]
     zvars = ['ddot', 'deltadot', 'thetadot', 'posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
     pvars = ['xt', 'yt', 'phit', 'sin_phit', 'cos_phit', 'theta_hat', 'Qc', 'Ql', 'Q_theta', 'R_d', 'R_delta', 'r']
 
@@ -100,31 +100,50 @@ def get_forces_solver_dynamic(N, Tf, modelparams = "modelparams.yaml"):
 
         #build CasADi expressions for dynamic model
         #front lateral tireforce
-        alphaf = -casadi.atan((omega*lf + vy)/ vx) + delta
+        alphaf = -casadi.atan2((omega*lf + vy), vx) + delta
         Ffy = Df*casadi.sin(Cf*casadi.atan(Bf*alphaf))
 
         #rear lateral tireforce
-        alphar = casadi.atan((omega*lr - vy)/vx)
-        Fry = Dr*casadi.sin(Cf*casadi.atan(Br*alphar))
+        alphar = casadi.atan2((omega*lr - vy),vx)
+
+        Fry = Dr*casadi.sin(Cr*casadi.atan(Br*alphar))
 
         #rear longitudinal forces
-        Frx = (Cm1-Cm2*vx) * d - Cr -Cd*vx**2
+
+        Frx = (Cm1-Cm2*vx) * d - Croll -Cd*vx*vx
+
+        #let z = [u, x] = [ddot, deltadot, thetadot, posx, posy, phi, vx, vy, omega, d, delta, theta]
 
         statedot = np.array([
-                vx * casadi.cos(phi) - vy * casadi.sin(phi), #posxdot
-                vx * casadi.sin(phi) + vy * casadi.cos(phi), #posxdot
-                omega,                       #phidot
-                1/m * (Frx - Ffy*casadi.sin(delta) + m*vy*omega), #vxdot
-                1/m * (Fry + Ffy*casadi.cos(delta) - m*vx*omega), #vydot
-                1/Iz * (Ffy*lf*casadi.cos(delta) - Fry*lr),       #omegadot
+                vx * casadi.cos(phi) - vy * casadi.sin(phi),        #posxdot
+                vx * casadi.sin(phi) + vy * casadi.cos(phi),        #posydot
+                omega,                                              #phidot
+                1/m * (Frx - Ffy*casadi.sin(delta) + m*vy*omega),   #vxdot
+                1/m * (Fry + Ffy*casadi.cos(delta) - m*vx*omega),   #vydot
+                1/Iz * (Ffy*lf*casadi.cos(delta) - Fry*lr),         #omegadot
                 ddot,
                 deltadot,
                 thetadot
                 ])
+        '''
+        statedot = np.array([
+                vx * casadi.sin(phi) - vy * casadi.cos(phi),        #posxdot
+                vx * casadi.cos(phi) + vy * casadi.sin(phi),        #posydot
+                omega,                                              #phidot
+                1/m * (Frx - Ffy*casadi.sin(delta) + m*vy*omega),   #vxdot
+                1/m * (Fry + Ffy*casadi.cos(delta) - m*vx*omega),   #vydot
+                1/Iz * (Ffy*lf*casadi.cos(delta) - Fry*lr),         #omegadot
+                ddot,
+                deltadot,
+                thetadot
+                ])
+
+                '''
         return statedot
 
     #set model to continuous dynamics mode
     model.continuous_dynamics = continuous_dynamics
+
     #dynamics only in state Variables
     model.E = np.concatenate([np.zeros((9,3)),np.eye(9)], axis=1)
 
@@ -159,7 +178,7 @@ def get_forces_solver_dynamic(N, Tf, modelparams = "modelparams.yaml"):
     ddot_min = -10.0 #min change in d [-]
     ddot_max = 10.0  #max change in d [-]
 
-    d_min = -1 #min d [-]
+    d_min = -0.1 #min d [-]
     d_max = 1 #max d [-]
 
     delta_min = -0.40  # minimum steering angle [rad]
@@ -171,21 +190,21 @@ def get_forces_solver_dynamic(N, Tf, modelparams = "modelparams.yaml"):
     omega_min = -100 # minimum yawrate [rad/sec]
     omega_max = 100 # maximum yawrate [rad/sec]
 
-    thetadot_min = 0.01  # minimum adv param speed [m/s]
+    thetadot_min = 0.05  # minimum adv param speed [m/s]
     thetadot_max = 5 # maximum adv param speed [m/s]
 
     theta_min = 0.00  # minimum adv param [m]
-    theta_max = 100 # maximum adv param  [m]
+    theta_max = 1000 # maximum adv param  [m]
 
-    vx_max = 2 # max long vel [m/s]
-    vx_min = -1 # min long vel [m/s]
+    vx_max = 3.5 # max long vel [m/s]
+    vx_min = -0.5 #0.05 # min long vel [m/s]
 
-    vy_max = 2 # max lat vel [m/s]
-    vy_min = -2 # min lat vel [m/s]
+    vy_max = 3 # max lat vel [m/s]
+    vy_min = -3 # min lat vel [m/s]
 
     #Note: z = [u, x] = [vxdot, deltadot, thetadot, posx, posy, phi, vx, vy, omega, d, delta, theta]
-    model.ub = np.array([ddot_max, deltadot_max, thetadot_max, 100, 100, 1000, vx_max, vy_max, omega_max, d_max, delta_max, theta_max])
-    model.lb = np.array([ddot_min, deltadot_min, thetadot_min , -100, -100, -1000, vx_min, vy_min, omega_min, d_min, delta_min, theta_min])
+    model.ub = np.array([ddot_max, deltadot_max, thetadot_max, 10, 10, 100, vx_max, vy_max, omega_max, d_max, delta_max, theta_max])
+    model.lb = np.array([ddot_min, deltadot_min, thetadot_min , -10, -10, -100, vx_min, vy_min, omega_min, d_min, delta_min, theta_min])
 
     #put initial condition on all state variables x
     model.xinitidx = 3 + np.arange(model.nvar -3)
@@ -195,9 +214,9 @@ def get_forces_solver_dynamic(N, Tf, modelparams = "modelparams.yaml"):
     codeoptions.nlp.integrator.Ts = Ts
     codeoptions.nlp.integrator.nodes = 3 #intermediate integration nodes
 
-    codeoptions.maxit = 80  # Maximum number of iterations
+    codeoptions.maxit = 50  # Maximum number of iterations
     codeoptions.printlevel = 2  # Use printlevel = 2 to print progress (but not for timings)
-    codeoptions.optlevel = 1  # 0 no optimization, 1 optimize for size, 2 optimize for speed, 3 optimize for size & speed
+    codeoptions.optlevel = 0  # 0 no optimization, 1 optimize for size, 2 optimize for speed, 3 optimize for size & speed
     codeoptions.nlp.stack_parambounds = 1
     #codeoptions.noVariableElimination = True
     # Creates code for symbolic model formulation given above, then contacts server to generate new solver

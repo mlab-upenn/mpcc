@@ -4,6 +4,7 @@ import forcespro.nlp
 from python_sim_utils import   plotter, plot_pajecka, compute_objective
 import matplotlib.pyplot as plt
 import Bezier
+import yaml
 import sys
 
 
@@ -12,27 +13,45 @@ def main_dyn():
     np.set_printoptions(threshold=sys.maxsize)
     # model parameters
     paramfile = "modelparams.yaml"
+    #load global constant model parameters
+    with open(paramfile) as file:
+        params = yaml.load(file, Loader= yaml.FullLoader)
+    lf = params['lf'] #[m]
+    lr = params['lr'] #[m]
+    #pajecka and motor coefficients
+    Bf = params['Bf']
+    Br = params['Br']
+    Cf = params['Cf']
+    Cr = params['Cr']
+    Cm1 = params['Cm1']
+    Cm2 = params['Cm2']
+    Croll = params['Croll']
+    Cd = params['Cd']
+    Df = params['Df']
+    Dr = params['Dr']
+    lencar = lf+lr
+
     #sim parameters
-    Tsim = 4
+    Tsim = 20
     Tf = 1
     N = 20
     Qc = 0.1
     Ql = 1000
     Q_theta = 10
-    R_d = 0.1
-    R_delta = 0.1
+    R_d = 0.01
+    R_delta = 0.01
     Nsim = np.int(np.floor(N/Tf*Tsim))
-    r = 0.3 #trackwidth
+    r = 0.2 #trackwidth
 
     solver = get_forces_solver_dynamic(N, Tf, paramfile)
 
     track_lu_table, smax = Bezier.generatelookuptable("tracks/simpleoval")
-    trk_plt = plotter(track_lu_table, smax, r)
-    plot_pajecka(paramfile)
+    trk_plt = plotter(track_lu_table, smax, r, lencar)
+    #plot_pajecka(paramfile)
     trk_plt.plot_track()
 
     #starting position in track startidx = theta0[m] * 100 [pts/m]
-    startidx = 10
+    startidx = 20
 
     vars = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
     car_soln = []
@@ -43,14 +62,14 @@ def main_dyn():
 
     #initial condition
     zvars = ['ddot', 'deltadot', 'thetadot', 'posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
-    xinit = np.array([xt0, yt0, phit0, 1, 0.1, 0, 0, 0, theta_hat0])
+    xinit = np.array([xt0, yt0, phit0, 0.1, 0.0, 0, 0, 0, theta_hat0])
     zinit = np.concatenate([np.array([0,0,0]), xinit])
     ############################################################################
     #initialization for theta values
-    iter = 100
+    iter = 3
     z_current = np.tile(zinit,(N,1))
     #arbitrarily set theta  values and
-    theta_old = theta_hat0*np.ones((N,)) + 0.1*np.arange(N)
+    theta_old = theta_hat0*np.ones((N,)) + 0.001*np.arange(N)
     z_current[:,11] = theta_old
     index_lin_points = 100 * theta_old
     index_lin_points = index_lin_points.astype(np.int32)
@@ -133,7 +152,7 @@ def main_dyn():
 
 
     #list storing visited states
-    zinit_vals = []
+    zinit_vals = np.zeros((Nsim, 12))
     laps = 0
     ##########################SIMULATION#######################################
     for simidx in range(Nsim):
@@ -203,31 +222,40 @@ def main_dyn():
             step_sol_z_arr[idx_sol,:] = zsol
             idx_sol = idx_sol+1
 
-        theta_vals = step_sol_z_arr[:,11]
-        zinit = step_sol_z_arr[1,:]
-        xinit = zinit[3:]
-        zinit_vals.append(zinit)
 
+
+        print("theta: ", zinit[zvars.index('theta')])
+        print("vx: ", zinit[zvars.index('vx')])
+        print("vy: ", zinit[zvars.index('vy')])
+        print("omega: ", zinit[zvars.index('omega')])
+        print("phi: ", zinit[zvars.index('phi')]*180/3.1415)
+        print("d: ", zinit[zvars.index('d')])
+        print("delta: ", zinit[zvars.index('delta')])
+
+        vx = zinit[zvars.index('vx')]
+        vy = zinit[zvars.index('vy')]
+        delta = zinit[zvars.index('delta')]
+        omega = zinit[zvars.index('omega')]
+        d = zinit[zvars.index('d')]
+        alphaf = -np.arctan2((omega*lf + vy), vx) + delta
+        Ffy = Df*np.sin(Cf*np.arctan(Bf*alphaf))
+        alphar = np.arctan2((omega*lr - vy),vx)
+        Fry = Dr*np.sin(Cr*np.arctan(Br*alphar))
+        Frx = (Cm1-Cm2*vx) * d - 0*Cr -Cd*vx*vx
+
+        print("Ffy: ", Ffy)
+        print("Fry: ", Fry)
+        print("Frx: ", Frx)
+
+        theta_vals = step_sol_z_arr[:,11]
+        zinit = step_sol_z_arr[0,:]
+        xinit = zinit[3:]
+
+        zinit_vals[simidx,:] = zinit
         step_sol_u_arr = np.array(step_sol_u)
 
-        objective = compute_objective(Tf/float(N),
-                    Qc,
-                    Ql,
-                    Q_theta,
-                    R_d,
-                    R_delta,
-                    theta_vals,
-                    theta_old,
-                    step_sol_z_arr[:, 3:5],
-                    step_sol_u_arr,
-                    track_lin_points[:,vars.index('xtrack'):vars.index('ytrack')+1],
-                    track_lin_points[:,vars.index('phitrack')]
-                    )
-
-
+        '''
         #plotting result
-
-        print("objective value", objective)
         trk_plt.plot_horizon(theta_vals, step_sol_z_arr[:, 3:6])
         trk_plt.plot_input_state_traj(step_sol_z_arr, zvars)
         #plt.show()
@@ -237,7 +265,7 @@ def main_dyn():
         plt.pause(0.1)
         trk_plt.clear_horizion()
         trk_plt.clear_input_state_traj()
-
+        '''
         #preparation for next timestep
         theta_vals = np.hstack((step_sol_z_arr[1:, 11], step_sol_z_arr[-1, 11]+0.1))
 
@@ -247,7 +275,8 @@ def main_dyn():
 
 
     ###############################/SIMULATION##################################
-    trk_plt.plot_traj(np.array(x0vals))
+
+    trk_plt.plot_traj(zinit_vals[:,3:])
     plt.show()
     #np.savetxt("full_sol_x_log.csv", )
         #print(simidx)
