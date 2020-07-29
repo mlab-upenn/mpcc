@@ -46,9 +46,9 @@ extern "C" {
 
 static const casadi_int casadi_s0[11] = {7, 1, 0, 7, 0, 1, 2, 3, 4, 5, 6};
 static const casadi_int casadi_s1[7] = {3, 1, 0, 3, 0, 1, 2};
-static const casadi_int casadi_s2[17] = {13, 1, 0, 13, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+static const casadi_int casadi_s2[16] = {12, 1, 0, 12, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
 
-/* f110_kinematic_model_expl_ode_fun:(i0[7],i1[3],i2[13])->(o0[7]) */
+/* f110_kinematic_model_expl_ode_fun:(i0[7],i1[3],i2[12])->(o0[7]) */
 static int casadi_f0(const casadi_real** arg, casadi_real** res, casadi_int* iw, casadi_real* w, int mem) {
   casadi_real a0, a1, a2;
   a0=arg[0]? arg[0][3] : 0;
@@ -59,7 +59,7 @@ static int casadi_f0(const casadi_real** arg, casadi_real** res, casadi_int* iw,
   a1=sin(a1);
   a1=(a0*a1);
   if (res[0]!=0) res[0][1]=a1;
-  a1=1.0000000000000001e-01;
+  a1=6.3000000000000000e-02;
   a0=(a0/a1);
   a1=arg[0]? arg[0][6] : 0;
   a1=tan(a1);

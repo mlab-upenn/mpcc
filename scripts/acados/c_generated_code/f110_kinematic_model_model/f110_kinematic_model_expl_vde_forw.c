@@ -53,9 +53,9 @@ static const casadi_int casadi_s0[11] = {7, 1, 0, 7, 0, 1, 2, 3, 4, 5, 6};
 static const casadi_int casadi_s1[59] = {7, 7, 0, 7, 14, 21, 28, 35, 42, 49, 0, 1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 6};
 static const casadi_int casadi_s2[27] = {7, 3, 0, 7, 14, 21, 0, 1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 6};
 static const casadi_int casadi_s3[7] = {3, 1, 0, 3, 0, 1, 2};
-static const casadi_int casadi_s4[17] = {13, 1, 0, 13, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+static const casadi_int casadi_s4[16] = {12, 1, 0, 12, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
 
-/* f110_kinematic_model_expl_vde_forw:(i0[7],i1[7x7],i2[7x3],i3[3],i4[13])->(o0[7],o1[7x7],o2[7x3]) */
+/* f110_kinematic_model_expl_vde_forw:(i0[7],i1[7x7],i2[7x3],i3[3],i4[12])->(o0[7],o1[7x7],o2[7x3]) */
 static int casadi_f0(const casadi_real** arg, casadi_real** res, casadi_int* iw, casadi_real* w, int mem) {
   casadi_real a0, a1, a10, a11, a12, a13, a14, a15, a2, a3, a4, a5, a6, a7, a8, a9;
   a0=arg[0]? arg[0][3] : 0;
@@ -66,7 +66,7 @@ static int casadi_f0(const casadi_real** arg, casadi_real** res, casadi_int* iw,
   a3=sin(a1);
   a4=(a0*a3);
   if (res[0]!=0) res[0][1]=a4;
-  a4=1.0000000000000001e-01;
+  a4=6.3000000000000000e-02;
   a4=(a0/a4);
   a5=arg[0]? arg[0][6] : 0;
   a6=tan(a5);
@@ -94,7 +94,7 @@ static int casadi_f0(const casadi_real** arg, casadi_real** res, casadi_int* iw,
   a10=(a0*a10);
   a8=(a8+a10);
   if (res[1]!=0) res[1][1]=a8;
-  a8=10.;
+  a8=1.5873015873015873e+01;
   a7=(a8*a7);
   a7=(a6*a7);
   a10=arg[1]? arg[1][6] : 0;

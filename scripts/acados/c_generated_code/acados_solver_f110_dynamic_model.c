@@ -55,8 +55,8 @@
 #define NX     9
 #define NZ     0
 #define NU     3
-#define NP     13
-#define NBX    3
+#define NP     12
+#define NBX    9
 #define NBX0   9
 #define NBU    3
 #define NSBX   0
@@ -250,7 +250,7 @@ int acados_create()
         nl_constr_h_fun_jac[i].casadi_sparsity_in = &f110_dynamic_model_constr_h_fun_jac_uxt_zt_sparsity_in;
         nl_constr_h_fun_jac[i].casadi_sparsity_out = &f110_dynamic_model_constr_h_fun_jac_uxt_zt_sparsity_out;
         nl_constr_h_fun_jac[i].casadi_work = &f110_dynamic_model_constr_h_fun_jac_uxt_zt_work;
-        external_function_param_casadi_create(&nl_constr_h_fun_jac[i], 13);
+        external_function_param_casadi_create(&nl_constr_h_fun_jac[i], 12);
     }
     nl_constr_h_fun = (external_function_param_casadi *) malloc(sizeof(external_function_param_casadi)*N);
     for (int i = 0; i < N; i++) {
@@ -260,7 +260,7 @@ int acados_create()
         nl_constr_h_fun[i].casadi_sparsity_in = &f110_dynamic_model_constr_h_fun_sparsity_in;
         nl_constr_h_fun[i].casadi_sparsity_out = &f110_dynamic_model_constr_h_fun_sparsity_out;
         nl_constr_h_fun[i].casadi_work = &f110_dynamic_model_constr_h_fun_work;
-        external_function_param_casadi_create(&nl_constr_h_fun[i], 13);
+        external_function_param_casadi_create(&nl_constr_h_fun[i], 12);
     }
     
     
@@ -275,7 +275,7 @@ int acados_create()
         forw_vde_casadi[i].casadi_sparsity_in = &f110_dynamic_model_expl_vde_forw_sparsity_in;
         forw_vde_casadi[i].casadi_sparsity_out = &f110_dynamic_model_expl_vde_forw_sparsity_out;
         forw_vde_casadi[i].casadi_work = &f110_dynamic_model_expl_vde_forw_work;
-        external_function_param_casadi_create(&forw_vde_casadi[i], 13);
+        external_function_param_casadi_create(&forw_vde_casadi[i], 12);
     }
 
     expl_ode_fun = (external_function_param_casadi *) malloc(sizeof(external_function_param_casadi)*N);
@@ -286,7 +286,7 @@ int acados_create()
         expl_ode_fun[i].casadi_sparsity_in = &f110_dynamic_model_expl_ode_fun_sparsity_in;
         expl_ode_fun[i].casadi_sparsity_out = &f110_dynamic_model_expl_ode_fun_sparsity_out;
         expl_ode_fun[i].casadi_work = &f110_dynamic_model_expl_ode_fun_work;
-        external_function_param_casadi_create(&expl_ode_fun[i], 13);
+        external_function_param_casadi_create(&expl_ode_fun[i], 12);
     }
 
 
@@ -301,7 +301,7 @@ int acados_create()
         ext_cost_fun[i].casadi_sparsity_out = &f110_dynamic_model_ext_cost_fun_sparsity_out;
         ext_cost_fun[i].casadi_work = &f110_dynamic_model_ext_cost_fun_work;
 
-        external_function_param_casadi_create(&ext_cost_fun[i], 13);
+        external_function_param_casadi_create(&ext_cost_fun[i], 12);
     }
 
     ext_cost_fun_jac = (external_function_param_casadi *) malloc(sizeof(external_function_param_casadi)*N);
@@ -315,7 +315,7 @@ int acados_create()
         ext_cost_fun_jac[i].casadi_sparsity_out = &f110_dynamic_model_ext_cost_fun_jac_sparsity_out;
         ext_cost_fun_jac[i].casadi_work = &f110_dynamic_model_ext_cost_fun_jac_work;
 
-        external_function_param_casadi_create(&ext_cost_fun_jac[i], 13);
+        external_function_param_casadi_create(&ext_cost_fun_jac[i], 12);
     }
 
     ext_cost_fun_jac_hess = (external_function_param_casadi *) malloc(sizeof(external_function_param_casadi)*N);
@@ -329,7 +329,7 @@ int acados_create()
         ext_cost_fun_jac_hess[i].casadi_sparsity_out = &f110_dynamic_model_ext_cost_fun_jac_hess_sparsity_out;
         ext_cost_fun_jac_hess[i].casadi_work = &f110_dynamic_model_ext_cost_fun_jac_hess_work;
 
-        external_function_param_casadi_create(&ext_cost_fun_jac_hess[i], 13);
+        external_function_param_casadi_create(&ext_cost_fun_jac_hess[i], 12);
     }
 
     /************************************************
@@ -491,7 +491,7 @@ int acados_create()
     ubu[0] = 10;
     lbu[1] = -2;
     ubu[1] = 2;
-    lbu[2] = -0.1;
+    lbu[2] = 0.05;
     ubu[2] = 5;
 
     for (int i = 0; i < N; i++)
@@ -531,18 +531,36 @@ int acados_create()
     // x
     int idxbx[NBX];
     
-    idxbx[0] = 6;
-    idxbx[1] = 7;
-    idxbx[2] = 8;
+    idxbx[0] = 0;
+    idxbx[1] = 1;
+    idxbx[2] = 2;
+    idxbx[3] = 3;
+    idxbx[4] = 4;
+    idxbx[5] = 5;
+    idxbx[6] = 6;
+    idxbx[7] = 7;
+    idxbx[8] = 8;
     double lbx[NBX];
     double ubx[NBX];
     
-    lbx[0] = 0;
-    ubx[0] = 100;
-    lbx[1] = -1;
-    ubx[1] = 5;
-    lbx[2] = -0.4;
-    ubx[2] = 0.4;
+    lbx[0] = 10;
+    ubx[0] = 10;
+    lbx[1] = 10;
+    ubx[1] = 10;
+    lbx[2] = 100;
+    ubx[2] = 100;
+    lbx[3] = -0.5;
+    ubx[3] = 3.5;
+    lbx[4] = -3;
+    ubx[4] = 3;
+    lbx[5] = -100;
+    ubx[5] = 100;
+    lbx[6] = -0.1;
+    ubx[6] = 1;
+    lbx[7] = -0.4;
+    ubx[7] = 0.4;
+    lbx[8] = 0;
+    ubx[8] = 1000;
 
     for (int i = 1; i < N; i++)
     {
@@ -622,7 +640,7 @@ int acados_create()
     for (int i = 0; i < N; i++)
         ocp_nlp_solver_opts_set_at_stage(nlp_config, nlp_opts, i, "dynamics_jac_reuse", &tmp_bool);
 
-    double nlp_solver_step_length = 0.05;
+    double nlp_solver_step_length = 0.01;
     ocp_nlp_solver_opts_set(nlp_config, nlp_opts, "step_length", &nlp_solver_step_length);
 
     double levenberg_marquardt = 0;
@@ -650,7 +668,7 @@ int acados_create()
     double nlp_solver_tol_comp = 0.0001;
     ocp_nlp_solver_opts_set(nlp_config, nlp_opts, "tol_comp", &nlp_solver_tol_comp);
 
-    int nlp_solver_max_iter = 100;
+    int nlp_solver_max_iter = 50;
     ocp_nlp_solver_opts_set(nlp_config, nlp_opts, "max_iter", &nlp_solver_max_iter);
 
     int initialize_t_slacks = 0;
@@ -706,7 +724,7 @@ int acados_create()
 
 
     // initialize parameters to nominal value
-    double p[13];
+    double p[12];
     
     p[0] = 0;
     p[1] = 0;
@@ -720,7 +738,6 @@ int acados_create()
     p[9] = 0;
     p[10] = 0;
     p[11] = 0;
-    p[12] = 0;
 
 
     for (int ii = 0; ii < N; ii++)
@@ -762,7 +779,7 @@ int acados_update_params(int stage, double *p, int np)
 {
     int solver_status = 0;
 
-    int casadi_np = 13;
+    int casadi_np = 12;
     if (casadi_np != np) {
         printf("acados_update_params: trying to set %i parameters for external functions."
             " External function has %i parameters. Exiting.\n", np, casadi_np);
@@ -868,7 +885,7 @@ void acados_print_stats()
     ocp_nlp_get(nlp_config, nlp_solver, "stat_m", &stat_m);
 
     
-    double stat[1000];
+    double stat[500];
     ocp_nlp_get(nlp_config, nlp_solver, "statistics", stat);
 
     int nrow = sqp_iter+1 < stat_m ? sqp_iter+1 : stat_m;

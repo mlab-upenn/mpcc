@@ -50,10 +50,10 @@ casadi_real casadi_sq(casadi_real x) { return x*x;}
 
 static const casadi_int casadi_s0[11] = {7, 1, 0, 7, 0, 1, 2, 3, 4, 5, 6};
 static const casadi_int casadi_s1[7] = {3, 1, 0, 3, 0, 1, 2};
-static const casadi_int casadi_s2[17] = {13, 1, 0, 13, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+static const casadi_int casadi_s2[16] = {12, 1, 0, 12, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
 static const casadi_int casadi_s3[14] = {10, 1, 0, 10, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
-/* f110_kinematic_model_expl_vde_adj:(i0[7],i1[7],i2[3],i3[13])->(o0[10]) */
+/* f110_kinematic_model_expl_vde_adj:(i0[7],i1[7],i2[3],i3[12])->(o0[10]) */
 static int casadi_f0(const casadi_real** arg, casadi_real** res, casadi_int* iw, casadi_real* w, int mem) {
   casadi_real a0, a1, a2, a3, a4, a5, a6, a7, a8;
   a0=0.;
@@ -71,7 +71,7 @@ static int casadi_f0(const casadi_real** arg, casadi_real** res, casadi_int* iw,
   a5=(a5*a7);
   a2=(a2-a5);
   if (res[0]!=0) res[0][2]=a2;
-  a2=10.;
+  a2=1.5873015873015873e+01;
   a5=arg[0]? arg[0][6] : 0;
   a7=tan(a5);
   a8=arg[1]? arg[1][2] : 0;
@@ -87,7 +87,7 @@ static int casadi_f0(const casadi_real** arg, casadi_real** res, casadi_int* iw,
   if (res[0]!=0) res[0][4]=a0;
   a0=arg[1]? arg[1][3] : 0;
   if (res[0]!=0) res[0][5]=a0;
-  a0=1.0000000000000001e-01;
+  a0=6.3000000000000000e-02;
   a3=(a3/a0);
   a3=(a3*a8);
   a5=cos(a5);

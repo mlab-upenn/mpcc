@@ -48,18 +48,18 @@ extern "C" {
 
 static const casadi_int casadi_s0[13] = {9, 1, 0, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8};
 static const casadi_int casadi_s1[7] = {3, 1, 0, 3, 0, 1, 2};
-static const casadi_int casadi_s2[17] = {13, 1, 0, 13, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+static const casadi_int casadi_s2[16] = {12, 1, 0, 12, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
 static const casadi_int casadi_s3[5] = {1, 1, 0, 1, 0};
-static const casadi_int casadi_s4[10] = {12, 1, 0, 6, 0, 1, 2, 3, 4, 9};
+static const casadi_int casadi_s4[10] = {12, 1, 0, 6, 0, 1, 2, 3, 4, 11};
 
-/* f110_dynamic_model_ext_cost_fun_jac:(i0[9],i1[3],i2[13])->(o0,o1[12x1,6nz]) */
+/* f110_dynamic_model_ext_cost_fun_jac:(i0[9],i1[3],i2[12])->(o0,o1[12x1,6nz]) */
 static int casadi_f0(const casadi_real** arg, casadi_real** res, casadi_int* iw, casadi_real* w, int mem) {
   casadi_real a0, a1, a10, a11, a12, a13, a14, a15, a2, a3, a4, a5, a6, a7, a8, a9;
   a0=arg[2]? arg[2][3] : 0;
   a1=arg[2]? arg[2][0] : 0;
   a2=arg[2]? arg[2][4] : 0;
-  a3=arg[0]? arg[0][6] : 0;
-  a4=arg[2]? arg[2][7] : 0;
+  a3=arg[0]? arg[0][8] : 0;
+  a4=arg[2]? arg[2][5] : 0;
   a5=(a3-a4);
   a5=(a2*a5);
   a1=(a1+a5);
@@ -74,7 +74,7 @@ static int casadi_f0(const casadi_real** arg, casadi_real** res, casadi_int* iw,
   a4=(a7-a3);
   a4=(a2*a4);
   a6=(a6-a4);
-  a4=arg[2]? arg[2][8] : 0;
+  a4=arg[2]? arg[2][6] : 0;
   a8=(a6*a4);
   a9=(a8*a6);
   a1=(a1-a5);
@@ -85,17 +85,17 @@ static int casadi_f0(const casadi_real** arg, casadi_real** res, casadi_int* iw,
   a7=(a1*a4);
   a3=(a7*a1);
   a9=(a9+a3);
-  a3=arg[2]? arg[2][10] : 0;
+  a3=arg[2]? arg[2][8] : 0;
   a5=arg[1]? arg[1][2] : 0;
   a5=(a3*a5);
   a9=(a9-a5);
   a5=arg[1]? arg[1][0] : 0;
-  a10=arg[2]? arg[2][11] : 0;
+  a10=arg[2]? arg[2][9] : 0;
   a11=(a5*a10);
   a12=(a11*a5);
   a9=(a9+a12);
   a12=arg[1]? arg[1][1] : 0;
-  a13=arg[2]? arg[2][12] : 0;
+  a13=arg[2]? arg[2][10] : 0;
   a14=(a12*a13);
   a15=(a14*a12);
   a9=(a9+a15);

@@ -84,7 +84,7 @@ int f110_kinematic_model_acados_sim_create()
     sim_forw_vde_casadi->casadi_sparsity_in = &f110_kinematic_model_expl_vde_forw_sparsity_in;
     sim_forw_vde_casadi->casadi_sparsity_out = &f110_kinematic_model_expl_vde_forw_sparsity_out;
     sim_forw_vde_casadi->casadi_work = &f110_kinematic_model_expl_vde_forw_work;
-    external_function_param_casadi_create(sim_forw_vde_casadi, 13);
+    external_function_param_casadi_create(sim_forw_vde_casadi, 12);
 
     sim_expl_ode_fun_casadi->casadi_fun = &f110_kinematic_model_expl_ode_fun;
     sim_expl_ode_fun_casadi->casadi_n_in = &f110_kinematic_model_expl_ode_fun_n_in;
@@ -92,7 +92,7 @@ int f110_kinematic_model_acados_sim_create()
     sim_expl_ode_fun_casadi->casadi_sparsity_in = &f110_kinematic_model_expl_ode_fun_sparsity_in;
     sim_expl_ode_fun_casadi->casadi_sparsity_out = &f110_kinematic_model_expl_ode_fun_sparsity_out;
     sim_expl_ode_fun_casadi->casadi_work = &f110_kinematic_model_expl_ode_fun_work;
-    external_function_param_casadi_create(sim_expl_ode_fun_casadi, 13);
+    external_function_param_casadi_create(sim_expl_ode_fun_casadi, 12);
 
     
 
@@ -142,7 +142,7 @@ int f110_kinematic_model_acados_sim_create()
     /* initialize parameter values */
     
     // initialize parameters to nominal value
-    double p[13];
+    double p[12];
     
     p[0] = 0;
     p[1] = 0;
@@ -156,7 +156,6 @@ int f110_kinematic_model_acados_sim_create()
     p[9] = 0;
     p[10] = 0;
     p[11] = 0;
-    p[12] = 0;
     sim_forw_vde_casadi[0].set_param(sim_forw_vde_casadi, p);
     sim_expl_ode_fun_casadi[0].set_param(sim_expl_ode_fun_casadi, p);
     
@@ -229,7 +228,7 @@ int f110_kinematic_model_acados_sim_free()
 int f110_kinematic_model_acados_sim_update_params(double *p, int np)
 {
     int status = 0;
-    int casadi_np = 13;
+    int casadi_np = 12;
     sim_forw_vde_casadi[0].set_param(sim_forw_vde_casadi, p);
     sim_expl_ode_fun_casadi[0].set_param(sim_expl_ode_fun_casadi, p);
 

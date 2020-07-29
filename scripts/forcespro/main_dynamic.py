@@ -53,17 +53,21 @@ def main_dyn():
     #starting position in track startidx = theta0[m] * 100 [pts/m]
     startidx = 20
 
-    vars = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
+    trackvars = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
+    xvars = ['posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
+    uvars = ['ddot', 'deltadot', 'thetadot']
+    pvars = ['xt', 'yt', 'phit', 'sin_phit', 'cos_phit', 'theta_hat', 'Qc', 'Ql', 'Q_theta', 'R_d', 'R_delta', 'r']
     car_soln = []
-    xt0 = track_lu_table[startidx,vars.index('xtrack')]
-    yt0 = track_lu_table[startidx,vars.index('ytrack')]
-    phit0 = track_lu_table[startidx,vars.index('phitrack')]
-    theta_hat0 = track_lu_table[startidx,vars.index('sval')]
+    xt0 = track_lu_table[startidx,trackvars.index('xtrack')]
+    yt0 = track_lu_table[startidx,trackvars.index('ytrack')]
+    phit0 = track_lu_table[startidx,trackvars.index('phitrack')]
+    theta_hat0 = track_lu_table[startidx,trackvars.index('sval')]
 
     #initial condition
     zvars = ['ddot', 'deltadot', 'thetadot', 'posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
     xinit = np.array([xt0, yt0, phit0, 0.1, 0.0, 0, 0, 0, theta_hat0])
     zinit = np.concatenate([np.array([0,0,0]), xinit])
+
     ############################################################################
     #initialization for theta values
     iter = 3
@@ -76,9 +80,9 @@ def main_dyn():
     track_lin_points = track_lu_table[index_lin_points,:]
 
     #initialize x values on track
-    z_current[:,3] = track_lin_points[:,vars.index('xtrack')]
-    z_current[:,4] = track_lin_points[:,vars.index('ytrack')]
-    z_current[:,5] = track_lin_points[:,vars.index('phitrack')]
+    z_current[:,3] = track_lin_points[:,trackvars.index('xtrack')]
+    z_current[:,4] = track_lin_points[:,trackvars.index('ytrack')]
+    z_current[:,5] = track_lin_points[:,trackvars.index('phitrack')]
 
     for idx in range(iter):
 
@@ -89,12 +93,12 @@ def main_dyn():
         track_lin_points = track_lu_table[index_lin_points,:]
 
         for stageidx in range(N):
-            p_val = np.array([track_lin_points[stageidx,vars.index('xtrack')],
-                                track_lin_points[stageidx,vars.index('ytrack')],
-                                track_lin_points[stageidx,vars.index('phitrack')],
-                                track_lin_points[stageidx,vars.index('sin(phi)')],
-                                track_lin_points[stageidx,vars.index('cos(phi)')],
-                                track_lin_points[stageidx,vars.index('sval')],  #aka theta_hat
+            p_val = np.array([track_lin_points[stageidx,trackvars.index('xtrack')],
+                                track_lin_points[stageidx,trackvars.index('ytrack')],
+                                track_lin_points[stageidx,trackvars.index('phitrack')],
+                                track_lin_points[stageidx,trackvars.index('sin(phi)')],
+                                track_lin_points[stageidx,trackvars.index('cos(phi)')],
+                                track_lin_points[stageidx,trackvars.index('sval')],  #aka theta_hat
                                 Qc,
                                 Ql,
                                 Q_theta,
@@ -125,7 +129,7 @@ def main_dyn():
             z_current[idx_sol,:] = zsol
             idx_sol = idx_sol+1
 
-        theta_current = z_current[:, 11]
+        theta_current = z_current[:, zvars.index('theta')]
 
         #compute difference
         theta_diff = np.sum(np.abs(theta_current-theta_old))
@@ -168,12 +172,12 @@ def main_dyn():
         #######################################################################
         #set params and warmstart
         for stageidx in range(N-1):
-            p_val = np.array([track_lin_points[stageidx,vars.index('xtrack')],
-                                track_lin_points[stageidx,vars.index('ytrack')],
-                                track_lin_points[stageidx,vars.index('phitrack')],
-                                track_lin_points[stageidx,vars.index('sin(phi)')],
-                                track_lin_points[stageidx,vars.index('cos(phi)')],
-                                track_lin_points[stageidx,vars.index('sval')] + laps*smax,  #aka theta_hat
+            p_val = np.array([track_lin_points[stageidx,trackvars.index('xtrack')],
+                                track_lin_points[stageidx,trackvars.index('ytrack')],
+                                track_lin_points[stageidx,trackvars.index('phitrack')],
+                                track_lin_points[stageidx,trackvars.index('sin(phi)')],
+                                track_lin_points[stageidx,trackvars.index('cos(phi)')],
+                                track_lin_points[stageidx,trackvars.index('sval')] + laps*smax,  #aka theta_hat
                                 Qc,
                                 Ql,
                                 Q_theta,
@@ -188,12 +192,12 @@ def main_dyn():
 
         #last stage copy old solution for init
         stageidx = N-1
-        p_val = np.array([track_lin_points[stageidx,vars.index('xtrack')],
-                            track_lin_points[stageidx,vars.index('ytrack')],
-                            track_lin_points[stageidx,vars.index('phitrack')],
-                            track_lin_points[stageidx,vars.index('sin(phi)')],
-                            track_lin_points[stageidx,vars.index('cos(phi)')],
-                            track_lin_points[stageidx,vars.index('sval')] + laps*smax,  #aka theta_hat
+        p_val = np.array([track_lin_points[stageidx,trackvars.index('xtrack')],
+                            track_lin_points[stageidx,trackvars.index('ytrack')],
+                            track_lin_points[stageidx,trackvars.index('phitrack')],
+                            track_lin_points[stageidx,trackvars.index('sin(phi)')],
+                            track_lin_points[stageidx,trackvars.index('cos(phi)')],
+                            track_lin_points[stageidx,trackvars.index('sval')] + laps*smax,  #aka theta_hat
                             Qc,
                             Ql,
                             Q_theta,

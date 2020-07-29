@@ -70,11 +70,11 @@ static void mdlInitializeSizes (SimStruct *S)
     // x0
     ssSetInputPortVectorDimension(S, 0, 9);
     // parameters
-    ssSetInputPortVectorDimension(S, 1, (20+1) * 13);
+    ssSetInputPortVectorDimension(S, 1, (20+1) * 12);
     // lbx
-    ssSetInputPortVectorDimension(S, 2, 3);
+    ssSetInputPortVectorDimension(S, 2, 9);
     // ubx
-    ssSetInputPortVectorDimension(S, 3, 3);
+    ssSetInputPortVectorDimension(S, 3, 9);
     // lbu
     ssSetInputPortVectorDimension(S, 4, 3);
     // ubu
@@ -146,7 +146,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     
 
     // local buffer
-    real_t buffer[13];
+    real_t buffer[12];
 
 
     /* go through inputs */
@@ -169,9 +169,9 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     // update value of parameters
     for (int ii = 0; ii <= 20; ii++) 
     {
-        for (int jj = 0; jj < 13; jj++)
-            buffer[jj] = (double)(*in_sign[ii*13+jj]);
-        acados_update_params(ii, buffer, 13);
+        for (int jj = 0; jj < 12; jj++)
+            buffer[jj] = (double)(*in_sign[ii*12+jj]);
+        acados_update_params(ii, buffer, 12);
     }
 
 
@@ -179,7 +179,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     // lbx
     in_sign = ssGetInputPortRealSignalPtrs(S, 2);
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 9; i++)
         buffer[i] = (double)(*in_sign[i]);
 
     for (int ii = 1; ii < 20; ii++)
@@ -188,7 +188,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     // ubx
     in_sign = ssGetInputPortRealSignalPtrs(S, 3);
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 9; i++)
         buffer[i] = (double)(*in_sign[i]);
 
     for (int ii = 1; ii < 20; ii++)

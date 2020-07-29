@@ -105,11 +105,9 @@ def get_forces_solver_dynamic(N, Tf, modelparams = "modelparams.yaml"):
 
         #rear lateral tireforce
         alphar = casadi.atan2((omega*lr - vy),vx)
-
         Fry = Dr*casadi.sin(Cr*casadi.atan(Br*alphar))
 
         #rear longitudinal forces
-
         Frx = (Cm1-Cm2*vx) * d - Croll -Cd*vx*vx
 
         #let z = [u, x] = [ddot, deltadot, thetadot, posx, posy, phi, vx, vy, omega, d, delta, theta]
@@ -125,20 +123,6 @@ def get_forces_solver_dynamic(N, Tf, modelparams = "modelparams.yaml"):
                 deltadot,
                 thetadot
                 ])
-        '''
-        statedot = np.array([
-                vx * casadi.sin(phi) - vy * casadi.cos(phi),        #posxdot
-                vx * casadi.cos(phi) + vy * casadi.sin(phi),        #posydot
-                omega,                                              #phidot
-                1/m * (Frx - Ffy*casadi.sin(delta) + m*vy*omega),   #vxdot
-                1/m * (Fry + Ffy*casadi.cos(delta) - m*vx*omega),   #vydot
-                1/Iz * (Ffy*lf*casadi.cos(delta) - Fry*lr),         #omegadot
-                ddot,
-                deltadot,
-                thetadot
-                ])
-
-                '''
         return statedot
 
     #set model to continuous dynamics mode
@@ -214,7 +198,7 @@ def get_forces_solver_dynamic(N, Tf, modelparams = "modelparams.yaml"):
     codeoptions.nlp.integrator.Ts = Ts
     codeoptions.nlp.integrator.nodes = 3 #intermediate integration nodes
 
-    codeoptions.maxit = 50  # Maximum number of iterations
+    codeoptions.maxit = 12  # Maximum number of iterations
     codeoptions.printlevel = 2  # Use printlevel = 2 to print progress (but not for timings)
     codeoptions.optlevel = 0  # 0 no optimization, 1 optimize for size, 2 optimize for speed, 3 optimize for size & speed
     codeoptions.nlp.stack_parambounds = 1

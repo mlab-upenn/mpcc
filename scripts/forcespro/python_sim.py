@@ -40,8 +40,10 @@ def main_kin():
     #starting position in track startidx = theta0[m] * 100 [pts/m]
     startidx = 10
 
-    vars = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
-    zvars = ['vxdot', 'deltadot', 'thetadot', 'posx', 'posy', 'phi', 'vx', 'delta', 'theta']
+    xvars = ['posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
+    uvars = ['ddot', 'deltadot', 'thetadot']
+    pvars = ['xt', 'yt', 'phit', 'sin_phit', 'cos_phit', 'theta_hat', 'Qc', 'Ql', 'Q_theta', 'R_d', 'R_delta', 'r']
+
     car_soln = []
     xt0 = track_lu_table[startidx,vars.index('xtrack')]
     yt0 = track_lu_table[startidx,vars.index('ytrack')]

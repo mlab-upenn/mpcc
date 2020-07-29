@@ -110,7 +110,7 @@ int main()
     u0[1] = 0.0;
     u0[2] = 0.0;
     // set parameters
-    double p[13];
+    double p[12];
     
     p[0] = 0;
     
@@ -135,8 +135,6 @@ int main()
     p[10] = 0;
     
     p[11] = 0;
-    
-    p[12] = 0;
     
     for (int ii = 0; ii < 20; ii++)
     {

@@ -5,7 +5,7 @@ import scipy.linalg
 import numpy as npy
 
 
-def acados_settings_dyn(Tf, N, modelparams):
+def acados_settings_dyn(Tf, N, modelparams = "modelparams.yaml"):
     #create render arguments
     ocp = AcadosOcp()
 
@@ -82,9 +82,11 @@ def acados_settings_dyn(Tf, N, modelparams):
     #ocp.constraints.Jsh = 1
 
     # boxconstraints
-    ocp.constraints.lbx = npy.array([model.theta_min, model.d_min, model.delta_min])
-    ocp.constraints.ubx = npy.array([model.theta_max, model.d_max, model.delta_max])
-    ocp.constraints.idxbx = npy.array([6,7,8])
+    # xvars = ['posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
+
+    ocp.constraints.lbx = npy.array([10, 10, 100, model.vx_min, model.vy_min, model.omega_min, model.d_min, model.delta_min, model.theta_min])
+    ocp.constraints.ubx = npy.array([10, 10, 100, model.vx_max, model.vy_max, model.omega_max, model.d_max, model.delta_max, model.theta_max])
+    ocp.constraints.idxbx = npy.arange(nx)
     #ocp.constraints.lsbx= -0.1 * npy.ones(ocp.dims.nbx)
     #ocp.constraints.usbx= 0.1 * npy.ones(ocp.dims.nbx)
     #ocp.constraints.idxsbx= npy.array([6,7,8])
@@ -108,16 +110,15 @@ def acados_settings_dyn(Tf, N, modelparams):
     ocp.parameter_values = npy.zeros(np)
     #ocp.solver_options.sim_method_num_stages = 4
     #ocp.solver_options.sim_method_num_steps = 3
-    ocp.solver_options.nlp_solver_step_length = 0.05
-    ocp.solver_options.nlp_solver_max_iter = 100
+    ocp.solver_options.nlp_solver_step_length = 0.01
+    ocp.solver_options.nlp_solver_max_iter = 50
     ocp.solver_options.tol = 1e-4
     #ocp.solver_options.print_level = 1
     # ocp.solver_options.nlp_solver_tol_comp = 1e-1
 
     # create solver
-    acados_solver = AcadosOcpSolver(ocp, json_file="acados_ocp2.json")
+    acados_solver = AcadosOcpSolver(ocp, json_file="acados_ocp_dynamic.json")
 
-    print("solver created returning to main")
     return constraints, model, acados_solver, ocp
 
 
@@ -238,3 +239,9 @@ def acados_settings_kin(Tf, N, modelparams):
 
     print("solver created returning to main")
     return constraints, model, acados_solver, ocp
+
+if __name__ == "__main__":
+    N = 20
+    Tf = 1
+
+    solver = acados_settings_dyn(N, Tf)
