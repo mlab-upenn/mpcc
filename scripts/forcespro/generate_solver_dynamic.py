@@ -198,10 +198,10 @@ def get_forces_solver_dynamic(N, Tf, modelparams = "modelparams.yaml"):
     codeoptions.nlp.integrator.Ts = Ts
     codeoptions.nlp.integrator.nodes = 3 #intermediate integration nodes
 
-    codeoptions.maxit = 12  # Maximum number of iterations
+    codeoptions.maxit = 15  # Maximum number of iterations
     codeoptions.printlevel = 2  # Use printlevel = 2 to print progress (but not for timings)
     codeoptions.optlevel = 0  # 0 no optimization, 1 optimize for size, 2 optimize for speed, 3 optimize for size & speed
-    codeoptions.nlp.stack_parambounds = 1
+    codeoptions.nlp.stack_parambounds = 2
     #codeoptions.noVariableElimination = True
     # Creates code for symbolic model formulation given above, then contacts server to generate new solver
     solver = model.generate_solver(codeoptions)

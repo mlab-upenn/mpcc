@@ -9,9 +9,9 @@ c_header = "include/dynamic_solver.h"
 
 # Parameter             | Type    | Scalar type      | Ctypes type    | Numpy type   | Shape     | Len
 params = \
-[("x0"                  , "dense" , ""               , ctypes.c_double, numpy.float64, (240,   1),  240),
+[("x0"                  , "dense" , ""               , ctypes.c_double, numpy.float64, (480,   1),  480),
  ("xinit"               , "dense" , ""               , ctypes.c_double, numpy.float64, (  9,   1),    9),
- ("all_parameters"      , "dense" , ""               , ctypes.c_double, numpy.float64, (240,   1),  240)]
+ ("all_parameters"      , "dense" , ""               , ctypes.c_double, numpy.float64, (480,   1),  480)]
 
 # Output                | Type    | Scalar type      | Ctypes type    | Numpy type   | Shape     | Len
 outputs = \
@@ -34,7 +34,27 @@ outputs = \
  ("x17"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
  ("x18"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
  ("x19"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
- ("x20"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12)]
+ ("x20"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
+ ("x21"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
+ ("x22"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
+ ("x23"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
+ ("x24"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
+ ("x25"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
+ ("x26"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
+ ("x27"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
+ ("x28"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
+ ("x29"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
+ ("x30"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
+ ("x31"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
+ ("x32"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
+ ("x33"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
+ ("x34"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
+ ("x35"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
+ ("x36"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
+ ("x37"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
+ ("x38"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
+ ("x39"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
+ ("x40"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12)]
 
 # Info Struct Fields
 info = \

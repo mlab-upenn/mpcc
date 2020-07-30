@@ -33,19 +33,19 @@ def main_dyn():
 
     #sim parameters
     Tsim = 20
-    Tf = 1
-    N = 20
+    Tf = 2
+    N = 40
     Qc = 0.1
     Ql = 1000
     Q_theta = 10
     R_d = 0.01
     R_delta = 0.01
     Nsim = np.int(np.floor(N/Tf*Tsim))
-    r = 0.2 #trackwidth
+    r = 0.15 #trackwidth
 
     solver = get_forces_solver_dynamic(N, Tf, paramfile)
 
-    track_lu_table, smax = Bezier.generatelookuptable("tracks/simpleoval")
+    track_lu_table, smax = Bezier.generatelookuptable("tracks/sample_track")
     trk_plt = plotter(track_lu_table, smax, r, lencar)
     #plot_pajecka(paramfile)
     trk_plt.plot_track()
@@ -70,7 +70,7 @@ def main_dyn():
 
     ############################################################################
     #initialization for theta values
-    iter = 3
+    iter = 100
     z_current = np.tile(zinit,(N,1))
     #arbitrarily set theta  values and
     theta_old = theta_hat0*np.ones((N,)) + 0.001*np.arange(N)
@@ -104,7 +104,7 @@ def main_dyn():
                                 Q_theta,
                                 R_d,
                                 R_delta,
-                                r
+                                r-lencar/2
                                 ])
             all_parameters.append(p_val)
 
@@ -183,7 +183,7 @@ def main_dyn():
                                 Q_theta,
                                 R_d,
                                 R_delta,
-                                r
+                                r-lencar/2
                                 ])
             #create parameter matrix
             all_parameters.append(p_val)
@@ -203,7 +203,7 @@ def main_dyn():
                             Q_theta,
                             R_d,
                             R_delta,
-                            r
+                            r-lencar/2
                             ])
         all_parameters.append(p_val)
         all_parameters = np.array(all_parameters)
@@ -258,7 +258,7 @@ def main_dyn():
         zinit_vals[simidx,:] = zinit
         step_sol_u_arr = np.array(step_sol_u)
 
-        '''
+
         #plotting result
         trk_plt.plot_horizon(theta_vals, step_sol_z_arr[:, 3:6])
         trk_plt.plot_input_state_traj(step_sol_z_arr, zvars)
@@ -269,7 +269,7 @@ def main_dyn():
         plt.pause(0.1)
         trk_plt.clear_horizion()
         trk_plt.clear_input_state_traj()
-        '''
+
         #preparation for next timestep
         theta_vals = np.hstack((step_sol_z_arr[1:, 11], step_sol_z_arr[-1, 11]+0.1))
 

@@ -77,7 +77,7 @@ static void mdlInitializeSizes(SimStruct *S)
     if (!ssSetNumInputPorts(S, 3)) return;
     	
 	/* Input Port 0 */
-    ssSetInputPortMatrixDimensions(S,  0, 240, 1);
+    ssSetInputPortMatrixDimensions(S,  0, 480, 1);
     ssSetInputPortDataType(S, 0, SS_DOUBLE);
     ssSetInputPortComplexSignal(S, 0, COMPLEX_NO); /* no complex signals suppported */
     ssSetInputPortDirectFeedThrough(S, 0, 1); /* Feedthrough enabled */
@@ -89,7 +89,7 @@ static void mdlInitializeSizes(SimStruct *S)
     ssSetInputPortDirectFeedThrough(S, 1, 1); /* Feedthrough enabled */
     ssSetInputPortRequiredContiguous(S, 1, 1); /*direct input signal access*/	
 	/* Input Port 2 */
-    ssSetInputPortMatrixDimensions(S,  2, 240, 1);
+    ssSetInputPortMatrixDimensions(S,  2, 480, 1);
     ssSetInputPortDataType(S, 2, SS_DOUBLE);
     ssSetInputPortComplexSignal(S, 2, COMPLEX_NO); /* no complex signals suppported */
     ssSetInputPortDirectFeedThrough(S, 2, 1); /* Feedthrough enabled */
@@ -100,7 +100,7 @@ static void mdlInitializeSizes(SimStruct *S)
     if (!ssSetNumOutputPorts(S, 1)) return;    
 		
 	/* Output Port 0 */
-    ssSetOutputPortMatrixDimensions(S,  0, 240, 1);
+    ssSetOutputPortMatrixDimensions(S,  0, 480, 1);
     ssSetOutputPortDataType(S, 0, SS_DOUBLE);
     ssSetOutputPortComplexSignal(S, 0, COMPLEX_NO); /* no complex signals suppported */
 
@@ -212,7 +212,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
 	
 
 	/* Copy inputs */
-	for( i=0; i<240; i++)
+	for( i=0; i<480; i++)
 	{ 
 		params.x0[i] = (double) x0[i]; 
 	}
@@ -222,7 +222,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
 		params.xinit[i] = (double) xinit[i]; 
 	}
 
-	for( i=0; i<240; i++)
+	for( i=0; i<480; i++)
 	{ 
 		params.all_parameters[i] = (double) all_parameters[i]; 
 	}
@@ -374,6 +374,126 @@ static void mdlOutputs(SimStruct *S, int_T tid)
 	for( i=0; i<12; i++)
 	{ 
 		outputs[k++] = (real_T) output.x20[i]; 
+	}
+
+	k=240; 
+	for( i=0; i<12; i++)
+	{ 
+		outputs[k++] = (real_T) output.x21[i]; 
+	}
+
+	k=252; 
+	for( i=0; i<12; i++)
+	{ 
+		outputs[k++] = (real_T) output.x22[i]; 
+	}
+
+	k=264; 
+	for( i=0; i<12; i++)
+	{ 
+		outputs[k++] = (real_T) output.x23[i]; 
+	}
+
+	k=276; 
+	for( i=0; i<12; i++)
+	{ 
+		outputs[k++] = (real_T) output.x24[i]; 
+	}
+
+	k=288; 
+	for( i=0; i<12; i++)
+	{ 
+		outputs[k++] = (real_T) output.x25[i]; 
+	}
+
+	k=300; 
+	for( i=0; i<12; i++)
+	{ 
+		outputs[k++] = (real_T) output.x26[i]; 
+	}
+
+	k=312; 
+	for( i=0; i<12; i++)
+	{ 
+		outputs[k++] = (real_T) output.x27[i]; 
+	}
+
+	k=324; 
+	for( i=0; i<12; i++)
+	{ 
+		outputs[k++] = (real_T) output.x28[i]; 
+	}
+
+	k=336; 
+	for( i=0; i<12; i++)
+	{ 
+		outputs[k++] = (real_T) output.x29[i]; 
+	}
+
+	k=348; 
+	for( i=0; i<12; i++)
+	{ 
+		outputs[k++] = (real_T) output.x30[i]; 
+	}
+
+	k=360; 
+	for( i=0; i<12; i++)
+	{ 
+		outputs[k++] = (real_T) output.x31[i]; 
+	}
+
+	k=372; 
+	for( i=0; i<12; i++)
+	{ 
+		outputs[k++] = (real_T) output.x32[i]; 
+	}
+
+	k=384; 
+	for( i=0; i<12; i++)
+	{ 
+		outputs[k++] = (real_T) output.x33[i]; 
+	}
+
+	k=396; 
+	for( i=0; i<12; i++)
+	{ 
+		outputs[k++] = (real_T) output.x34[i]; 
+	}
+
+	k=408; 
+	for( i=0; i<12; i++)
+	{ 
+		outputs[k++] = (real_T) output.x35[i]; 
+	}
+
+	k=420; 
+	for( i=0; i<12; i++)
+	{ 
+		outputs[k++] = (real_T) output.x36[i]; 
+	}
+
+	k=432; 
+	for( i=0; i<12; i++)
+	{ 
+		outputs[k++] = (real_T) output.x37[i]; 
+	}
+
+	k=444; 
+	for( i=0; i<12; i++)
+	{ 
+		outputs[k++] = (real_T) output.x38[i]; 
+	}
+
+	k=456; 
+	for( i=0; i<12; i++)
+	{ 
+		outputs[k++] = (real_T) output.x39[i]; 
+	}
+
+	k=468; 
+	for( i=0; i<12; i++)
+	{ 
+		outputs[k++] = (real_T) output.x40[i]; 
 	}
 
 	

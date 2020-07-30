@@ -8,17 +8,14 @@ import yaml
 class plotter():
 
     def __init__(self, table, smax, r, lencar):
-        #trackplot
-        self.fig, self.ax = plt.subplots(1, figsize=(20,12))
-        #input and state plot
-        self.fig2, (self.ax1, self.ax2) = plt.subplots(nrows = 2, ncols = 1, figsize=(10,10))
+
 
         self.r = r
         self.lencar = lencar
         self.smax = smax
         maxidx = np.floor(smax * 100).astype(np.int32)
         #downsample
-        self.downsampling = 8
+        self.downsampling = 2
         self.coords_full = table[:, 2:4]
         self.coords = table[:maxidx:self.downsampling, 2:4]
         self.phis = table[:maxidx:self.downsampling, 4]
@@ -30,15 +27,52 @@ class plotter():
         self.normaldir = np.vstack((-self.sin_phi, self.cos_phi)).T
         self.trajplots = []
 
+        deltaxmax = np.max(self.coords_full[:,0])-np.min(self.coords_full[:,0])
+        deltaymax = np.max(self.coords_full[:,1])-np.min(self.coords_full[:,1])
+
+        ratio = deltaymax/deltaxmax
+        #trackplot
+        self.fig, self.ax = plt.subplots(1, figsize=(20,ratio*20))
+        self.track_xbounds = [-0.1-np.max(r)+np.min(self.coords_full[:,0]),np.max(self.coords_full[:,0])+np.max(r)+0.2]
+        self.track_ybounds = [-0.1-np.max(r)+np.min(self.coords_full[:,1]),np.max(self.coords_full[:,1])+np.max(r)+0.2]
+        #input and state plot
+        self.fig2, (self.ax1, self.ax2) = plt.subplots(nrows = 2, ncols = 1, figsize=(10,10))
+
     def plot_track(self):
+        #centerline
         self.ax.plot(self.coords[:,0],self.coords[:,1], color = 'k')
-        self.ax.scatter(self.coords[::4,0],self.coords[::4,1], color = 'r')
-        self.ax.plot(self.coords[:,0] + self.r * self.normaldir[:,0] ,\
-        self.coords[:,1]+ self.r * self.normaldir[:,1], linestyle = '--', color = 'k')
-        self.ax.plot(self.coords[:,0] - self.r * self.normaldir[:,0] ,\
-        self.coords[:,1]- self.r * self.normaldir[:,1], linestyle = '--', color = 'k')
-        self.ax.set_xlim([-1,5])
-        self.ax.set_ylim([-0.5,3.1])
+        self.ax.scatter(self.coords[::10,0],self.coords[::10,1], color = 'grey', s = 8, marker = 'x')
+        #bound1
+        b1_x = self.coords[:,0] + self.r * self.normaldir[:,0]
+        b1_y = self.coords[:,1] + self.r * self.normaldir[:,1]
+
+        #bound2
+        b2_x = self.coords[:,0] - self.r * self.normaldir[:,0]
+        b2_y = self.coords[:,1] - self.r * self.normaldir[:,1]
+
+        #filter bound trajectory to eliminate curvature inversion (inefficient, but works)
+        bounds_to_del_1 = []
+        bounds_to_del_2 = []
+        for idx_center in range(len(self.coords)):
+            for idx_bound in range(len(self.coords)):
+                dx1 = self.coords[idx_center,0]-b1_x[idx_bound]
+                dx2 = self.coords[idx_center,0]-b2_x[idx_bound]
+                dy1 = self.coords[idx_center,1]-b1_y[idx_bound]
+                dy2 = self.coords[idx_center,1]-b2_y[idx_bound]
+
+                if dx1**2 + dy1**2 < self.r**2 -0.008:
+                    bounds_to_del_1.append(idx_bound)
+                if dx2**2 + dy2**2 < self.r**2 -0.008:
+                    bounds_to_del_2.append(idx_bound)
+        b1_x = np.delete(b1_x, bounds_to_del_1)
+        b1_y = np.delete(b1_y, bounds_to_del_1)
+        b2_x = np.delete(b2_x, bounds_to_del_2)
+        b2_y = np.delete(b2_y, bounds_to_del_2)
+
+        self.ax.plot(b1_x, b1_y, linestyle = '--', color = 'k')
+        self.ax.plot(b2_x, b2_y, linestyle = '--', color = 'k')
+        self.ax.set_xlim(self.track_xbounds)
+        self.ax.set_ylim(self.track_ybounds)
         #plt.show(block=False)
         #plt.pause(2) # Pause for interval seconds.
         #input("hit [enter] to continue.")
@@ -78,8 +112,9 @@ class plotter():
         front = center + width/2*np.array([np.cos(phi0), np.sin(phi0)])
         self.cardir = self.ax.plot([center[0], front[0]], [center[1], front[1]], linewidth = 1, color = 'r')
 
-        self.theta_horz = self.ax.scatter(x_theta_vals, y_theta_vals, marker = 'x', color = 'g')
-        self.pos_horz = self.ax.scatter(xval[:,0], xval[:,1], marker = 'D', color = 'b')
+        self.theta_horz = self.ax.scatter(x_theta_vals, y_theta_vals, marker = 'x', s =8, color = 'g')
+        #self.pos_horz = self.ax.scatter(xval[:,0], xval[:,1], marker = 'D', s = 10, color = 'b')
+        self.pos_horz = self.ax.plot(xval[:,0], xval[:,1], linewidth = 1, color = 'b')
         for idx in range(len(x_theta_vals)):
             connector = self.ax.plot([x_theta_vals[idx], xval[idx,0]],\
                                                 [ y_theta_vals[idx],  xval[idx,1]],\
@@ -119,7 +154,7 @@ class plotter():
 
     def clear_horizion(self):
         self.theta_horz.remove()
-        self.pos_horz.remove()
+        self.pos_horz[0].remove()
         for idx in range(len(self.connect_horz)):
             connector = self.connect_horz[idx]
             connector[0].remove()

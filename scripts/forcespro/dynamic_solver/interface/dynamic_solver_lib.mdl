@@ -60,13 +60,13 @@ Model {
       }
     }
   }
-  Created		  "7/29/2020 8:30:38 PM"
+  Created		  "7/30/2020 8:46:40 AM"
   Creator		  "embotech AG"
   UpdateHistory		  "UpdateHistoryNever"
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "embotech AG"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "7/29/2020 8:30:38 PM"
+  LastModifiedDate	  "7/30/2020 8:46:40 AM"
   RTWModifiedTimeStamp	  315310195
   ModelVersionFormat	  "1.%<AutoIncrement:2>"
   ConfigurationManager	  "None"
@@ -767,8 +767,8 @@ Model {
       BlockType		      S-Function
       Name		      "dynamic_solver"
       SID		      "1"
-      Ports		      [3, 20]
-      Position		      [170, 99, 650, 340]
+      Ports		      [3, 40]
+      Position		      [170, 99, 650, 680]
       ZOrder		      1
       FunctionName	      "dynamic_solver_simulinkBlock"
 	  SFunctionModules	      "dynamic_solver dynamic_solver_simulinkBlock"
@@ -804,9 +804,9 @@ Model {
 	Help			"dynamic_solver_simulinkBlock provides an easy Simulink interface for simulating your customized solver.  \n"
 	"\nOUTPUTS = dynamic_solver(INPUTS) solves an optimization problem where:\n\n"
 	"INPUTS:\n"
-	" - x0 - column vector of length 240\n "
+	" - x0 - column vector of length 480\n "
 " - xinit - column vector of length 9\n "
-" - all_parameters - column vector of length 240\n "
+" - all_parameters - column vector of length 480\n "
 
 	"\nOUTPUTS:\n"
 	" - x01 - column vector of length 12\n "
@@ -829,6 +829,26 @@ Model {
 " - x18 - column vector of length 12\n "
 " - x19 - column vector of length 12\n "
 " - x20 - column vector of length 12\n "
+" - x21 - column vector of length 12\n "
+" - x22 - column vector of length 12\n "
+" - x23 - column vector of length 12\n "
+" - x24 - column vector of length 12\n "
+" - x25 - column vector of length 12\n "
+" - x26 - column vector of length 12\n "
+" - x27 - column vector of length 12\n "
+" - x28 - column vector of length 12\n "
+" - x29 - column vector of length 12\n "
+" - x30 - column vector of length 12\n "
+" - x31 - column vector of length 12\n "
+" - x32 - column vector of length 12\n "
+" - x33 - column vector of length 12\n "
+" - x34 - column vector of length 12\n "
+" - x35 - column vector of length 12\n "
+" - x36 - column vector of length 12\n "
+" - x37 - column vector of length 12\n "
+" - x38 - column vector of length 12\n "
+" - x39 - column vector of length 12\n "
+" - x40 - column vector of length 12\n "
 
 	"\n For more information, see https://www.embotech.com/FORCES-Pro/How-to-use/Simulink-Interface/Simulink-Block \n "
 
@@ -855,6 +875,26 @@ Model {
 "port_label('output', 18, 'x18') \n "
 "port_label('output', 19, 'x19') \n "
 "port_label('output', 20, 'x20') \n "
+"port_label('output', 21, 'x21') \n "
+"port_label('output', 22, 'x22') \n "
+"port_label('output', 23, 'x23') \n "
+"port_label('output', 24, 'x24') \n "
+"port_label('output', 25, 'x25') \n "
+"port_label('output', 26, 'x26') \n "
+"port_label('output', 27, 'x27') \n "
+"port_label('output', 28, 'x28') \n "
+"port_label('output', 29, 'x29') \n "
+"port_label('output', 30, 'x30') \n "
+"port_label('output', 31, 'x31') \n "
+"port_label('output', 32, 'x32') \n "
+"port_label('output', 33, 'x33') \n "
+"port_label('output', 34, 'x34') \n "
+"port_label('output', 35, 'x35') \n "
+"port_label('output', 36, 'x36') \n "
+"port_label('output', 37, 'x37') \n "
+"port_label('output', 38, 'x38') \n "
+"port_label('output', 39, 'x39') \n "
+"port_label('output', 40, 'x40') \n "
 "if( exist('FORCES_PRO_Logo.jpg','file') ), image(imread('FORCES_PRO_Logo.jpg'),'center','on'); elseif( exist(['interface',filesep,'FORCES_PRO_Logo.jpg'],'file') ), image(imread(['interface',filesep,'FORCES_PRO_Logo.jpg']),'center','on'); elseif( exist(['dynamic_solver',filesep,'interface',filesep,'FORCES_PRO_Logo.jpg'],'file') ), image(imread(['dynamic_solver',filesep,'interface',filesep,'FORCES_PRO_Logo.jpg']),'center','on'); end \n "
 
       }

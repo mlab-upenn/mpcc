@@ -2,9 +2,9 @@
 %
 %   OUTPUT = dynamic_solver(PARAMS) solves a multistage problem
 %   subject to the parameters supplied in the following struct:
-%       PARAMS.x0 - column vector of length 240
+%       PARAMS.x0 - column vector of length 480
 %       PARAMS.xinit - column vector of length 9
-%       PARAMS.all_parameters - column vector of length 240
+%       PARAMS.all_parameters - column vector of length 480
 %
 %   OUTPUT returns the values of the last iteration of the solver where
 %       OUTPUT.x01 - column vector of size 12
@@ -27,6 +27,26 @@
 %       OUTPUT.x18 - column vector of size 12
 %       OUTPUT.x19 - column vector of size 12
 %       OUTPUT.x20 - column vector of size 12
+%       OUTPUT.x21 - column vector of size 12
+%       OUTPUT.x22 - column vector of size 12
+%       OUTPUT.x23 - column vector of size 12
+%       OUTPUT.x24 - column vector of size 12
+%       OUTPUT.x25 - column vector of size 12
+%       OUTPUT.x26 - column vector of size 12
+%       OUTPUT.x27 - column vector of size 12
+%       OUTPUT.x28 - column vector of size 12
+%       OUTPUT.x29 - column vector of size 12
+%       OUTPUT.x30 - column vector of size 12
+%       OUTPUT.x31 - column vector of size 12
+%       OUTPUT.x32 - column vector of size 12
+%       OUTPUT.x33 - column vector of size 12
+%       OUTPUT.x34 - column vector of size 12
+%       OUTPUT.x35 - column vector of size 12
+%       OUTPUT.x36 - column vector of size 12
+%       OUTPUT.x37 - column vector of size 12
+%       OUTPUT.x38 - column vector of size 12
+%       OUTPUT.x39 - column vector of size 12
+%       OUTPUT.x40 - column vector of size 12
 %
 %   [OUTPUT, EXITFLAG] = dynamic_solver(PARAMS) returns additionally
 %   the integer EXITFLAG indicating the state of the solution with 
