@@ -4,6 +4,9 @@ import matplotlib.patches as patches
 import matplotlib
 from matplotlib import cm
 import yaml
+from matplotlib.animation import FuncAnimation
+import os
+import imageio
 
 class plotter():
 
@@ -31,17 +34,18 @@ class plotter():
         deltaymax = np.max(self.coords_full[:,1])-np.min(self.coords_full[:,1])
 
         ratio = deltaymax/deltaxmax
-        #trackplot
-        self.fig, self.ax = plt.subplots(1, figsize=(20,ratio*20))
-        self.track_xbounds = [-0.1-np.max(r)+np.min(self.coords_full[:,0]),np.max(self.coords_full[:,0])+np.max(r)+0.2]
-        self.track_ybounds = [-0.1-np.max(r)+np.min(self.coords_full[:,1]),np.max(self.coords_full[:,1])+np.max(r)+0.2]
         #input and state plot
         self.fig2, (self.ax1, self.ax2) = plt.subplots(nrows = 2, ncols = 1, figsize=(10,10))
+        #trackplot
+        self.fig, self.ax = plt.subplots(1, figsize=(10,ratio*10))
+        self.track_xbounds = [-0.1-np.max(r)+np.min(self.coords_full[:,0]),np.max(self.coords_full[:,0])+np.max(r)+0.1]
+        self.track_ybounds = [-0.1-np.max(r)+np.min(self.coords_full[:,1]),np.max(self.coords_full[:,1])+np.max(r)+0.1]
+
 
     def plot_track(self):
         #centerline
-        self.ax.plot(self.coords[:,0],self.coords[:,1], color = 'k')
-        self.ax.scatter(self.coords[::10,0],self.coords[::10,1], color = 'grey', s = 8, marker = 'x')
+        self.ax.plot(self.coords[:,0],self.coords[:,1], linewidth = 0.8 , color = 'k')
+        #self.ax.scatter(self.coords[::10,0],self.coords[::10,1], color = 'grey', s = 8, marker = 'x')
         #bound1
         b1_x = self.coords[:,0] + self.r * self.normaldir[:,0]
         b1_y = self.coords[:,1] + self.r * self.normaldir[:,1]
@@ -60,17 +64,17 @@ class plotter():
                 dy1 = self.coords[idx_center,1]-b1_y[idx_bound]
                 dy2 = self.coords[idx_center,1]-b2_y[idx_bound]
 
-                if dx1**2 + dy1**2 < self.r**2 -0.008:
+                if dx1**2 + dy1**2 < self.r**2 -0.002:
                     bounds_to_del_1.append(idx_bound)
-                if dx2**2 + dy2**2 < self.r**2 -0.008:
+                if dx2**2 + dy2**2 < self.r**2 -0.004:
                     bounds_to_del_2.append(idx_bound)
         b1_x = np.delete(b1_x, bounds_to_del_1)
         b1_y = np.delete(b1_y, bounds_to_del_1)
         b2_x = np.delete(b2_x, bounds_to_del_2)
         b2_y = np.delete(b2_y, bounds_to_del_2)
 
-        self.ax.plot(b1_x, b1_y, linestyle = '--', color = 'k')
-        self.ax.plot(b2_x, b2_y, linestyle = '--', color = 'k')
+        self.ax.plot(b1_x, b1_y, linewidth = 1.5, color = 'k')
+        self.ax.plot(b2_x, b2_y, linewidth = 1.5, color = 'k')
         self.ax.set_xlim(self.track_xbounds)
         self.ax.set_ylim(self.track_ybounds)
         #plt.show(block=False)
@@ -112,7 +116,7 @@ class plotter():
         front = center + width/2*np.array([np.cos(phi0), np.sin(phi0)])
         self.cardir = self.ax.plot([center[0], front[0]], [center[1], front[1]], linewidth = 1, color = 'r')
 
-        self.theta_horz = self.ax.scatter(x_theta_vals, y_theta_vals, marker = 'x', s =8, color = 'g')
+        self.theta_horz = self.ax.scatter(x_theta_vals, y_theta_vals, marker = 'x', s =4, color = 'g')
         #self.pos_horz = self.ax.scatter(xval[:,0], xval[:,1], marker = 'D', s = 10, color = 'b')
         self.pos_horz = self.ax.plot(xval[:,0], xval[:,1], linewidth = 1, color = 'b')
         for idx in range(len(x_theta_vals)):
@@ -158,7 +162,8 @@ class plotter():
         for idx in range(len(self.connect_horz)):
             connector = self.connect_horz[idx]
             connector[0].remove()
-        #self.car.remove()
+        self.car.remove()
+        self.cardir[0].remove()
         self.fig.canvas.draw()
 
     def clear_input_state_traj(self):
@@ -167,6 +172,35 @@ class plotter():
             self.trajplots[idxtraj][0].remove()
         self.trajplots = []
         self.fig2.canvas.draw()
+
+    def animate_result(self, zdata, N, Tf, name = 'temp.gif'):
+        Ts = Tf/N
+        zvars = ['ddot', 'deltadot', 'thetadot', 'posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
+        def init():
+            self.plot_horizon(zdata[0,:,zvars.index('theta')],zdata[0,:, 3:6])
+            plt.pause(0.001)
+        def animate(idx):
+            self.clear_horizion()
+            self.plot_horizon(zdata[idx,:,zvars.index('theta')],zdata[idx,:, 3:6])
+            plt.pause(0.001)
+
+        #anim = FuncAnimation(self.fig, animate, frames=len(zdata[:,0,0]), interval=Ts*1000, blit=True)
+        self.fig
+        os.mkdir("tempdump")
+        imagenames = []
+        for idx in range(len(zdata[:,0,0])):
+            self.plot_horizon(zdata[idx,:,zvars.index('theta')],zdata[idx,:, 3:6])
+            imagenames.append('tempdump/f_'+str(idx)+'.jpg')
+            plt.savefig(imagenames[-1])
+            self.clear_horizion()
+
+        with imageio.get_writer(name, mode='I', duration = Ts) as writer:
+            for filename in imagenames:
+                image = imageio.imread(filename)
+                writer.append_data(image)
+
+        return 0
+
 
 def plot_pajecka(modelparams):
     #loadparameters

@@ -29,11 +29,11 @@ def main_dyn():
     Cd = params['Cd']
     Df = params['Df']
     Dr = params['Dr']
-    lencar = lf+lr
+    lencar = 2*(lf+lr)
 
     #sim parameters
-    Tsim = 20
-    Tf = 2
+    Tsim = 18
+    Tf = 1.5
     N = 40
     Qc = 0.1
     Ql = 1000
@@ -157,6 +157,7 @@ def main_dyn():
 
     #list storing visited states
     zinit_vals = np.zeros((Nsim, 12))
+    z_data = np.zeros((Nsim,N,12))
     laps = 0
     ##########################SIMULATION#######################################
     for simidx in range(Nsim):
@@ -226,7 +227,8 @@ def main_dyn():
             step_sol_z_arr[idx_sol,:] = zsol
             idx_sol = idx_sol+1
 
-
+        #log solution
+        z_data[simidx,:,:] = step_sol_z_arr
 
         print("theta: ", zinit[zvars.index('theta')])
         print("vx: ", zinit[zvars.index('vx')])
@@ -258,7 +260,7 @@ def main_dyn():
         zinit_vals[simidx,:] = zinit
         step_sol_u_arr = np.array(step_sol_u)
 
-
+        '''
         #plotting result
         trk_plt.plot_horizon(theta_vals, step_sol_z_arr[:, 3:6])
         trk_plt.plot_input_state_traj(step_sol_z_arr, zvars)
@@ -269,7 +271,7 @@ def main_dyn():
         plt.pause(0.1)
         trk_plt.clear_horizion()
         trk_plt.clear_input_state_traj()
-
+        '''
         #preparation for next timestep
         theta_vals = np.hstack((step_sol_z_arr[1:, 11], step_sol_z_arr[-1, 11]+0.1))
 
@@ -279,7 +281,7 @@ def main_dyn():
 
 
     ###############################/SIMULATION##################################
-
+    #trk_plt.animate_result(z_data,N,Tf, 'test.gif')
     trk_plt.plot_traj(zinit_vals[:,3:])
     plt.show()
     #np.savetxt("full_sol_x_log.csv", )
