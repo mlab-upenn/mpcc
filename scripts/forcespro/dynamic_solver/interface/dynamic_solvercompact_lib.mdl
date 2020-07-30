@@ -60,13 +60,13 @@ Model {
       }
     }
   }
-  Created		  "7/30/2020 12:50:29 PM"
+  Created		  "7/30/2020 3:58:08 PM"
   Creator		  "embotech AG"
   UpdateHistory		  "UpdateHistoryNever"
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "embotech AG"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "7/30/2020 12:50:29 PM"
+  LastModifiedDate	  "7/30/2020 3:58:08 PM"
   RTWModifiedTimeStamp	  315310195
   ModelVersionFormat	  "1.%<AutoIncrement:2>"
   ConfigurationManager	  "None"
@@ -804,12 +804,12 @@ Model {
 	Help			"dynamic_solver_simulinkBlockcompact provides an easy Simulink interface for simulating your customized solver.  \n"
 	"\nOUTPUTS = dynamic_solver(INPUTS) solves an optimization problem where:\n\n"
 	"INPUTS:\n"
-	" - x0 - column vector of length 480\n "
+	" - x0 - column vector of length 1200\n "
 " - xinit - column vector of length 9\n "
-" - all_parameters - column vector of length 480\n "
+" - all_parameters - column vector of length 1200\n "
 
 	"\nOUTPUTS:\n"
-	" - outputs - column vector of length 480\n "
+	" - outputs - column vector of length 1200\n "
 
 	"\n For more information, see https://www.embotech.com/FORCES-Pro/How-to-use/Simulink-Interface/Simulink-Block \n "
 

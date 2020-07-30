@@ -32,12 +32,12 @@ def main_dyn():
     lencar = 2*(lf+lr)
 
     #sim parameters
-    Tsim = 18
-    Tf = 1.5
-    N = 40
+    Tsim = 10
+    Tf = 8
+    N = 100
     Qc = 0.1
     Ql = 1000
-    Q_theta = 10
+    Q_theta = 100
     R_d = 0.01
     R_delta = 0.01
     Nsim = np.int(np.floor(N/Tf*Tsim))
@@ -51,7 +51,7 @@ def main_dyn():
     trk_plt.plot_track()
 
     #starting position in track startidx = theta0[m] * 100 [pts/m]
-    startidx = 20
+    startidx = 900
 
     trackvars = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
     xvars = ['posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
@@ -65,7 +65,7 @@ def main_dyn():
 
     #initial condition
     zvars = ['ddot', 'deltadot', 'thetadot', 'posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
-    xinit = np.array([xt0, yt0, phit0, 0.1, 0.0, 0, 0, 0, theta_hat0])
+    xinit = np.array([xt0, yt0, phit0, 1.8, 0.0, 0, 0, 0, theta_hat0])
     zinit = np.concatenate([np.array([0,0,0]), xinit])
 
     ############################################################################
@@ -260,7 +260,7 @@ def main_dyn():
         zinit_vals[simidx,:] = zinit
         step_sol_u_arr = np.array(step_sol_u)
 
-        '''
+
         #plotting result
         trk_plt.plot_horizon(theta_vals, step_sol_z_arr[:, 3:6])
         trk_plt.plot_input_state_traj(step_sol_z_arr, zvars)
@@ -271,7 +271,7 @@ def main_dyn():
         plt.pause(0.1)
         trk_plt.clear_horizion()
         trk_plt.clear_input_state_traj()
-        '''
+
         #preparation for next timestep
         theta_vals = np.hstack((step_sol_z_arr[1:, 11], step_sol_z_arr[-1, 11]+0.1))
 
