@@ -1,0 +1,51 @@
+This is BibTeX, Version 0.99d (TeX Live 2017/Debian)
+Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+The top-level auxiliary file: root.aux
+The style file: alpha.bst
+Illegal, another \bibstyle command---line 28 of file root.aux
+ : \bibstyle
+ :          {ieeetr}
+I'm skipping whatever remains of this command
+Database file #1: sample.bib
+You've used 2 entries,
+            2543 wiz_defined-function locations,
+            574 strings with 4814 characters,
+and the built_in function-call counts, 1104 in all, are:
+= -- 116
+> -- 50
+< -- 1
++ -- 18
+- -- 18
+* -- 81
+:= -- 176
+add.period$ -- 7
+call.type$ -- 2
+change.case$ -- 14
+chr.to.int$ -- 2
+cite$ -- 2
+duplicate$ -- 42
+empty$ -- 78
+format.name$ -- 20
+if$ -- 233
+int.to.chr$ -- 1
+int.to.str$ -- 0
+missing$ -- 2
+newline$ -- 13
+num.names$ -- 6
+pop$ -- 13
+preamble$ -- 1
+purify$ -- 16
+quote$ -- 0
+skip$ -- 39
+stack$ -- 0
+substring$ -- 79
+swap$ -- 14
+text.length$ -- 1
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 16
+warning$ -- 0
+while$ -- 11
+width$ -- 3
+write$ -- 29
+(There was 1 error message)

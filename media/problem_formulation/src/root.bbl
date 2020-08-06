@@ -1,0 +1,14 @@
+\begin{thebibliography}{LMG10}
+
+\bibitem[LDM15]{liniger2015optimization}
+Alexander Liniger, Alexander Domahidi, and Manfred Morari.
+\newblock Optimization-based autonomous racing of 1: 43 scale rc cars.
+\newblock {\em Optimal Control Applications and Methods}, 36(5):628--647, 2015.
+
+\bibitem[LMG10]{lam2010model}
+Denise Lam, Chris Manzie, and Malcolm Good.
+\newblock Model predictive contouring control.
+\newblock In {\em 49th IEEE Conference on Decision and Control (CDC)}, pages
+  6137--6142. IEEE, 2010.
+
+\end{thebibliography}

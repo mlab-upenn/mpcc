@@ -1,1 +1,2 @@
-scripts/forcespro/media/
+scripts/forcespro/media/*
+media/problem_formulation/src/*

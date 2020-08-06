@@ -1,0 +1,159 @@
+\documentclass[12pt]{article}
+\usepackage{fullpage,graphicx,psfrag,amsmath,amsfonts,verbatim}
+\usepackage[small,bf]{caption}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{tikz}
+%\usepackage{pythontex}
+\usepackage{listings}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+	backgroundcolor=\color{backcolour},   commentstyle=\color{codegreen},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\ttfamily\footnotesize,
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	captionpos=b,                    
+	keepspaces=true,                 
+	numbers=left,                    
+	numbersep=5pt,                  
+	showspaces=false,                
+	showstringspaces=false,
+	showtabs=false,                  
+	tabsize=2
+}
+\lstset{style=mystyle}
+\input defs.tex
+\bibliographystyle{alpha}
+
+\title{MPCC Docs}
+\author{Peter Werner}
+
+
+\begin{document}
+\maketitle
+
+\section{Problem Formulation}
+
+The MPCC problem as described in \cite{lam2010model} and \cite{liniger2015optimization} is reformulated in continuous time (for the solver) as follows
+
+\begin{align}
+\begin{aligned}
+&\minz &&\int_{0}^{T}\begin{bmatrix}
+\epsilon_c^{lin}(t)&&\epsilon_l^{lin}(t)
+\end{bmatrix}
+\begin{bmatrix}
+Qc&&0\\0&&Ql
+\end{bmatrix}
+\begin{bmatrix}
+\epsilon_c^{lin}(t)\\
+\epsilon_l^{lin}(t)
+\end{bmatrix} - Q_{\theta}\dot{\theta}(t) + u^T(t) R u(t)dt\\
+&\st  &&\dot{x} = f(x,u,\Phi)\\
+&&& b_{lower}\preceq x(t) \preceq b_{upper}\\
+&&& l_{lower}\preceq u(t) \preceq l_{upper}\\
+&&& h(x, \Phi) \leq 0
+\end{aligned}
+\end{align}
+
+given the system dynamics $f$ and the arclength parametrization of the contour (in our case the track) $\Phi$. Here $x(t)$ denotes the system state, $u(t)$ the inputs to the system, $b$ the box constraints on the state, $l$ the box constraints on the input and $h$ captures the track boundary constraints.
+
+The state of the system is augmented with the advancing parameter $\theta$ 
+\begin{align}
+x = \begin{bmatrix}
+x_{model}\\
+\theta
+\end{bmatrix}
+\end{align}
+ and the virtual input $\dot\theta$ is appended to the inputs from the original system dynamics. 
+\begin{align}
+u = \begin{bmatrix}
+u_{model}\\\dot\theta
+\end{bmatrix}
+\end{align}
+
+The track boundary constraint is realized as a convex disk constraint.
+\begin{align}
+h(x,\Phi) = (x-x_t^{lin}(\theta))^2 + (y-y_t^{lin}(\theta))^2 - r_{\Phi}(\hat{\theta})
+\end{align}
+Here $r_{\Phi}(\hat{\theta})$ is the half-width of the track at the last predicted arc length.
+\newpage
+The linearized contouring error $\epsilon_c^{lin}$ and lag error are computed as shown in fig. \ref{fig:contouring}. To make the problem realtime feasible the are approximmated by linearizing the both them and the track around the previous solution $\hat\theta$ as:
+
+\begin{align}
+\Phi(\theta) &= \begin{bmatrix}
+x_t(\theta)\\y_t(\theta)
+\end{bmatrix}\approx\Phi(\hat\theta) + \partial_{\theta} \Phi(\hat\theta)(\theta-\hat\theta) \\
+\Rightarrow \Phi^{lin}(\theta) &= \begin{bmatrix}
+x_t(\hat\theta)+cos(\phi(\hat\theta))(\theta-\hat\theta)\\
+y_t(\hat\theta)+sin(\phi(\hat\theta))(\theta-\hat\theta)
+\end{bmatrix} 
+\end{align}
+this allows us to compute the errors
+\begin{align}
+&x_t^{lin}(\theta) = x(t) + \epsilon^{lin}_lcos(\phi(\hat\theta))+ \epsilon^{lin}_csin(\phi(\hat\theta))\\
+&y_t^{lin}(\theta) = y(t) + \epsilon^{lin}_lsin(\phi(\hat\theta))- \epsilon^{lin}_ccos(\phi(\hat\theta))\\
+\Leftrightarrow &\begin{cases}
+\epsilon^{lin}_l = cos(\phi(\hat\theta))(x_t^{lin}(\theta)-x(t))+sin(\phi(\hat\theta))(y_t^{lin}(\theta)-y(t))\\
+\epsilon^{lin}_c = sin(\phi(\hat\theta))(x_t^{lin}(\theta)-x(t)) - cos(\phi(\hat\theta))(y_t^{lin}(\theta)-y(t))
+\end{cases}
+\end{align}
+
+These approximations are especially good if $\epsilon_l\approx0$ and $\hat\theta-\theta \approx 0$. In practice the first can be incentivized by increasing $Q_l$ and the second by warmstarting the problem correctly. 
+
+
+
+\begin{figure}[!h]
+\centering
+\input{fig/contouringerror.tex}
+\caption{To compute the linearized conturing error $\epsilon_c^{lin}$ and lag error $\epsilon_l^{lin}$ the track is linearized around the last solution as the estimate of the arclength progress $\hat\theta$ of the MPCC. The coordinate frame $(_Ix,_Iy)$ is the inertial reference frame the track is described in.}
+
+\label{fig:contouring}
+\end{figure}
+
+Taking a step back we see that MPCC basically is optimizing to move the position of a virtual point given by $\theta(t)$ as far along the track as possible while steering the model of the system to keep the contouring and lag errors small. The solver than discretizes this problem and finds approximate solutions.
+\section{Dynamic Model}
+
+For now the model from \cite{liniger2015optimization} is implemented with adapted parameters. In the code the state is arranged in the following way
+
+\begin{align}
+x = \begin{bmatrix}
+x\\
+y\\
+\phi\\
+v_x\\
+v_y\\
+\omega\\
+\theta\\
+d\\
+\delta
+\end{bmatrix}
+\end{align}
+where $x$, $y$ are the position of the center of gravity, $\phi$ is the yaw angle of the car w.r.t. the world frame, $v_x$ is the longitudinal velocity, $v_y$ is the lateral velocity, $\omega$ is the yaw rate, $\theta$ the advancing parameter and lastly $d$ is the integrated motor torque and $\delta$ is the steering angle.
+
+The input $u$ is arranged as
+\begin{align}
+u = \begin{bmatrix}
+\dot{d}\\
+\dot\theta\\
+\dot\delta
+\end{bmatrix}
+\end{align} 
+
+The inputs we optimize for are chosen to be the derivatives of the commandable inputs to the system such that we can penalize their smoothness.
+
+\section{Track Parametrization}
+
+For the track the centerline is given in waypoints. To implement MPCC we need an arclenght parametrization $\Phi$. This is realized by interpolating the waypoints using cubic bezier curves (with a cyclic boundary condition) and creating a dense lookup table with the track location and the linearization parameters. Note that in the optimization it is not practical to pass the  full bezier curve since it contains functions that the used solver has dificulties dealing with such as floor and modulo. Instead the linearization parameters are passed at every stage.   
+
+
+\bibliographystyle{ieeetr}
+\bibliography{sample}
+\end{document}

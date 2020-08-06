@@ -1,3 +1,4 @@
+
 #!/usr/bin/python3
 from acados_template import AcadosModel, AcadosOcp, AcadosOcpSolver
 from models import dynamic_model, kinematic_model
