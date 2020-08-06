@@ -28,7 +28,7 @@ import matplotlib.patches as patches
 import matplotlib
 from matplotlib import cm
 import yaml
-from matplotlib.animation import FuncAnimation
+
 import os
 import imageio
 
@@ -61,7 +61,7 @@ class plotter():
         #input and state plot
         self.fig2, (self.ax1, self.ax2) = plt.subplots(nrows = 2, ncols = 1, figsize=(10,10))
         #trackplot
-        self.fig, self.ax = plt.subplots(1, figsize=(10,ratio*10))
+        self.fig, self.ax = plt.subplots(1, figsize=(7,ratio*7))
         self.track_xbounds = [-0.1-np.max(r)+np.min(self.coords_full[:,0]),np.max(self.coords_full[:,0])+np.max(r)+0.1]
         self.track_ybounds = [-0.1-np.max(r)+np.min(self.coords_full[:,1]),np.max(self.coords_full[:,1])+np.max(r)+0.1]
 
@@ -88,9 +88,9 @@ class plotter():
                 dy1 = self.coords[idx_center,1]-b1_y[idx_bound]
                 dy2 = self.coords[idx_center,1]-b2_y[idx_bound]
 
-                if dx1**2 + dy1**2 < self.r**2 -0.002:
+                if dx1**2 + dy1**2 < self.r**2 -0.003:
                     bounds_to_del_1.append(idx_bound)
-                if dx2**2 + dy2**2 < self.r**2 -0.004:
+                if dx2**2 + dy2**2 < self.r**2 -0.003:
                     bounds_to_del_2.append(idx_bound)
         b1_x = np.delete(b1_x, bounds_to_del_1)
         b1_y = np.delete(b1_y, bounds_to_del_1)
@@ -110,7 +110,7 @@ class plotter():
 
         heatmap = self.ax.scatter(xvals[:,0], xvals[:,1], s = 40, c=xvals[:,3], cmap=cm.jet, edgecolor='none', marker='o')
         cbar = self.fig.colorbar(heatmap, fraction=0.035)
-        cbar.set_label("velocity in [m/s]")
+        cbar.set_label("velocity [m/s]")
         self.fig.canvas.draw()
         #plt.show(block=False)
         #plt.pause(0.001) # Pause for interval seconds.

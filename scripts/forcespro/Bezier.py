@@ -141,13 +141,14 @@ def fit_st(waypoints, a, b):
 
 def getwaypoints(track):
     #placeholder for now
+    '''
     scaler = 10
     trackx = scaler*np.array([0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.75, \
                   0.8 ,0.8 ,0.8 ,0.8, 0.75, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.05, 0.0, 0.0, 0.0, 0.0 ])
     tracky = scaler*np.array([0.05, 0.3, 0.4, 0.2, 0.2, 0.0, 0.0, 0.0, 0.05, \
                     0.1, 0.2, 0.3, 0.4, 0.45, 0.5, 0.5, 0.3, 0.3, 0.5, 0.5, 0.5, 0.45, 0.4, 0.3, 0.2, 0.1 ])
     waypoints = np.vstack([trackx,tracky]).T
-
+    '''
     waypoints = np.genfromtxt(track + '.csv', delimiter=',')
     return waypoints
 

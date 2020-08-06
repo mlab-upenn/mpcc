@@ -56,7 +56,7 @@ def main_dyn():
     lencar = 2*(lf+lr)
 
     #sim parameters
-    Tsim = 10
+    Tsim = 25
     Tf = 1.5
     N = 30
     Qc = 0.1
@@ -65,7 +65,7 @@ def main_dyn():
     R_d = 0.01
     R_delta = 0.01
     Nsim = np.int(np.floor(N/Tf*Tsim))
-    r = 0.15 #trackwidth
+    r = 0.18 #trackwidth
 
     solver = get_forces_solver_dynamic(N, Tf, paramfile)
 
@@ -284,7 +284,7 @@ def main_dyn():
         zinit_vals[simidx,:] = zinit
         step_sol_u_arr = np.array(step_sol_u)
 
-
+        '''
         #plotting result
         trk_plt.plot_horizon(theta_vals, step_sol_z_arr[:, 3:6])
         trk_plt.plot_input_state_traj(step_sol_z_arr, zvars)
@@ -295,7 +295,7 @@ def main_dyn():
         plt.pause(0.1)
         trk_plt.clear_horizion()
         trk_plt.clear_input_state_traj()
-
+        '''
         #preparation for next timestep
         theta_vals = np.hstack((step_sol_z_arr[1:, zvars.index('theta')], step_sol_z_arr[-1, zvars.index('theta')]+0.1))
 
