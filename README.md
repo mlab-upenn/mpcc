@@ -1,8 +1,11 @@
-# Model Predictive Contouring Control using ACADOS or ForcesPRO
+# Model Predictive Contouring Control
 
-This repo contains an inprogress implementation of model predictive contouring control based on the ACADOS solver. Currently the dynamic model is not working using the acados solver. Additionally a working implementation of MPCC for both the single track kinematic bycicle model and its dynamic extension are included using the commercial solver forces PRO by embotech (academic licences are available). A registered licence for forces PRO is required to run this part of the repo. 
+This repo contains an inprogress implementation of model predictive contouring control based on the ACADOS (kinematic model only) and forces PRO solver (both models).  A registered licence for forces PRO is required to run this part of the repo. 
 
-## Setup
+## Problem formulation
+![](media/sample_track.gif)
+
+## ACADOS Setup
 
 1. Clone this repo
 
