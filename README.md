@@ -5,7 +5,7 @@ This repo contains an inprogress implementation of model predictive contouring c
 ## Problem formulation
 [The mathematical formulation can be found here.](media/problem_formulation/problem_formulation.pdf) The resulting controller is shown below.
 ![Resulting Controller](media/sample_track.gif)
-[](media/heatmap.png)
+![heatmap](media/heatmap.png)
 ## ACADOS Setup
 
 1. Clone this repo
