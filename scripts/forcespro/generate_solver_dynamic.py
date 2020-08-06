@@ -196,7 +196,7 @@ def get_forces_solver_dynamic(N, Tf, modelparams = "modelparams.yaml"):
     codeoptions = forcespro.CodeOptions("dynamic_solver")
     codeoptions.nlp.integrator.type = 'ERK4'
     codeoptions.nlp.integrator.Ts = Ts
-    codeoptions.nlp.integrator.nodes = 3 #intermediate integration nodes
+    codeoptions.nlp.integrator.nodes = 2 #intermediate integration nodes
 
     codeoptions.maxit = 15  # Maximum number of iterations
     codeoptions.printlevel = 2  # Use printlevel = 2 to print progress (but not for timings)

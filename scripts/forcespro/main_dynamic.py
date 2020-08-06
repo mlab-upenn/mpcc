@@ -33,8 +33,8 @@ def main_dyn():
 
     #sim parameters
     Tsim = 10
-    Tf = 8
-    N = 100
+    Tf = 1.5
+    N = 30
     Qc = 0.1
     Ql = 1000
     Q_theta = 100
@@ -51,7 +51,7 @@ def main_dyn():
     trk_plt.plot_track()
 
     #starting position in track startidx = theta0[m] * 100 [pts/m]
-    startidx = 900
+    startidx = 3000
 
     trackvars = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
     xvars = ['posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
@@ -165,7 +165,7 @@ def main_dyn():
         all_parameters = []
         theta_old = theta_vals
         #get track linearization
-        index_lin_points = 100 * theta_old - 100*laps*smax
+        index_lin_points = 100 * theta_old
         index_lin_points = index_lin_points.astype(np.int32)
         print("track linearized around entries:", index_lin_points )
         track_lin_points = track_lu_table[index_lin_points,:]
@@ -178,7 +178,7 @@ def main_dyn():
                                 track_lin_points[stageidx,trackvars.index('phitrack')],
                                 track_lin_points[stageidx,trackvars.index('sin(phi)')],
                                 track_lin_points[stageidx,trackvars.index('cos(phi)')],
-                                track_lin_points[stageidx,trackvars.index('sval')] + laps*smax,  #aka theta_hat
+                                track_lin_points[stageidx,trackvars.index('sval')],  #aka theta_hat
                                 Qc,
                                 Ql,
                                 Q_theta,
@@ -198,7 +198,7 @@ def main_dyn():
                             track_lin_points[stageidx,trackvars.index('phitrack')],
                             track_lin_points[stageidx,trackvars.index('sin(phi)')],
                             track_lin_points[stageidx,trackvars.index('cos(phi)')],
-                            track_lin_points[stageidx,trackvars.index('sval')] + laps*smax,  #aka theta_hat
+                            track_lin_points[stageidx,trackvars.index('sval')],  #aka theta_hat
                             Qc,
                             Ql,
                             Q_theta,
@@ -247,13 +247,13 @@ def main_dyn():
         Ffy = Df*np.sin(Cf*np.arctan(Bf*alphaf))
         alphar = np.arctan2((omega*lr - vy),vx)
         Fry = Dr*np.sin(Cr*np.arctan(Br*alphar))
-        Frx = (Cm1-Cm2*vx) * d - 0*Cr -Cd*vx*vx
+        Frx = (Cm1-Cm2*vx) * d - Cr -Cd*vx*vx
 
         print("Ffy: ", Ffy)
         print("Fry: ", Fry)
         print("Frx: ", Frx)
 
-        theta_vals = step_sol_z_arr[:,11]
+        theta_vals = step_sol_z_arr[:,zvars.index('theta')]
         zinit = step_sol_z_arr[0,:]
         xinit = zinit[3:]
 
@@ -273,12 +273,14 @@ def main_dyn():
         trk_plt.clear_input_state_traj()
 
         #preparation for next timestep
-        theta_vals = np.hstack((step_sol_z_arr[1:, 11], step_sol_z_arr[-1, 11]+0.1))
+        theta_vals = np.hstack((step_sol_z_arr[1:, zvars.index('theta')], step_sol_z_arr[-1, zvars.index('theta')]+0.1))
 
-        if theta_vals[0] > (laps+1)*smax :
+        if theta_vals[0] > smax :
             print("#################################RESET###############################")
             laps = laps + 1
-
+            print("lap:", laps)
+            theta_vals = theta_vals - smax
+            step_sol_z_arr[:,zvars.index('theta')] = theta_vals
 
     ###############################/SIMULATION##################################
     #trk_plt.animate_result(z_data,N,Tf, 'test.gif')
