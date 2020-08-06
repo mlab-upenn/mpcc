@@ -131,9 +131,9 @@ y\\
 v_x\\
 v_y\\
 \omega\\
-\theta\\
 d\\
-\delta
+\delta\\
+\theta
 \end{bmatrix}
 \end{align}
 where $x$, $y$ are the position of the center of gravity, $\phi$ is the yaw angle of the car w.r.t. the world frame, $v_x$ is the longitudinal velocity, $v_y$ is the lateral velocity, $\omega$ is the yaw rate, $\theta$ the advancing parameter and lastly $d$ is the integrated motor torque and $\delta$ is the steering angle.
@@ -142,8 +142,8 @@ The input $u$ is arranged as
 \begin{align}
 u = \begin{bmatrix}
 \dot{d}\\
-\dot\theta\\
-\dot\delta
+\dot\delta\\
+\dot\theta
 \end{bmatrix}
 \end{align} 
 
