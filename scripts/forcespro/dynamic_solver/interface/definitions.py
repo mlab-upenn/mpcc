@@ -11,7 +11,7 @@ c_header = "include/dynamic_solver.h"
 params = \
 [("x0"                  , "dense" , ""               , ctypes.c_double, numpy.float64, (360,   1),  360),
  ("xinit"               , "dense" , ""               , ctypes.c_double, numpy.float64, (  9,   1),    9),
- ("all_parameters"      , "dense" , ""               , ctypes.c_double, numpy.float64, (360,   1),  360)]
+ ("all_parameters"      , "dense" , ""               , ctypes.c_double, numpy.float64, (510,   1),  510)]
 
 # Output                | Type    | Scalar type      | Ctypes type    | Numpy type   | Shape     | Len
 outputs = \

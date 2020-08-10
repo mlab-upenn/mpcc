@@ -23,7 +23,8 @@
 '''
 
 import numpy as np
-from generate_solver_dynamic import get_forces_solver_dynamic
+#from generate_solver_dynamic import get_forces_solver_dynamic
+from generate_col_avoid_solver import get_col_avoid_solver
 import forcespro.nlp
 from python_sim_utils import   plotter, plot_pajecka, compute_objective
 import matplotlib.pyplot as plt
@@ -54,6 +55,7 @@ def main_dyn():
     Df = params['Df']
     Dr = params['Dr']
     lencar = 2*(lf+lr)
+    widthcar = lencar/2
 
     #sim parameters
     Tsim = 10
@@ -67,7 +69,7 @@ def main_dyn():
     Nsim = np.int(np.floor(N/Tf*Tsim))
     r = 0.15 #trackwidth
 
-    solver = get_forces_solver_dynamic(N, Tf, paramfile)
+    solver = get_col_avoid_solver(N, Tf, paramfile)
 
     track_lu_table, smax = Bezier.generatelookuptable("tracks/sample_track")
     trk_plt = plotter(track_lu_table, smax, r, lencar)
@@ -80,7 +82,7 @@ def main_dyn():
     trackvars = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
     xvars = ['posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
     uvars = ['ddot', 'deltadot', 'thetadot']
-    pvars = ['xt', 'yt', 'phit', 'sin_phit', 'cos_phit', 'theta_hat', 'Qc', 'Ql', 'Q_theta', 'R_d', 'R_delta', 'r']
+    pvars = ['xt', 'yt', 'phit', 'sin_phit', 'cos_phit', 'theta_hat', 'Qc', 'Ql', 'Q_theta', 'R_d', 'R_delta', 'r', 'x_ob', 'y_ob', 'phi_ob', 'l_ob', 'w_ob']
     car_soln = []
     xt0 = track_lu_table[startidx,trackvars.index('xtrack')]
     yt0 = track_lu_table[startidx,trackvars.index('ytrack')]
@@ -92,9 +94,21 @@ def main_dyn():
     xinit = np.array([xt0, yt0, phit0, 1.8, 0.0, 0, 0, 0, theta_hat0])
     zinit = np.concatenate([np.array([0,0,0]), xinit])
 
+    #static obstacle
+    ob_idx = 400
+    phi_ob = track_lu_table[ob_idx, trackvars.index('phitrack')]
+    x_ob = track_lu_table[ob_idx,trackvars.index('xtrack')] - 0.5 * r * np.sin(phi_ob)
+    y_ob = track_lu_table[ob_idx,trackvars.index('ytrack')] + 0.5 * r * np.cos(phi_ob)
+    l_ob = lencar
+    w_ob = lencar/2
+
+
+    trk_plt.plot_static_obstacle(x_ob, y_ob, phi_ob, l_ob, w_ob)
+    #plt.show()
+
     ############################################################################
     #initialization for theta values
-    iter = 100
+    iter = 2
     z_current = np.tile(zinit,(N,1))
     #arbitrarily set theta  values and
     theta_old = theta_hat0*np.ones((N,)) + 0.001*np.arange(N)
@@ -128,7 +142,12 @@ def main_dyn():
                                 Q_theta,
                                 R_d,
                                 R_delta,
-                                r-lencar/2
+                                r-widthcar,
+                                x_ob,
+                                y_ob,
+                                phi_ob,
+                                l_ob,
+                                w_ob
                                 ])
             all_parameters.append(p_val)
 
@@ -140,8 +159,8 @@ def main_dyn():
                    "all_parameters": all_parameters.reshape(-1,)}
         #solve problem
         output, exitflag, info = solver.solve(problem)
-        #print(info)
-        #print(output)
+        print(info)
+        print(exitflag)
         #input("hit [enter] to continue.")
 
         #extract theta values
@@ -208,7 +227,12 @@ def main_dyn():
                                 Q_theta,
                                 R_d,
                                 R_delta,
-                                r-lencar/2
+                                r-widthcar,
+                                x_ob,
+                                y_ob,
+                                phi_ob,
+                                l_ob,
+                                w_ob
                                 ])
             #create parameter matrix
             all_parameters.append(p_val)
@@ -228,7 +252,12 @@ def main_dyn():
                             Q_theta,
                             R_d,
                             R_delta,
-                            r-lencar/2
+                            r-widthcar,
+                            x_ob,
+                            y_ob,
+                            phi_ob,
+                            l_ob,
+                            w_ob
                             ])
         all_parameters.append(p_val)
         all_parameters = np.array(all_parameters)

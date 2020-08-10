@@ -13,6 +13,8 @@ def get_col_avoid_solver(N, Tf, modelparams = "modelparams.yaml", name = "col_av
     lf = params['lf'] #[m]
     lr = params['lr'] #[m]
     Iz = params['Iz'] #[kg*m^3]
+    lencar = lf+lr
+    widthcar = lencar/2
 
     #pajecka and motor coefficients
     Bf = params['Bf']
@@ -37,7 +39,7 @@ def get_col_avoid_solver(N, Tf, modelparams = "modelparams.yaml", name = "col_av
     model.nvar = 12 #stage variables z = [u, x]'
     model.neq = 9 #number of equality constraints
     model.nh = 2 #number of inequality constraints
-    model.npar = 12 #
+    model.npar = 17 #
     ninputs = 3
 
     #let z = [u, x] = [ddot, deltadot, thetadot, posx, posy, phi, vx, vy, omega, d, delta, theta]
@@ -151,12 +153,40 @@ def get_col_avoid_solver(N, Tf, modelparams = "modelparams.yaml", name = "col_av
         xt_hat = xt + cos_phit * ( theta - theta_hat)
         yt_hat = yt + sin_phit * ( theta - theta_hat)
 
-        hval = (xt_hat-posx)**2 + (yt_hat-posy)**2 - r**2
+        #inside track <=> tval <= 0
+        tval = (xt_hat-posx)**2 + (yt_hat-posy)**2 - r**2
+
+        #ellipsoidal obstacle
+
+        x_ob = p[pvars.index('x_ob')]
+        y_ob = p[pvars.index('y_ob')]
+        phi_ob = p[pvars.index('phi_ob')]
+        l_ob = p[pvars.index('l_ob')]
+        w_ob = p[pvars.index('w_ob')]
+
+        #implicit elipse eqn
+        dx = posx - x_ob
+        dy = posy - y_ob
+        s = casadi.sin(phi_ob)
+        c = casadi.cos(phi_ob)
+        #tighten constraint with car length/width
+        a = np.sqrt(2)*(l_ob/2 + lencar/2)
+        b = np.sqrt(2)*(w_ob/2 + widthcar/2)
+        #implicit ellipse value ielval = 1 defines obstacle ellipse
+        ielval = (1/a**2)*(c*dx+s*dy)*(c*dx+s*dy) + (1/b**2)*(s*dx-c*dy)*(s*dx-c*dy)
+        #cosntraint value -> obsval<=0  <=> car outside of obstacle
+        obsval = 1-ielval
+
+        #concatenate
+        hval = np.array([
+                tval,
+                obsval
+                ])
         return hval
 
     model.ineq = lambda z, p: nonlinear_ineq(z, p)
-    model.hu = np.array([0.0000])
-    model.hl = np.array([-10])
+    model.hu = np.array([0.0000, 0.00])
+    model.hl = np.array([-10, -10000])
 
     #boxconstraints
     ddot_min = -10.0 #min change in d [-]

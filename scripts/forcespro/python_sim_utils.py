@@ -61,7 +61,8 @@ class plotter():
         #input and state plot
         self.fig2, (self.ax1, self.ax2) = plt.subplots(nrows = 2, ncols = 1, figsize=(10,10))
         #trackplot
-        self.fig, self.ax = plt.subplots(1, figsize=(7,ratio*7))
+        plotsize = 20
+        self.fig, self.ax = plt.subplots(1, figsize=(plotsize,ratio*plotsize))
         self.track_xbounds = [-0.1-np.max(r)+np.min(self.coords_full[:,0]),np.max(self.coords_full[:,0])+np.max(r)+0.1]
         self.track_ybounds = [-0.1-np.max(r)+np.min(self.coords_full[:,1]),np.max(self.coords_full[:,1])+np.max(r)+0.1]
 
@@ -179,6 +180,10 @@ class plotter():
         min = np.min(uval)
         self.ax2.set_ylim([min-0.1,max+0.1])
         self.fig2.canvas.draw()
+
+    def plot_static_obstacle(self, x, y, phi, l, w):
+        obstacle = patches.Ellipse((x, y), l, w, angle = phi * 180/3.14159 ,linewidth=1,edgecolor='k',facecolor='none')
+        self.ax.add_patch(obstacle)
 
     def clear_horizion(self):
         self.theta_horz.remove()

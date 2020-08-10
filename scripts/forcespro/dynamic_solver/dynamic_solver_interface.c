@@ -56,8 +56,8 @@ extern void dynamic_solver_casadi2forces(dynamic_solver_float *x,        /* prim
     /* temporary storage for casadi sparse output */
     dynamic_solver_float this_f;
     dynamic_solver_float nabla_f_sparse[6];
-    dynamic_solver_float h_sparse[1];
-    dynamic_solver_float nabla_h_sparse[3];
+    dynamic_solver_float h_sparse[2];
+    dynamic_solver_float nabla_h_sparse[5];
     dynamic_solver_float c_sparse[9];
     dynamic_solver_float nabla_c_sparse[53];
             
