@@ -1,3 +1,4 @@
+
 '''
 // MIT License
 
@@ -65,7 +66,7 @@ class plotter():
         self.fig, self.ax = plt.subplots(1, figsize=(plotsize,ratio*plotsize))
         self.track_xbounds = [-0.1-np.max(r)+np.min(self.coords_full[:,0]),np.max(self.coords_full[:,0])+np.max(r)+0.1]
         self.track_ybounds = [-0.1-np.max(r)+np.min(self.coords_full[:,1]),np.max(self.coords_full[:,1])+np.max(r)+0.1]
-
+        self.static_obstacles = []
 
     def plot_track(self):
         #centerline
@@ -153,6 +154,47 @@ class plotter():
         plt.show(block = False)
         plt.pause(0.01)
 
+    def plot_agents(self, agent_1, agent_2):
+        width = self.lencar
+        height = width/2
+
+        #agent_1
+        x1 = agent_1[0,3]
+        y1 = agent_1[0,4]
+        phi1 = agent_1[0,5]
+        #define transform
+        tr = matplotlib.transforms.Affine2D().rotate_deg_around(x1, y1, phi1*180/3.14159)
+        ts = self.ax.transData
+        t = tr + ts
+
+        car1 = patches.Rectangle((x1-width/2, y1-height/2),width, height,\
+        linewidth=1,edgecolor='k',facecolor='r', transform= t)
+        self.car1 = self.ax.add_patch(car1)
+        center = np.array([x1, y1])
+        front = center + width/2*np.array([np.cos(phi1), np.sin(phi1)])
+        self.cardir1 = self.ax.plot([center[0], front[0]], [center[1], front[1]], linewidth = 1, color = 'k')
+        self.pos_horz1 = self.ax.plot(agent_1[:,3], agent_1[:,4], linewidth = 1, color = 'r')
+
+        #agent_2
+        x2 = agent_2[0,3]
+        y2 = agent_2[0,4]
+        phi2 = agent_2[0,5]
+        #define transform
+        tr = matplotlib.transforms.Affine2D().rotate_deg_around(x2, y2, phi2*180/3.14159)
+        ts = self.ax.transData
+        t = tr + ts
+
+        car2 = patches.Rectangle((x2-width/2, y2-height/2),width, height,\
+        linewidth=1,edgecolor='k',facecolor='b', transform= t)
+        self.car2 = self.ax.add_patch(car2)
+        center = np.array([x2, y2])
+        front = center + width/2*np.array([np.cos(phi2), np.sin(phi2)])
+        self.cardir2 = self.ax.plot([center[0], front[0]], [center[1], front[1]], linewidth = 1, color = 'k')
+        self.pos_horz2 = self.ax.plot(agent_2[:,3], agent_2[:,4], linewidth = 1, color = 'b')
+
+        self.fig.canvas.draw()
+        plt.show(block = False)
+        plt.pause(0.01)
 
     def plot_input_state_traj(self, zval, varnames):
 
@@ -183,7 +225,9 @@ class plotter():
 
     def plot_static_obstacle(self, x, y, phi, l, w):
         obstacle = patches.Ellipse((x, y), l, w, angle = phi * 180/3.14159 ,linewidth=1,edgecolor='k',facecolor='none')
-        self.ax.add_patch(obstacle)
+        obs = self.ax.add_patch(obstacle)
+        self.static_obstacles.append(obs)
+        self.fig.canvas.draw()
 
     def clear_horizion(self):
         self.theta_horz.remove()
@@ -201,6 +245,23 @@ class plotter():
             self.trajplots[idxtraj][0].remove()
         self.trajplots = []
         self.fig2.canvas.draw()
+
+    def clear_obstacles(self):
+    
+        for idx in range(len(self.static_obstacles)):
+            obs = self.static_obstacles[idx]
+            obs.remove()
+        self.static_obstacles = []
+        self.fig.canvas.draw()
+
+    def clear_agents(self):
+        self.pos_horz1[0].remove()
+        self.car1.remove()
+        self.cardir1[0].remove()
+
+        self.pos_horz2[0].remove()
+        self.car2.remove()
+        self.cardir2[0].remove()
 
     def animate_result(self, zdata, N, Tf, name = 'temp.gif'):
         Ts = Tf/N
