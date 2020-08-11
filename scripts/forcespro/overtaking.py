@@ -37,9 +37,11 @@ def main_dyn():
     np.set_printoptions(precision=4)
     np.set_printoptions(threshold=sys.maxsize)
     # model parameters
-    paramfile = "modelparams.yaml"
+    modelparams = "modelparams.yaml"
+    solverparams = "solverparams.yaml"
+
     #load global constant model parameters
-    with open(paramfile) as file:
+    with open(modelparams) as file:
         params = yaml.load(file, Loader= yaml.FullLoader)
     lf = params['lf'] #[m]
     lr = params['lr'] #[m]
@@ -54,22 +56,25 @@ def main_dyn():
     Cd = params['Cd']
     Df = params['Df']
     Dr = params['Dr']
-    lencar = 2*(lf+lr)
+    lencar = (lf+lr)
     widthcar = lencar/2
 
     #sim parameters
-    Tsim = 10
-    Tf = 1.5
-    N = 30
-    Qc = 0.1
-    Ql = 1000
-    Q_theta = 100
-    R_d = 0.01
-    R_delta = 0.01
-    Nsim = np.int(np.floor(N/Tf*Tsim))
-    r = 0.15 #trackwidth
+    with open(solverparams) as file:
+        params = yaml.load(file, Loader= yaml.FullLoader)
+    Tsim = 15
+    Tf = params['Tf']
+    N = params['N']
+    Qc = params['Qc']
+    Ql = params['Ql']
+    Q_theta = params['Q_theta']
+    R_d = params['R_d']
+    R_delta = params['R_delta']
 
-    solver = get_col_avoid_solver(N, Tf, paramfile)
+    Nsim = np.int(np.floor(N/Tf*Tsim))
+    r = 0.1 #trackwidth
+
+    solver = get_col_avoid_solver(solverparams, modelparams)
 
     track_lu_table, smax = Bezier.generatelookuptable("tracks/sample_track")
     trk_plt = plotter(track_lu_table, smax, r, lencar)
@@ -97,10 +102,10 @@ def main_dyn():
     #static obstacle
     ob_idx = 400
     phi_ob = track_lu_table[ob_idx, trackvars.index('phitrack')]
-    x_ob = track_lu_table[ob_idx,trackvars.index('xtrack')] - 0.5 * r * np.sin(phi_ob)
-    y_ob = track_lu_table[ob_idx,trackvars.index('ytrack')] + 0.5 * r * np.cos(phi_ob)
-    l_ob = lencar
-    w_ob = lencar/2
+    x_ob = track_lu_table[ob_idx,trackvars.index('xtrack')] + 0.5 * r * np.sin(phi_ob)
+    y_ob = track_lu_table[ob_idx,trackvars.index('ytrack')] - 0.5 * r * np.cos(phi_ob)
+    l_ob = lencar*2
+    w_ob = l_ob/2
 
 
     trk_plt.plot_static_obstacle(x_ob, y_ob, phi_ob, l_ob, w_ob)
@@ -108,10 +113,10 @@ def main_dyn():
 
     ############################################################################
     #initialization for theta values
-    iter = 2
+    iter = 10
     z_current = np.tile(zinit,(N,1))
     #arbitrarily set theta  values and
-    theta_old = theta_hat0*np.ones((N,)) + 0.001*np.arange(N)
+    theta_old = theta_hat0*np.ones((N,)) + 0.01*np.arange(N)
     z_current[:,11] = theta_old
     index_lin_points = 100 * theta_old
     index_lin_points = index_lin_points.astype(np.int32)
@@ -123,7 +128,7 @@ def main_dyn():
     z_current[:,5] = track_lin_points[:,trackvars.index('phitrack')]
 
     for idx in range(iter):
-
+        print("theta values", theta_old)
         all_parameters = []
         #get track linearization
         index_lin_points = 100 * theta_old
@@ -142,7 +147,7 @@ def main_dyn():
                                 Q_theta,
                                 R_d,
                                 R_delta,
-                                r-widthcar,
+                                r,
                                 x_ob,
                                 y_ob,
                                 phi_ob,
@@ -159,8 +164,8 @@ def main_dyn():
                    "all_parameters": all_parameters.reshape(-1,)}
         #solve problem
         output, exitflag, info = solver.solve(problem)
-        print(info)
-        print(exitflag)
+        #print(info)
+        #print(exitflag)
         #input("hit [enter] to continue.")
 
         #extract theta values
@@ -227,7 +232,7 @@ def main_dyn():
                                 Q_theta,
                                 R_d,
                                 R_delta,
-                                r-widthcar,
+                                r,
                                 x_ob,
                                 y_ob,
                                 phi_ob,
@@ -252,7 +257,7 @@ def main_dyn():
                             Q_theta,
                             R_d,
                             R_delta,
-                            r-widthcar,
+                            r,
                             x_ob,
                             y_ob,
                             phi_ob,
@@ -313,7 +318,7 @@ def main_dyn():
         zinit_vals[simidx,:] = zinit
         step_sol_u_arr = np.array(step_sol_u)
 
-
+        '''
         #plotting result
         trk_plt.plot_horizon(theta_vals, step_sol_z_arr[:, 3:6])
         trk_plt.plot_input_state_traj(step_sol_z_arr, zvars)
@@ -324,7 +329,7 @@ def main_dyn():
         plt.pause(0.1)
         trk_plt.clear_horizion()
         trk_plt.clear_input_state_traj()
-
+        '''
         #preparation for next timestep
         theta_vals = np.hstack((step_sol_z_arr[1:, zvars.index('theta')], step_sol_z_arr[-1, zvars.index('theta')]+0.1))
 

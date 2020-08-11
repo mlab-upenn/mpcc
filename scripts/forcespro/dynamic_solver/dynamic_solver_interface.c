@@ -76,7 +76,7 @@ extern void dynamic_solver_casadi2forces(dynamic_solver_float *x,        /* prim
     	/* set outputs for CasADi */
 	out[0] = &this_f;
 	out[1] = nabla_f_sparse;
-	if ((0 <= stage && stage <= 28))
+	if ((0 <= stage && stage <= 33))
 	{
 		/* set inputs */
 		out[2] = h_sparse;
@@ -118,7 +118,7 @@ extern void dynamic_solver_casadi2forces(dynamic_solver_float *x,        /* prim
 	/* set outputs for CasADi */
 	out[0] = &this_f;
 	out[1] = nabla_f_sparse;
-	if ((29 == stage))
+	if ((34 == stage))
 	{
 		/* set inputs */
 		out[2] = h_sparse;

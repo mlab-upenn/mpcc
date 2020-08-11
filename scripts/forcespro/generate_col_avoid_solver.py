@@ -4,7 +4,7 @@ import numpy as np
 import forcespro.nlp
 
 
-def get_col_avoid_solver(N, Tf, modelparams = "modelparams.yaml", name = "col_avoid_solver"):
+def get_col_avoid_solver( solverparams = "solverparams.yaml", modelparams = "modelparams.yaml", name = "col_avoid_solver"):
     #load global constant model parameters
     with open(modelparams) as file:
         params = yaml.load(file, Loader= yaml.FullLoader)
@@ -27,6 +27,40 @@ def get_col_avoid_solver(N, Tf, modelparams = "modelparams.yaml", name = "col_av
     Cd = params['Cd']
     Df = params['Df']
     Dr = params['Dr']
+
+    #load solverparams for the boxconstraints
+    with open(solverparams) as file:
+        params = yaml.load(file, Loader= yaml.FullLoader)
+
+    N = params['N'] # horizon steps
+    Tf = params['Tf'] # horizon length [s]
+
+    ddot_min = params['ddot_min'] # min change in d [-]
+    ddot_max = params['ddot_max'] # max change in d [-]
+
+    d_min = params['d_min'] # min d [-]
+    d_max = params['d_max'] # max d [-]
+
+    delta_min = params['delta_min'] # minimum steering angle [rad]
+    delta_max = params['delta_max'] # maximum steering angle [rad]
+
+    deltadot_min = params['deltadot_min']  # minimum steering angle cahgne[rad/s]
+    deltadot_max = params['deltadot_max'] # maximum steering angle cahgne[rad/s]
+
+    omega_min = params['omega_min'] # minimum yawrate [rad/sec]
+    omega_max = params['omega_max'] # maximum yawrate [rad/sec]
+
+    thetadot_min = params['thetadot_min'] # minimum adv param speed [m/s]
+    thetadot_max = params['thetadot_max'] # maximum adv param speed [m/s]
+
+    theta_min = params['theta_min'] # minimum adv param [m]
+    theta_max = params['theta_max'] # maximum adv param  [m]
+
+    vx_min = params['vx_min'] # min long vel [m/s]
+    vx_max = params['vx_max'] # max long vel [m/s]
+
+    vy_min = params['vy_min'] # min lat vel [m/s]
+    vy_max = params['vy_max']# max lat vel [m/s]
 
     #forces model
     model = forcespro.nlp.SymbolicModel()
@@ -154,7 +188,7 @@ def get_col_avoid_solver(N, Tf, modelparams = "modelparams.yaml", name = "col_av
         yt_hat = yt + sin_phit * ( theta - theta_hat)
 
         #inside track <=> tval <= 0
-        tval = (xt_hat-posx)**2 + (yt_hat-posy)**2 - r**2
+        tval = (xt_hat-posx)**2 + (yt_hat-posy)**2 - (r-widthcar)**2
 
         #ellipsoidal obstacle
 
@@ -189,33 +223,6 @@ def get_col_avoid_solver(N, Tf, modelparams = "modelparams.yaml", name = "col_av
     model.hl = np.array([-10, -10000])
 
     #boxconstraints
-    ddot_min = -10.0 #min change in d [-]
-    ddot_max = 10.0  #max change in d [-]
-
-    d_min = -0.1 #min d [-]
-    d_max = 1 #max d [-]
-
-    delta_min = -0.40  # minimum steering angle [rad]
-    delta_max = 0.40  # maximum steering angle [rad]
-
-    deltadot_min = -2  # minimum steering angle cahgne[rad/s]
-    deltadot_max = 2 # maximum steering angle cahgne[rad/s]
-
-    omega_min = -100 # minimum yawrate [rad/sec]
-    omega_max = 100 # maximum yawrate [rad/sec]
-
-    thetadot_min = 0.05  # minimum adv param speed [m/s]
-    thetadot_max = 5 # maximum adv param speed [m/s]
-
-    theta_min = 0.00  # minimum adv param [m]
-    theta_max = 1000 # maximum adv param  [m]
-
-    vx_max = 3.5 # max long vel [m/s]
-    vx_min = -0.5 #0.05 # min long vel [m/s]
-
-    vy_max = 3 # max lat vel [m/s]
-    vy_min = -3 # min lat vel [m/s]
-
     #Note: z = [u, x] = [vxdot, deltadot, thetadot, posx, posy, phi, vx, vy, omega, d, delta, theta]
     model.ub = np.array([ddot_max, deltadot_max, thetadot_max, 10, 10, 100, vx_max, vy_max, omega_max, d_max, delta_max, theta_max])
     model.lb = np.array([ddot_min, deltadot_min, thetadot_min , -10, -10, -100, vx_min, vy_min, omega_min, d_min, delta_min, theta_min])
@@ -228,9 +235,9 @@ def get_col_avoid_solver(N, Tf, modelparams = "modelparams.yaml", name = "col_av
     codeoptions.nlp.integrator.Ts = Ts
     codeoptions.nlp.integrator.nodes = 2 #intermediate integration nodes
 
-    codeoptions.maxit = 15  # Maximum number of iterations
+    codeoptions.maxit = 30  # Maximum number of iterations
     codeoptions.printlevel = 2  # Use printlevel = 2 to print progress (but not for timings)
-    codeoptions.optlevel = 0  # 0 no optimization, 1 optimize for size, 2 optimize for speed, 3 optimize for size & speed
+    codeoptions.optlevel = 2  # 0 no optimization, 1 optimize for size, 2 optimize for speed, 3 optimize for size & speed
     codeoptions.nlp.stack_parambounds = 2
     #codeoptions.noVariableElimination = True
     # Creates code for symbolic model formulation given above, then contacts server to generate new solver

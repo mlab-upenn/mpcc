@@ -2,9 +2,9 @@
 %
 %   OUTPUT = dynamic_solver(PARAMS) solves a multistage problem
 %   subject to the parameters supplied in the following struct:
-%       PARAMS.x0 - column vector of length 360
+%       PARAMS.x0 - column vector of length 420
 %       PARAMS.xinit - column vector of length 9
-%       PARAMS.all_parameters - column vector of length 510
+%       PARAMS.all_parameters - column vector of length 595
 %
 %   OUTPUT returns the values of the last iteration of the solver where
 %       OUTPUT.x01 - column vector of size 12
@@ -37,6 +37,11 @@
 %       OUTPUT.x28 - column vector of size 12
 %       OUTPUT.x29 - column vector of size 12
 %       OUTPUT.x30 - column vector of size 12
+%       OUTPUT.x31 - column vector of size 12
+%       OUTPUT.x32 - column vector of size 12
+%       OUTPUT.x33 - column vector of size 12
+%       OUTPUT.x34 - column vector of size 12
+%       OUTPUT.x35 - column vector of size 12
 %
 %   [OUTPUT, EXITFLAG] = dynamic_solver(PARAMS) returns additionally
 %   the integer EXITFLAG indicating the state of the solution with 

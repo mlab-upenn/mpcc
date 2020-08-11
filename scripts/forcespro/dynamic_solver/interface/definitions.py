@@ -9,9 +9,9 @@ c_header = "include/dynamic_solver.h"
 
 # Parameter             | Type    | Scalar type      | Ctypes type    | Numpy type   | Shape     | Len
 params = \
-[("x0"                  , "dense" , ""               , ctypes.c_double, numpy.float64, (360,   1),  360),
+[("x0"                  , "dense" , ""               , ctypes.c_double, numpy.float64, (420,   1),  420),
  ("xinit"               , "dense" , ""               , ctypes.c_double, numpy.float64, (  9,   1),    9),
- ("all_parameters"      , "dense" , ""               , ctypes.c_double, numpy.float64, (510,   1),  510)]
+ ("all_parameters"      , "dense" , ""               , ctypes.c_double, numpy.float64, (595,   1),  595)]
 
 # Output                | Type    | Scalar type      | Ctypes type    | Numpy type   | Shape     | Len
 outputs = \
@@ -44,7 +44,12 @@ outputs = \
  ("x27"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
  ("x28"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
  ("x29"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
- ("x30"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12)]
+ ("x30"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
+ ("x31"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
+ ("x32"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
+ ("x33"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
+ ("x34"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12),
+ ("x35"                 , ""      , ""               , ctypes.c_double, numpy.float64,     ( 12,),   12)]
 
 # Info Struct Fields
 info = \

@@ -79,7 +79,7 @@ void mexFunction( solver_int32_default nlhs, mxArray *plhs[], solver_int32_defau
 	solver_int32_default i;
 	solver_int32_default exitflag;
 	const solver_int8_default *fname;
-	const solver_int8_default *outputnames[30] = {"x01","x02","x03","x04","x05","x06","x07","x08","x09","x10","x11","x12","x13","x14","x15","x16","x17","x18","x19","x20","x21","x22","x23","x24","x25","x26","x27","x28","x29","x30"};
+	const solver_int8_default *outputnames[35] = {"x01","x02","x03","x04","x05","x06","x07","x08","x09","x10","x11","x12","x13","x14","x15","x16","x17","x18","x19","x20","x21","x22","x23","x24","x25","x26","x27","x28","x29","x30","x31","x32","x33","x34","x35"};
 	const solver_int8_default *infofields[10] = { "it", "it2opt", "res_eq", "res_ineq",  "rsnorm",  "rcompnorm",  "pobj",  "mu",  "solvetime",  "fevalstime"};
 	
 	/* Check for proper number of arguments */
@@ -109,14 +109,14 @@ void mexFunction( solver_int32_default nlhs, mxArray *plhs[], solver_int32_defau
     {
     mexErrMsgTxt("PARAMS.x0 must be a double.");
     }
-    if( mxGetM(par) != 360 || mxGetN(par) != 1 ) 
+    if( mxGetM(par) != 420 || mxGetN(par) != 1 ) 
 	{
-    mexErrMsgTxt("PARAMS.x0 must be of size [360 x 1]");
+    mexErrMsgTxt("PARAMS.x0 must be of size [420 x 1]");
     }
 #endif	 
 	if ( (mxGetN(par) != 0) && (mxGetM(par) != 0) )
 	{
-		copyMArrayToC_double(mxGetPr(par), params.x0,360);
+		copyMArrayToC_double(mxGetPr(par), params.x0,420);
 
 	}
 	par = mxGetField(PARAMS, 0, "xinit");
@@ -149,14 +149,14 @@ void mexFunction( solver_int32_default nlhs, mxArray *plhs[], solver_int32_defau
     {
     mexErrMsgTxt("PARAMS.all_parameters must be a double.");
     }
-    if( mxGetM(par) != 510 || mxGetN(par) != 1 ) 
+    if( mxGetM(par) != 595 || mxGetN(par) != 1 ) 
 	{
-    mexErrMsgTxt("PARAMS.all_parameters must be of size [510 x 1]");
+    mexErrMsgTxt("PARAMS.all_parameters must be of size [595 x 1]");
     }
 #endif	 
 	if ( (mxGetN(par) != 0) && (mxGetM(par) != 0) )
 	{
-		copyMArrayToC_double(mxGetPr(par), params.all_parameters,510);
+		copyMArrayToC_double(mxGetPr(par), params.all_parameters,595);
 
 	}
 
@@ -185,7 +185,7 @@ void mexFunction( solver_int32_default nlhs, mxArray *plhs[], solver_int32_defau
 	#endif
 
 	/* copy output to matlab arrays */
-	plhs[0] = mxCreateStructMatrix(1, 1, 30, outputnames);
+	plhs[0] = mxCreateStructMatrix(1, 1, 35, outputnames);
 		outvar = mxCreateDoubleMatrix(12, 1, mxREAL);
 	copyCArrayToM_double( output.x01, mxGetPr(outvar), 12);
 	mxSetField(plhs[0], 0, "x01", outvar);
@@ -305,6 +305,26 @@ void mexFunction( solver_int32_default nlhs, mxArray *plhs[], solver_int32_defau
 	outvar = mxCreateDoubleMatrix(12, 1, mxREAL);
 	copyCArrayToM_double( output.x30, mxGetPr(outvar), 12);
 	mxSetField(plhs[0], 0, "x30", outvar);
+
+	outvar = mxCreateDoubleMatrix(12, 1, mxREAL);
+	copyCArrayToM_double( output.x31, mxGetPr(outvar), 12);
+	mxSetField(plhs[0], 0, "x31", outvar);
+
+	outvar = mxCreateDoubleMatrix(12, 1, mxREAL);
+	copyCArrayToM_double( output.x32, mxGetPr(outvar), 12);
+	mxSetField(plhs[0], 0, "x32", outvar);
+
+	outvar = mxCreateDoubleMatrix(12, 1, mxREAL);
+	copyCArrayToM_double( output.x33, mxGetPr(outvar), 12);
+	mxSetField(plhs[0], 0, "x33", outvar);
+
+	outvar = mxCreateDoubleMatrix(12, 1, mxREAL);
+	copyCArrayToM_double( output.x34, mxGetPr(outvar), 12);
+	mxSetField(plhs[0], 0, "x34", outvar);
+
+	outvar = mxCreateDoubleMatrix(12, 1, mxREAL);
+	copyCArrayToM_double( output.x35, mxGetPr(outvar), 12);
+	mxSetField(plhs[0], 0, "x35", outvar);
 
 	/* copy exitflag */
 	if( nlhs > 1 )
