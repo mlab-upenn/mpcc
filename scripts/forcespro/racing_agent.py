@@ -33,7 +33,8 @@ import sys
 
 
 class racer():
-    def __init__(self, name = "default_racer", modelparams = "modelparams.yaml", solverparams = "solverparams", track, Tsim):
+
+    def __init__(self, track, Tsim, name = "default_racer", modelparams = "modelparams.yaml", solverparams = "solverparams"):
 
         self.name = name
         #load global constant model parameters
@@ -52,8 +53,8 @@ class racer():
         self.Cd = params['Cd']
         self.Df = params['Df']
         self.Dr = params['Dr']
-        self.lencar = (lf+lr)
-        self.widthcar = lencar/2
+        self.lencar = (self.lf+self.lr)
+        self.widthcar = self.lencar/2
 
         #solver params
         with open(solverparams) as file:
@@ -71,23 +72,23 @@ class racer():
 
         self.r = track['r']
         self.smax = track['smax']
-        self.track_lu_table = blah
+        self.track_lu_table = track['track_lu_table']
 
-        self.solver = get_col_avoid_solver(self.N, self.Tf, modelparams)
+        self.solver = get_col_avoid_solver(solverparams, modelparams, self.name+"_solver")
 
-        self.trackvars =['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
+        self.trackvars = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
         self.xvars = ['posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
         self.uvars = ['ddot', 'deltadot', 'thetadot']
         self.pvars = ['xt', 'yt', 'phit', 'sin_phit', 'cos_phit', 'theta_hat', 'Qc', 'Ql', 'Q_theta', 'R_d', 'R_delta', 'r', 'x_ob', 'y_ob', 'phi_ob', 'l_ob', 'w_ob']
         self.zvars = ['ddot', 'deltadot', 'thetadot', 'posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
 
-        self.z_current = np.zeros((N, len(self.zvars) ))
-        self.theta_current = np.zeros((N,))
+        self.z_current = np.zeros((self.N, len(self.zvars) ))
+        self.theta_current = np.zeros((self.N,))
 
         #list to store all visited states
-        self.zinit_vals = np.zeros(Nsim, len(self.zvars))
+        self.zinit_vals = np.zeros((self.Nsim, len(self.zvars)))
         #list containing also the prediction horizons
-        self.z_data = np.zeros(Nsim, N, len(self.zvars))
+        self.z_data = np.zeros((self.Nsim, self.N, len(self.zvars)))
         #sim step trackign
         self.simidx = 0
         self.laps = 0
@@ -103,14 +104,14 @@ class racer():
         iter = 15
 
         self.zinit = np.concatenate([np.array([0,0,0]), xinit])
-        self.z_current = np.tile(zinit,(N,1))
+        self.z_current = np.tile(self.zinit,(self.N,1))
 
         #arbitrarily set theta  values and
-        theta_old = zinit[self.zvars.index('theta')]*np.ones((N,)) + 0.01*np.arange(N)
+        theta_old = self.zinit[self.zvars.index('theta')]*np.ones((self.N,)) + 0.01*np.arange(self.N)
         self.z_current[:,self.zvars.index('theta')] = theta_old
         index_lin_points = 100 * theta_old
         index_lin_points = index_lin_points.astype(np.int32)
-        track_lin_points = track_lu_table[index_lin_points,:]
+        track_lin_points = self.track_lu_table[index_lin_points,:]
 
         #initialize x values on track
         self.z_current[:,3] = track_lin_points[:,self.trackvars.index('xtrack')]
@@ -123,7 +124,7 @@ class racer():
             #get track linearization
             index_lin_points = 100 * theta_old
             index_lin_points = index_lin_points.astype(np.int32)
-            track_lin_points = track_lu_table[index_lin_points,:]
+            track_lin_points = self.track_lu_table[index_lin_points,:]
 
             for stageidx in range(self.N):
                 p_val = np.array([track_lin_points[stageidx,self.trackvars.index('xtrack')],
@@ -132,12 +133,12 @@ class racer():
                                     track_lin_points[stageidx,self.trackvars.index('sin(phi)')],
                                     track_lin_points[stageidx,self.trackvars.index('cos(phi)')],
                                     track_lin_points[stageidx,self.trackvars.index('sval')],  #aka theta_hat
-                                    Qc,
-                                    Ql,
-                                    Q_theta,
-                                    R_d,
-                                    R_delta,
-                                    r,
+                                    self.Qc,
+                                    self.Ql,
+                                    self.Q_theta,
+                                    self.R_d,
+                                    self.R_delta,
+                                    self.r,
                                     x_ob,
                                     y_ob,
                                     phi_ob,
@@ -167,14 +168,14 @@ class racer():
                 self.z_current[idx_sol,:] = zsol
                 idx_sol = idx_sol+1
 
-            self.theta_current = z_current[:, zvars.index('theta')]
+            self.theta_current = self.z_current[:, self.zvars.index('theta')]
 
             #compute difference
-            theta_diff = np.sum(np.abs(theta_current-theta_old))
+            theta_diff = np.sum(np.abs(self.theta_current-theta_old))
             print(self.name +": theta init difference: ", theta_diff)
             print("theta values", self.theta_current)
             theta_old = self.theta_current
-
+            self.xinit = self.z_current[0,3:]
         return self.z_current
 
     def update(self, enemyinfo):
@@ -203,12 +204,12 @@ class racer():
                                 track_lin_points[stageidx,self.trackvars.index('sin(phi)')],
                                 track_lin_points[stageidx,self.trackvars.index('cos(phi)')],
                                 track_lin_points[stageidx,self.trackvars.index('sval')],  #aka theta_hat
-                                Qc,
-                                Ql,
-                                Q_theta,
-                                R_d,
-                                R_delta,
-                                r,
+                                self.Qc,
+                                self.Ql,
+                                self.Q_theta,
+                                self.R_d,
+                                self.R_delta,
+                                self.r,
                                 x_ob,
                                 y_ob,
                                 phi_ob,
@@ -228,12 +229,12 @@ class racer():
                             track_lin_points[stageidx,self.trackvars.index('sin(phi)')],
                             track_lin_points[stageidx,self.trackvars.index('cos(phi)')],
                             track_lin_points[stageidx,self.trackvars.index('sval')],  #aka theta_hat
-                            Qc,
-                            Ql,
-                            Q_theta,
-                            R_d,
-                            R_delta,
-                            r,
+                            self.Qc,
+                            self.Ql,
+                            self.Q_theta,
+                            self.R_d,
+                            self.R_delta,
+                            self.r,
                             x_ob,
                             y_ob,
                             phi_ob,
@@ -260,7 +261,7 @@ class racer():
             idx_sol = idx_sol+1
 
         #log solution
-        self.z_data[simidx,:,:] = self.z_current
+        self.z_data[self.simidx,:,:] = self.z_current
         '''
         print("theta: ", zinit[self.zvars.index('theta')])
         print("vx: ", zinit[self.zvars.index('vx')])
@@ -288,32 +289,20 @@ class racer():
         self.theta_current = self.z_current[:,self.zvars.index('theta')]
         self.zinit = self.z_current[0,:]
         self.xinit = self.zinit[3:]
-        self.zinit_vals[simidx,:] = self.zinit
+        self.zinit_vals[self.simidx,:] = self.zinit
 
-        '''
-        #plotting result
-        trk_plt.plot_horizon(theta_vals, step_sol_z_arr[:, 3:6])
-        trk_plt.plot_input_state_traj(step_sol_z_arr, zvars)
-        #plt.show()
-
-        plt.pause(0.1)
-        input("hit [enter] to continue.")
-        plt.pause(0.1)
-        trk_plt.clear_horizion()
-        trk_plt.clear_input_state_traj()
-        '''
         #preparation for next timestep
         self.theta_current = np.hstack((self.z_current[1:, self.zvars.index('theta')], self.z_current[-1, self.zvars.index('theta')]+0.1))
 
         if self.theta_current[0] > self.smax :
             print("#################################RESET###############################")
-            laps = laps + 1
-            print("lap:", laps)
-            theta_vals = theta_vals - smax
-            self.z_current[:,self.zvars.index('theta')] = theta_vals
+            self.laps = self.laps + 1
+            print("lap:", self.laps)
+            self.theta_current = self.theta_current - self.smax
+            self.z_current[:,self.zvars.index('theta')] = self.theta_current
 
         self.simidx = self.simidx + 1
         return self.z_current
 
-    def return_sim_data():
+    def return_sim_data(self):
         return self.zinit_vals, self.z_data

@@ -230,14 +230,14 @@ def get_col_avoid_solver( solverparams = "solverparams.yaml", modelparams = "mod
     #put initial condition on all state variables x
     model.xinitidx = 3 + np.arange(model.nvar -3)
     # Set solver options
-    codeoptions = forcespro.CodeOptions("dynamic_solver")
+    codeoptions = forcespro.CodeOptions(name)
     codeoptions.nlp.integrator.type = 'ERK4'
     codeoptions.nlp.integrator.Ts = Ts
     codeoptions.nlp.integrator.nodes = 2 #intermediate integration nodes
 
     codeoptions.maxit = 30  # Maximum number of iterations
     codeoptions.printlevel = 2  # Use printlevel = 2 to print progress (but not for timings)
-    codeoptions.optlevel = 2  # 0 no optimization, 1 optimize for size, 2 optimize for speed, 3 optimize for size & speed
+    codeoptions.optlevel = 0  # 0 no optimization, 1 optimize for size, 2 optimize for speed, 3 optimize for size & speed
     codeoptions.nlp.stack_parambounds = 2
     #codeoptions.noVariableElimination = True
     # Creates code for symbolic model formulation given above, then contacts server to generate new solver
