@@ -62,7 +62,7 @@ class plotter():
         #input and state plot
         self.fig2, (self.ax1, self.ax2) = plt.subplots(nrows = 2, ncols = 1, figsize=(10,10))
         #trackplot
-        plotsize = 20
+        plotsize = 8
         self.fig, self.ax = plt.subplots(1, figsize=(plotsize,ratio*plotsize))
         self.track_xbounds = [-0.1-np.max(r)+np.min(self.coords_full[:,0]),np.max(self.coords_full[:,0])+np.max(r)+0.1]
         self.track_ybounds = [-0.1-np.max(r)+np.min(self.coords_full[:,1]),np.max(self.coords_full[:,1])+np.max(r)+0.1]
@@ -84,7 +84,8 @@ class plotter():
         bounds_to_del_1 = []
         bounds_to_del_2 = []
         for idx_center in range(len(self.coords)):
-            for idx_bound in range(len(self.coords)):
+            for idx_bound_unsigned in range(100):
+                idx_bound = np.mod(idx_center + idx_bound_unsigned - 50, len(self.coords))
                 dx1 = self.coords[idx_center,0]-b1_x[idx_bound]
                 dx2 = self.coords[idx_center,0]-b2_x[idx_bound]
                 dy1 = self.coords[idx_center,1]-b1_y[idx_bound]
@@ -224,7 +225,7 @@ class plotter():
         self.fig2.canvas.draw()
 
     def plot_static_obstacle(self, x, y, phi, l, w):
-        obstacle = patches.Ellipse((x, y), l, w, angle = phi * 180/3.14159 ,linewidth=1,edgecolor='k',facecolor='none')
+        obstacle = patches.Ellipse((x, y), l, w, angle = phi * 180/3.14159 ,linewidth=1,edgecolor='k',facecolor='k')
         obs = self.ax.add_patch(obstacle)
         self.static_obstacles.append(obs)
         self.fig.canvas.draw()
@@ -247,7 +248,7 @@ class plotter():
         self.fig2.canvas.draw()
 
     def clear_obstacles(self):
-    
+
         for idx in range(len(self.static_obstacles)):
             obs = self.static_obstacles[idx]
             obs.remove()

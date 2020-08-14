@@ -11,7 +11,7 @@ c_header = "include/agent_2_solver.h"
 params = \
 [("x0"                  , "dense" , ""               , ctypes.c_double, numpy.float64, (420,   1),  420),
  ("xinit"               , "dense" , ""               , ctypes.c_double, numpy.float64, (  9,   1),    9),
- ("all_parameters"      , "dense" , ""               , ctypes.c_double, numpy.float64, (595,   1),  595)]
+ ("all_parameters"      , "dense" , ""               , ctypes.c_double, numpy.float64, (630,   1),  630)]
 
 # Output                | Type    | Scalar type      | Ctypes type    | Numpy type   | Shape     | Len
 outputs = \

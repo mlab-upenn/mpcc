@@ -23,14 +23,13 @@
 '''
 
 import numpy as np
-#from generate_solver_dynamic import get_forces_solver_dynamic
-#from generate_col_avoid_solver import get_col_avoid_solver
-from racing_agent import racer
+from racing_agent_obs import racer
 import forcespro.nlp
 from python_sim_utils import   plotter, plot_pajecka, compute_objective
 import matplotlib.pyplot as plt
 import Bezier
 import yaml
+import pickle
 import sys
 
 
@@ -52,13 +51,13 @@ def main():
     #sim parameters
     with open(solverparams_1) as file:
         params = yaml.load(file, Loader= yaml.FullLoader)
-    Tsim = 15
+    Tsim = 30
     Tf = params['Tf']
     N = params['N']
     Nsim = np.int(np.floor(N/Tf*Tsim))
 
     track_lu_table, smax = Bezier.generatelookuptable("tracks/sample_track")
-    r = 0.1 #trackwidth
+    r = 0.2 #trackwidth
     track = {"track_lu_table": track_lu_table,
              "smax": smax,
              "r": r}
@@ -72,7 +71,7 @@ def main():
     widthcar = lencar/2
     trk_plt = plotter(track_lu_table, smax, r, lencar)
     trk_plt.plot_track()
-
+    plt.pause(0.1)
     #initialize both agents
     agent_1 = racer(track, Tsim, "agent_1", modelparams_1, solverparams_1)
     agent_1_info = {"phi_ob": 0,
@@ -89,7 +88,7 @@ def main():
 
     #agent 1 trajecotry initialization
     #starting position in track startidx = theta0[m] * 100 [pts/m]
-    startidx_1 = 3000
+    startidx_1 = 400
     xt0 = track_lu_table[startidx_1,trackvars.index('xtrack')]
     yt0 = track_lu_table[startidx_1,trackvars.index('ytrack')]
     phit0 = track_lu_table[startidx_1,trackvars.index('phitrack')]
@@ -101,7 +100,7 @@ def main():
     agent_1_info["y_ob"] = xinit_1[xvars.index('posy')]
 
     #agent 2  trajectory initialization
-    startidx_2 = 20
+    startidx_2 = 500
     xt0 = track_lu_table[startidx_2,trackvars.index('xtrack')]
     yt0 = track_lu_table[startidx_2,trackvars.index('ytrack')]
     phit0 = track_lu_table[startidx_2,trackvars.index('phitrack')]
@@ -133,7 +132,6 @@ def main():
     input("press ENTER")
     trk_plt.clear_agents()
     trk_plt.clear_obstacles()
-    input("press Enter2")
     ##########################SIMULATION#######################################
     for simidx in range(Nsim):
         agent_1_info["phi_ob"] = z_current_1[1, zvars.index('phi')]
@@ -146,6 +144,7 @@ def main():
 
         z_current_1 = agent_1.update(agent_2_info)
         z_current_2 = agent_2.update(agent_1_info)
+
         trk_plt.plot_static_obstacle(agent_1_info["x_ob"],\
                                      agent_1_info["y_ob"],\
                                      agent_1_info["phi_ob"],\
@@ -159,15 +158,25 @@ def main():
                                      2*agent_2_info["w_ob"]
                                     )
         trk_plt.plot_agents(z_current_1, z_current_2)
-        plt.pause(0.1)
-        input("press ENTER")
+        plt.pause(0.01)
+        #input("press ENTER")
         trk_plt.clear_agents()
         trk_plt.clear_obstacles()
 
     ###############################/SIMULATION##################################
     #trk_plt.animate_result(z_data,N,Tf, 'test.gif')
-    zinit_vals, garbage = agent.return_sim_data()
-    trk_plt.plot_traj(zinit_vals[:,3:])
+    zinit_vals_1, z_data_full_1 = agent_1.return_sim_data()
+    zinit_vals_2, z_data_full_2 = agent_2.return_sim_data()
+
+    agent_1_data = {"zinit": zinit_vals_1,
+                    "zdata": z_data_full_1}
+    agent_2_data = {"zinit": zinit_vals_2,
+                    "zdata": z_data_full_2}
+
+    simdata = {"agent1": agent_1_data,
+               "agent2": agent_2_data}
+
+    trk_plt.plot_traj(zinit_vals_1[:,3:])
     plt.show()
     #np.savetxt("full_sol_x_log.csv", )
         #print(simidx)

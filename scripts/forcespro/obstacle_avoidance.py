@@ -29,7 +29,7 @@ from racing_agent import racer
 import forcespro.nlp
 from python_sim_utils import   plotter, plot_pajecka, compute_objective
 import matplotlib.pyplot as plt
-import Bezier
+import InterpolateTrack
 import yaml
 import sys
 
@@ -59,8 +59,8 @@ def main():
 
 
 
-    track_lu_table, smax = Bezier.generatelookuptable("tracks/sample_track")
-    r = 0.1 #trackwidth
+    track_lu_table, smax = InterpolateTrack.generatelookuptable("tracks/slider")
+    r = 0.2 #trackwidth
     track = {"track_lu_table": track_lu_table,
              "smax": smax,
              "r": r}
@@ -73,7 +73,7 @@ def main():
 
     #starting position in track startidx = theta0[m] * 100 [pts/m]
     trackvars = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
-    startidx = 3000
+    startidx = 1300
     xt0 = track_lu_table[startidx,trackvars.index('xtrack')]
     yt0 = track_lu_table[startidx,trackvars.index('ytrack')]
     phit0 = track_lu_table[startidx,trackvars.index('phitrack')]
@@ -81,7 +81,7 @@ def main():
     #initial condition
     zvars = ['ddot', 'deltadot', 'thetadot', 'posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
     xvars = ['posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
-    xinit = np.array([xt0, yt0, phit0, 1.8, 0.0, 0, 0, 0, theta_hat0])
+    xinit = np.array([xt0, yt0, phit0, 0.2, 0.0, 0, 0, 0, theta_hat0])
 
     #static obstacle
     ob_idx = 400
@@ -89,7 +89,7 @@ def main():
     x_ob = track_lu_table[ob_idx,trackvars.index('xtrack')] - 0.5 * r * np.sin(phi_ob)
     y_ob = track_lu_table[ob_idx,trackvars.index('ytrack')] + 0.5 * r * np.cos(phi_ob)
     l_ob = lencar*2
-    w_ob = l_ob/2
+    w_ob = l_ob*2
     obstacleinfo = {"phi_ob": phi_ob,
                     "x_ob": x_ob,
                     "y_ob": y_ob,
@@ -102,7 +102,7 @@ def main():
     plt.pause(0.1)
     trk_plt.clear_horizion()
     trk_plt.clear_input_state_traj()
-
+    input("start")
     ##########################SIMULATION#######################################
     for simidx in range(Nsim):
         z_current = agent.update(obstacleinfo)
@@ -110,15 +110,16 @@ def main():
         trk_plt.plot_horizon(z_current[:,zvars.index('theta')], z_current[:, 3:6])
         trk_plt.plot_input_state_traj(z_current, zvars)
 
-        plt.pause(0.1)
-        input("hit [enter] to continue.")
-        plt.pause(0.1)
+        #plt.pause(0.01)
+        #input("hit [enter] to continue.")
+        #plt.pause(0.1)
         trk_plt.clear_horizion()
         trk_plt.clear_input_state_traj()
 
     ###############################/SIMULATION##################################
-    #trk_plt.animate_result(z_data,N,Tf, 'test.gif')
-    zinit_vals, garbage = agent.return_sim_data()
+
+    zinit_vals, z_data = agent.return_sim_data()
+    #trk_plt.animate_result(z_data, N,Tf, 'test.gif')
     trk_plt.plot_traj(zinit_vals[:,3:])
     plt.show()
     #np.savetxt("full_sol_x_log.csv", )

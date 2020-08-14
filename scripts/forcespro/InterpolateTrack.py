@@ -29,38 +29,12 @@ import matplotlib.pyplot as plt
 import yaml
 
 def interpolate(waypoints):
-    #interpolates with cubic bezier curves with cyclic boundary condition
     n = len(waypoints)
-    M = np.zeros([n,n])
-
-    #build M
-    tridiagel = np.matrix([[1, 4, 1]])
-    for idx in range(n-2):
-        M[idx+1:idx+2, idx:idx+3] = tridiagel
-
-    M[0,0:2]= tridiagel[:,1:3]
-    M[-1,-2:]= tridiagel[:,0:2]
-    M[0:2,-1] = tridiagel[:,0].reshape(1,-1)
-    M[-1,0] = tridiagel[:,0].reshape(1,-1)
-
-
-    #build sol vector
-    s =np.zeros([n,2])
-    for idx in range(n-1):
-        s[idx,:] = 2*(2*waypoints[idx,:] + waypoints[idx+1,:])
-    s[-1:] = 2*(2*waypoints[-1,:] + waypoints[0,:])
-
-    #solve for a & b
-    Ax = np.linalg.solve(M,s[:,0])
-    Ay = np.linalg.solve(M,s[:,1])
-
-    a = np.vstack([Ax,Ay])
-    b = np.zeros([2,n])
-
-    b[:,:-1] = 2*waypoints.T[:,1:] - a[:,1:]
-    b[:,-1] = 2*waypoints.T[:,0] - a[:,0]
-
-    return a, b
+    pointvals = np.arange(n+1)
+    waypoints = np.vstack((waypoints, waypoints[0,:].reshape(-1,1).T))
+    x_int = CubicSpline(pointvals, waypoints[:,0], bc_type = 'periodic')
+    y_int = CubicSpline(pointvals, waypoints[:,1], bc_type = 'periodic')
+    return x_int, y_int
 
 def compute_t(coef, order, s):
     res = 0
@@ -68,29 +42,18 @@ def compute_t(coef, order, s):
         res += coef[idx]*np.power(s,order-idx)
     return res
 
-def eval_raw(waypoints, a, b, t):
-    n = len(waypoints)
-    t = np.mod(t, n)
-    segment = np.floor(t)
-    segment = np.int(segment)
-
-    if segment>=n:
-        t =n-0.0001
-        segment = n-1
-    elif t<0:
-        t = 0
-    t_val = t-segment
-    coords = np.power(1 - t_val, 3) * waypoints.T[:,segment] + 3 * np.power(1 - t_val, 2) * t_val * a[:,segment]\
-    + 3 * (1 - t_val) * np.power(t_val, 2) * b[:,segment] + np.power(t_val, 3) * waypoints.T[:,np.int(np.mod(segment+1,n))]
-
+def eval_raw(x_int, y_int, t):
+    x_vals = x_int(t)
+    y_vals = y_int(t)
+    coords = np.array([x_vals,y_vals])
     return coords
 
-def getangle_raw(waypoints, a, b, t):
-    der = eval_raw(waypoints, a, b, t+0.1) - eval_raw(waypoints, a, b, t)
+def getangle_raw(x_int, y_int, t):
+    der = eval_raw(x_int, y_int, t+0.1) - eval_raw(x_int, y_int, t)
     phi = np.arctan2(der[1],der[0])
     return phi
 
-def fit_st(waypoints, a, b):
+def fit_st(waypoints, x_int, y_int):
     #using two revolutions to account for horizon overshooting end of lap
 
     #fit  the s-t rel.
@@ -100,7 +63,7 @@ def fit_st(waypoints, a, b):
     tvals = np.linspace(0, nwp, npoints+1)
     coords =[]
     for t in tvals:
-        coords.append(eval_raw(waypoints, a, b, t))
+        coords.append(eval_raw(x_int, y_int, t))
     coords = np.array(coords)
     dists = []
     dists.append(0)
@@ -117,7 +80,7 @@ def fit_st(waypoints, a, b):
 
     coords =[]
     for t in tvals:
-        coords.append(eval_raw(waypoints, a, b, np.mod(t, nwp)))
+        coords.append(eval_raw(x_int, y_int, np.mod(t, nwp)))
     coords = np.array(coords)
 
     distsr = []
@@ -160,8 +123,8 @@ def generatelookuptable(track):
     #trackwidth
     r = 0.1
     #abez,bbez coeffs
-    a, b = interpolate(waypoints)
-    ts_inverse, smax = fit_st(waypoints, a, b)
+    x_int, y_int = interpolate(waypoints)
+    ts_inverse, smax = fit_st(waypoints, x_int, y_int)
 
     lutable_density = 100 #[p/m]
 
@@ -174,8 +137,8 @@ def generatelookuptable(track):
     names_table = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
     table = []
     for idx in range(npoints):
-        track_point = eval_raw(waypoints, a, b, tvals[idx])
-        phi = getangle_raw(waypoints, a, b, tvals[idx])
+        track_point = eval_raw(x_int, y_int, tvals[idx])
+        phi = getangle_raw(x_int, y_int, tvals[idx])
         n = [-np.sin(phi), np.cos(phi)]
         g_upper = r + track_point[0]*n[0] + track_point[1]*n[1]
         g_lower = -r + track_point[0]*n[0] + track_point[1]*n[1]

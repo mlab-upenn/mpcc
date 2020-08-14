@@ -23,21 +23,20 @@
 '''
 
 import numpy as np
-from generate_col_avoid_solver import get_col_avoid_solver
-#from generate_tv_col_avoid_solver import get_tv_col_avoid_solver
+from generate_sw_col_avoid_solver import get_sw_col_avoid_solver
 import forcespro.nlp
 from python_sim_utils import   plotter, plot_pajecka, compute_objective
 import matplotlib.pyplot as plt
+import Bezier
 import yaml
 import sys
-from dynamics import dynamics_simulator
+
 
 class racer():
 
     def __init__(self, track, Tsim, name = "default_racer", modelparams = "modelparams.yaml", solverparams = "solverparams"):
 
         self.name = name
-        self.modelparams = modelparams
         #load global constant model parameters
         with open(modelparams) as file:
             params = yaml.load(file, Loader= yaml.FullLoader)
@@ -75,18 +74,18 @@ class racer():
         self.smax = track['smax']
         self.track_lu_table = track['track_lu_table']
 
-        self.solver = get_col_avoid_solver(solverparams, modelparams, self.name+"_solver")
-        #dynamics initialized in trajectory initialization
+        self.solver = get_sw_col_avoid_solver(solverparams, modelparams, self.name+"_solver")
 
         self.trackvars = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
         self.xvars = ['posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
         self.uvars = ['ddot', 'deltadot', 'thetadot']
-        self.pvars = ['xt', 'yt', 'phit', 'sin_phit', 'cos_phit', 'theta_hat', 'Qc', 'Ql', 'Q_theta', 'R_d', 'R_delta', 'r', 'x_ob', 'y_ob', 'phi_ob', 'l_ob', 'w_ob']
+        self.pvars = ['xt', 'yt', 'phit', 'sin_phit', 'cos_phit', 'theta_hat', 'Qc', 'Ql', 'Q_theta', 'R_d', 'R_delta', 'r', 'x_ob', 'y_ob', 'phi_ob', 'l_ob', 'w_ob', 'deactivate_ob']
         self.zvars = ['ddot', 'deltadot', 'thetadot', 'posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
 
         self.z_current = np.zeros((self.N, len(self.zvars) ))
         self.theta_current = np.zeros((self.N,))
-
+        self.obstacle_stages = [0, 1, 2, 3, 4, 5, 6, 7]
+        
         #list to store all visited states
         self.zinit_vals = np.zeros((self.Nsim, len(self.zvars)))
         #list containing also the prediction horizons
@@ -103,16 +102,13 @@ class racer():
         w_ob = enemyinfo['w_ob']
 
         #initialization for theta values
-        iter = 80
-
-        #initialize dyamics simulation
-        self.dynamics = dynamics_simulator(self.modelparams, self.Tf/self.N, xinit, nodes=3)
+        iter = 20
 
         self.zinit = np.concatenate([np.array([0,0,0]), xinit])
         self.z_current = np.tile(self.zinit,(self.N,1))
 
         #arbitrarily set theta  values and
-        theta_old = self.zinit[self.zvars.index('theta')]*np.ones((self.N,)) + 0.01*np.arange(self.N)
+        theta_old = self.zinit[self.zvars.index('theta')]*np.ones((self.N,)) + 0.1*np.arange(self.N)
         self.z_current[:,self.zvars.index('theta')] = theta_old
         index_lin_points = 100 * theta_old
         index_lin_points = index_lin_points.astype(np.int32)
@@ -148,11 +144,15 @@ class racer():
                                     y_ob,
                                     phi_ob,
                                     l_ob,
-                                    w_ob
+                                    w_ob,
+                                    1.0     #deactivate obstacle by default
                                     ])
                 all_parameters.append(p_val)
 
             all_parameters = np.array(all_parameters)
+
+            for idx in self.obstacle_stages:
+                all_parameters[idx,-1] = 0 #explicitly activate obstacle constraint
 
             #problem dictionary, arrays have to be flattened
             problem = {"x0": self.z_current.reshape(-1,),
@@ -219,10 +219,13 @@ class racer():
                                 y_ob,
                                 phi_ob,
                                 l_ob,
-                                w_ob
+                                w_ob,
+                                1.0     #deactivate obstacle by default
                                 ])
             #create parameter matrix
             all_parameters.append(p_val)
+            #stack state initializations, last state is copied
+            self.z_current[stageidx,:] = self.z_current[stageidx+1,:]
 
         #last stage copy old solution for init
         stageidx = self.N-1
@@ -242,10 +245,14 @@ class racer():
                             y_ob,
                             phi_ob,
                             l_ob,
-                            w_ob
+                            w_ob,
+                            1.0     #deactivate obstacle by default
                             ])
         all_parameters.append(p_val)
         all_parameters = np.array(all_parameters)
+
+        for idx in self.obstacle_stages:
+            all_parameters[idx,-1] = 0 #explicitly activate obstacle constraint
         #last state of z_current is already copied.
 
         #######################################################################
@@ -263,15 +270,8 @@ class racer():
             self.z_current[idx_sol, :] = zsol
             idx_sol = idx_sol+1
 
-        #simulate dynaics
-        u = self.z_current[0,:3]
-        xtrue = self.dynamics.tick(u)
-        self.z_current[0,3:] = xtrue
-
         #log solution
         self.z_data[self.simidx,:,:] = self.z_current
-
-
         '''
         print("theta: ", zinit[self.zvars.index('theta')])
         print("vx: ", zinit[self.zvars.index('vx')])
@@ -310,7 +310,6 @@ class racer():
             print("lap:", self.laps)
             self.theta_current = self.theta_current - self.smax
             self.z_current[:,self.zvars.index('theta')] = self.theta_current
-            self.dynamics.set_theta(self.theta_current[0])
 
         self.simidx = self.simidx + 1
         return self.z_current
