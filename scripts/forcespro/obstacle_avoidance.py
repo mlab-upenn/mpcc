@@ -52,7 +52,7 @@ def main():
     #sim parameters
     with open(solverparams) as file:
         params = yaml.load(file, Loader= yaml.FullLoader)
-    Tsim = 15
+    Tsim = 12
     Tf = params['Tf']
     N = params['N']
     Nsim = np.int(np.floor(N/Tf*Tsim))
@@ -73,7 +73,7 @@ def main():
 
     #starting position in track startidx = theta0[m] * 100 [pts/m]
     trackvars = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
-    startidx = 1300
+    startidx = 300
     xt0 = track_lu_table[startidx,trackvars.index('xtrack')]
     yt0 = track_lu_table[startidx,trackvars.index('ytrack')]
     phit0 = track_lu_table[startidx,trackvars.index('phitrack')]
@@ -84,7 +84,7 @@ def main():
     xinit = np.array([xt0, yt0, phit0, 0.2, 0.0, 0, 0, 0, theta_hat0])
 
     #static obstacle
-    ob_idx = 400
+    ob_idx = 1050
     phi_ob = track_lu_table[ob_idx, trackvars.index('phitrack')]
     x_ob = track_lu_table[ob_idx,trackvars.index('xtrack')] - 0.5 * r * np.sin(phi_ob)
     y_ob = track_lu_table[ob_idx,trackvars.index('ytrack')] + 0.5 * r * np.cos(phi_ob)
@@ -96,7 +96,7 @@ def main():
                     "l_ob": l_ob,
                     "w_ob": w_ob}
 
-    trk_plt.plot_static_obstacle(x_ob, y_ob, phi_ob, l_ob, w_ob)
+    #trk_plt.plot_static_obstacle(x_ob, y_ob, phi_ob, l_ob, w_ob)
     z_current = agent.initialize_trajectory(xinit, obstacleinfo, startidx)
     trk_plt.plot_horizon(z_current[:,zvars.index('theta')], z_current[:, 3:6])
     plt.pause(0.1)
@@ -119,7 +119,7 @@ def main():
     ###############################/SIMULATION##################################
 
     zinit_vals, z_data = agent.return_sim_data()
-    #trk_plt.animate_result(z_data, N,Tf, 'test.gif')
+    trk_plt.animate_result(z_data, N,Tf, 'test.gif')
     trk_plt.plot_traj(zinit_vals[:,3:])
     plt.show()
     #np.savetxt("full_sol_x_log.csv", )

@@ -209,7 +209,8 @@ def get_col_avoid_solver( solverparams = "solverparams.yaml", modelparams = "mod
         #implicit ellipse value ielval = 1 defines obstacle ellipse
         ielval = (1/a**2)*(c*dx+s*dy)*(c*dx+s*dy) + (1/b**2)*(s*dx-c*dy)*(s*dx-c*dy)
         #cosntraint value -> obsval<=0  <=> car outside of obstacle
-        obsval = 1-ielval
+        obsval = 1/(1+casadi.exp(-(ielval-1)))
+
 
         #concatenate
         hval = np.array([
@@ -219,13 +220,13 @@ def get_col_avoid_solver( solverparams = "solverparams.yaml", modelparams = "mod
         return hval
 
     model.ineq = lambda z, p: nonlinear_ineq(z, p)
-    model.hu = np.array([0.0000, 0.00])
-    model.hl = np.array([-10, -10000])
+    model.hu = np.array([0.0000, 2])
+    model.hl = np.array([-10, 0.51])
 
     #boxconstraints
     #Note: z = [u, x] = [vxdot, deltadot, thetadot, posx, posy, phi, vx, vy, omega, d, delta, theta]
-    model.ub = np.array([ddot_max, deltadot_max, thetadot_max, 10, 10, 1000, vx_max, vy_max, omega_max, d_max, delta_max, theta_max])
-    model.lb = np.array([ddot_min, deltadot_min, thetadot_min , -10, -10, -1000, vx_min, vy_min, omega_min, d_min, delta_min, theta_min])
+    model.ub = np.array([ddot_max, deltadot_max, thetadot_max, 15, 15, 1000, vx_max, vy_max, omega_max, d_max, delta_max, theta_max])
+    model.lb = np.array([ddot_min, deltadot_min, thetadot_min , -15, -15, -1000, vx_min, vy_min, omega_min, d_min, delta_min, theta_min])
 
     #put initial condition on all state variables x
     model.xinitidx = 3 + np.arange(model.nvar -3)

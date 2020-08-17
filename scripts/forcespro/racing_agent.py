@@ -106,13 +106,13 @@ class racer():
         iter = 80
 
         #initialize dyamics simulation
-        self.dynamics = dynamics_simulator(self.modelparams, self.Tf/self.N, xinit, nodes=3)
+        self.dynamics = dynamics_simulator(self.modelparams, self.Tf/self.N, xinit, nodes=4)
 
         self.zinit = np.concatenate([np.array([0,0,0]), xinit])
         self.z_current = np.tile(self.zinit,(self.N,1))
 
         #arbitrarily set theta  values and
-        theta_old = self.zinit[self.zvars.index('theta')]*np.ones((self.N,)) + 0.01*np.arange(self.N)
+        theta_old = self.zinit[self.zvars.index('theta')]*np.ones((self.N,)) + 0.1*np.arange(self.N)
         self.z_current[:,self.zvars.index('theta')] = theta_old
         index_lin_points = 100 * theta_old
         index_lin_points = index_lin_points.astype(np.int32)
@@ -265,22 +265,22 @@ class racer():
 
         #simulate dynaics
         u = self.z_current[0,:3]
-        xtrue = self.dynamics.tick(u)
+        xtrue = self.dynamics.tick(u) #self.z_current[1, 3:] #
         self.z_current[0,3:] = xtrue
 
         #log solution
         self.z_data[self.simidx,:,:] = self.z_current
 
 
-        '''
-        print("theta: ", zinit[self.zvars.index('theta')])
-        print("vx: ", zinit[self.zvars.index('vx')])
-        print("vy: ", zinit[self.zvars.index('vy')])
-        print("omega: ", zinit[self.zvars.index('omega')])
-        print("phi: ", zinit[self.zvars.index('phi')]*180/3.1415)
-        print("d: ", zinit[self.zvars.index('d')])
-        print("delta: ", zinit[self.zvars.index('delta')])
 
+        print("theta: ", xtrue[self.xvars.index('theta')])
+        print("vx: ", xtrue[self.xvars.index('vx')])
+        print("vy: ", xtrue[self.xvars.index('vy')])
+        print("omega: ", xtrue[self.xvars.index('omega')])
+        print("phi: ", xtrue[self.xvars.index('phi')]*180/3.1415)
+        print("d: ", xtrue[self.xvars.index('d')])
+        print("delta: ", xtrue[self.xvars.index('delta')])
+        '''
         vx = zinit[self.zvars.index('vx')]
         vy = zinit[self.zvars.index('vy')]
         delta = zinit[self.zvars.index('delta')]
