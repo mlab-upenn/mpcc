@@ -32,7 +32,9 @@ import matplotlib.pyplot as plt
 import InterpolateTrack
 import yaml
 import sys
-
+import pickle
+from datetime import datetime
+from pathlib import Path
 
 def main():
     np.set_printoptions(precision=4)
@@ -52,14 +54,14 @@ def main():
     #sim parameters
     with open(solverparams) as file:
         params = yaml.load(file, Loader= yaml.FullLoader)
-    Tsim = 12
+    Tsim = 20
     Tf = params['Tf']
     N = params['N']
     Nsim = np.int(np.floor(N/Tf*Tsim))
 
 
-
-    track_lu_table, smax = InterpolateTrack.generatelookuptable("tracks/slider")
+    trackname = "slider"
+    track_lu_table, smax = InterpolateTrack.generatelookuptable("tracks/"+trackname)
     r = 0.2 #trackwidth
     track = {"track_lu_table": track_lu_table,
              "smax": smax,
@@ -96,7 +98,7 @@ def main():
                     "l_ob": l_ob,
                     "w_ob": w_ob}
 
-    #trk_plt.plot_static_obstacle(x_ob, y_ob, phi_ob, l_ob, w_ob)
+    trk_plt.plot_static_obstacle(x_ob, y_ob, phi_ob, l_ob, w_ob)
     z_current = agent.initialize_trajectory(xinit, obstacleinfo, startidx)
     trk_plt.plot_horizon(z_current[:,zvars.index('theta')], z_current[:, 3:6])
     plt.pause(0.1)
@@ -106,6 +108,7 @@ def main():
     ##########################SIMULATION#######################################
     for simidx in range(Nsim):
         z_current = agent.update(obstacleinfo)
+        '''
         #plotting result
         trk_plt.plot_horizon(z_current[:,zvars.index('theta')], z_current[:, 3:6])
         trk_plt.plot_input_state_traj(z_current, zvars)
@@ -115,11 +118,27 @@ def main():
         #plt.pause(0.1)
         trk_plt.clear_horizion()
         trk_plt.clear_input_state_traj()
-
+        '''
     ###############################/SIMULATION##################################
 
     zinit_vals, z_data = agent.return_sim_data()
-    trk_plt.animate_result(z_data, N,Tf, 'test.gif')
+    agent_data = {  "smax" :  smax,
+                    "lencar": lencar,
+                    "track" : trackname,
+                    "r" : r,
+                    "zinit": zinit_vals,
+                    "zdata": z_data}
+
+    now = datetime.now()
+    # dd/mm/YY H:M:S
+    dt_string = now.strftime("%m_%d_%H_%M_%S")
+    name_data = "1_agent_obs_avoid_"+dt_string+".pkl"
+    root = Path(".")
+    full_path = root / "simdata" / name_data
+    with open(full_path,'wb') as f:
+        pickle.dump(agent_data, f)
+
+    #trk_plt.animate_result(z_data, N,Tf, 'test.gif')
     trk_plt.plot_traj(zinit_vals[:,3:])
     plt.show()
     #np.savetxt("full_sol_x_log.csv", )
