@@ -207,11 +207,11 @@ def get_sw_col_avoid_solver( solverparams = "solverparams.yaml", modelparams = "
         #tighten constraint with car length/width
         a = np.sqrt(2)*(l_ob/2 + lencar/2)
         b = np.sqrt(2)*(w_ob/2 + widthcar/2)
+        
         #implicit ellipse value ielval = 1 defines obstacle ellipse
         ielval = (1/a**2)*(c*dx+s*dy)*(c*dx+s*dy) + (1/b**2)*(s*dx-c*dy)*(s*dx-c*dy)
-
-        #cosntraint value -> obsval<=0  <=> car outside of obstacle, to turn off obstace write deactivate_ob=1.0
-        obsval = 1-ielval-deactivate_ob
+        #cosntraint value squished constraint obsval>0.5 -> outside
+        obsval = 1/(1+casadi.exp(-(ielval-1+ deactivate_ob)))
 
         #concatenate
         hval = np.array([
@@ -221,8 +221,8 @@ def get_sw_col_avoid_solver( solverparams = "solverparams.yaml", modelparams = "
         return hval
 
     model.ineq = lambda z, p: nonlinear_ineq(z, p)
-    model.hu = np.array([0.0000, 0.00])
-    model.hl = np.array([-10, -1000000])
+    model.hu = np.array([0.0000, 2])
+    model.hl = np.array([-10, 0.51])
 
     #boxconstraints
     #Note: z = [u, x] = [vxdot, deltadot, thetadot, posx, posy, phi, vx, vy, omega, d, delta, theta]

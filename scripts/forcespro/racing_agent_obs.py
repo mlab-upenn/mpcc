@@ -27,9 +27,9 @@ from generate_sw_col_avoid_solver import get_sw_col_avoid_solver
 import forcespro.nlp
 from python_sim_utils import   plotter, plot_pajecka, compute_objective
 import matplotlib.pyplot as plt
-import Bezier
 import yaml
 import sys
+from dynamics import dynamics_simulator
 
 
 class racer():
@@ -37,6 +37,7 @@ class racer():
     def __init__(self, track, Tsim, name = "default_racer", modelparams = "modelparams.yaml", solverparams = "solverparams"):
 
         self.name = name
+        self.modelparams = modelparams
         #load global constant model parameters
         with open(modelparams) as file:
             params = yaml.load(file, Loader= yaml.FullLoader)
@@ -85,7 +86,7 @@ class racer():
         self.z_current = np.zeros((self.N, len(self.zvars) ))
         self.theta_current = np.zeros((self.N,))
         self.obstacle_stages = [0, 1, 2, 3, 4, 5, 6, 7]
-        
+
         #list to store all visited states
         self.zinit_vals = np.zeros((self.Nsim, len(self.zvars)))
         #list containing also the prediction horizons
@@ -103,6 +104,9 @@ class racer():
 
         #initialization for theta values
         iter = 20
+
+        #initialize dyamics simulation
+        self.dynamics = dynamics_simulator(self.modelparams, self.Tf/self.N, xinit, nodes=4)
 
         self.zinit = np.concatenate([np.array([0,0,0]), xinit])
         self.z_current = np.tile(self.zinit,(self.N,1))
@@ -161,7 +165,7 @@ class racer():
             #solve problem
             output, exitflag, info = self.solver.solve(problem)
             #print(info)
-            #print(exitflag)
+
             #input("hit [enter] to continue.")
 
             #extract theta values
@@ -224,8 +228,6 @@ class racer():
                                 ])
             #create parameter matrix
             all_parameters.append(p_val)
-            #stack state initializations, last state is copied
-            self.z_current[stageidx,:] = self.z_current[stageidx+1,:]
 
         #last stage copy old solution for init
         stageidx = self.N-1
@@ -262,16 +264,32 @@ class racer():
                    "all_parameters": all_parameters.reshape(-1,)}
         #solve problem
         output, exitflag, info = self.solver.solve(problem)
-
+        print("exitflag = ",exitflag)
+        print("xinit ", self.xinit)
         #extract solution
         idx_sol = 0
         for key in output:
+            #print(key)
             zsol = output[key]
             self.z_current[idx_sol, :] = zsol
             idx_sol = idx_sol+1
 
+        #simulate dynaics
+        u = self.z_current[0,:3]
+        xtrue = self.dynamics.tick(u) #self.z_current[1, 3:] #
+
+        #shift horizon for next warmstart and instert the new "measured position"
+        self.z_current[1,3:] = xtrue
+        self.z_current = np.roll(self.z_current,-1, axis = 0)
+        self.z_current[-1,:] = self.z_current[-2,:]
+        #advance the last prediction for theta
+        self.z_current[-1,self.zvars.index('theta')] += 0.1
+
         #log solution
         self.z_data[self.simidx,:,:] = self.z_current
+        self.zinit = self.z_current[0,:]
+        self.xinit = self.zinit[3:]
+        self.zinit_vals[self.simidx,:] = self.zinit
         '''
         print("theta: ", zinit[self.zvars.index('theta')])
         print("vx: ", zinit[self.zvars.index('vx')])
@@ -297,12 +315,9 @@ class racer():
         print("Frx: ", Frx)
         '''
         self.theta_current = self.z_current[:,self.zvars.index('theta')]
-        self.zinit = self.z_current[0,:]
-        self.xinit = self.zinit[3:]
-        self.zinit_vals[self.simidx,:] = self.zinit
 
         #preparation for next timestep
-        self.theta_current = np.hstack((self.z_current[1:, self.zvars.index('theta')], self.z_current[-1, self.zvars.index('theta')]+0.1))
+        #self.theta_current = np.hstack((self.z_current[1:, self.zvars.index('theta')], self.z_current[-1, self.zvars.index('theta')]+0.1))
 
         if self.theta_current[0] > self.smax :
             print("#################################RESET###############################")
@@ -310,6 +325,7 @@ class racer():
             print("lap:", self.laps)
             self.theta_current = self.theta_current - self.smax
             self.z_current[:,self.zvars.index('theta')] = self.theta_current
+            self.dynamics.set_theta(self.theta_current[0])
 
         self.simidx = self.simidx + 1
         return self.z_current

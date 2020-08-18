@@ -1,9 +1,9 @@
 #solverparameters for constfunction
 N: 35 # horizon steps
-Tf: 1.5 # horizon length [s]
-Qc: 1.0 # cost for contouring error
-Ql:  1000.0 # lag error cost
-Q_theta: 10 # advancing parameter reward
+Tf: 1.0 # horizon length [s]
+Qc: 100.0 # cost for contouring error
+Ql:  100.0 # lag error cost
+Q_theta: 1 # advancing parameter reward
 R_d: 0.01
 R_delta: 0.01
 
@@ -24,13 +24,13 @@ omega_min : -100 # minimum yawrate [rad/sec]
 omega_max : 100 # maximum yawrate [rad/sec]
 
 thetadot_min : 0.1  # minimum adv param speed [m/s]
-thetadot_max : 5 # maximum adv param speed [m/s]
+thetadot_max : 4 # maximum adv param speed [m/s]
 
 theta_min : 0.00  # minimum adv param [m]
 theta_max : 1000 # maximum adv param  [m]
 
-vx_max : 2 # max long vel [m/s]
+vx_max : 2.1 # max long vel [m/s]
 vx_min : -0.5 #0.05 # min long vel [m/s]
 
-vy_max : 3 # max lat vel [m/s]
-vy_min : -3 # min lat vel [m/s]
+vy_max : 2 # max lat vel [m/s]
+vy_min : -2 # min lat vel [m/s]

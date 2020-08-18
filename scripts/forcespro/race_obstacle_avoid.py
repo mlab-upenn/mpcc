@@ -27,14 +27,15 @@ from racing_agent_obs import racer
 import forcespro.nlp
 from python_sim_utils import   plotter, plot_pajecka, compute_objective
 import matplotlib.pyplot as plt
-import Bezier
+import InterpolateTrack
 import yaml
 import pickle
 import sys
-
+from datetime import datetime
+from pathlib import Path
 
 def main():
-    np.set_printoptions(precision=4)
+    np.set_printoptions(precision=6)
     np.set_printoptions(threshold=sys.maxsize)
 
     #state variable ordering
@@ -51,12 +52,13 @@ def main():
     #sim parameters
     with open(solverparams_1) as file:
         params = yaml.load(file, Loader= yaml.FullLoader)
-    Tsim = 30
+    Tsim = 10
     Tf = params['Tf']
     N = params['N']
     Nsim = np.int(np.floor(N/Tf*Tsim))
 
-    track_lu_table, smax = Bezier.generatelookuptable("tracks/sample_track")
+    trackname = "slider"
+    track_lu_table, smax = InterpolateTrack.generatelookuptable("tracks/"+trackname)
     r = 0.2 #trackwidth
     track = {"track_lu_table": track_lu_table,
              "smax": smax,
@@ -100,7 +102,7 @@ def main():
     agent_1_info["y_ob"] = xinit_1[xvars.index('posy')]
 
     #agent 2  trajectory initialization
-    startidx_2 = 500
+    startidx_2 = 600
     xt0 = track_lu_table[startidx_2,trackvars.index('xtrack')]
     yt0 = track_lu_table[startidx_2,trackvars.index('ytrack')]
     phit0 = track_lu_table[startidx_2,trackvars.index('phitrack')]
@@ -134,17 +136,16 @@ def main():
     trk_plt.clear_obstacles()
     ##########################SIMULATION#######################################
     for simidx in range(Nsim):
-        agent_1_info["phi_ob"] = z_current_1[1, zvars.index('phi')]
-        agent_1_info["x_ob"] = z_current_1[1, zvars.index('posx')]
-        agent_1_info["y_ob"] = z_current_1[1, zvars.index('posy')]
-        agent_2_info["phi_ob"] = z_current_2[1, zvars.index('phi')]
-        agent_2_info["x_ob"] = z_current_2[1, zvars.index('posx')]
-        agent_2_info["y_ob"] = z_current_2[1, zvars.index('posy')]
-
+        #agent_1_info["phi_ob"] = z_current_1[2, zvars.index('phi')]
+        #agent_1_info["x_ob"] = z_current_1[2, zvars.index('posx')]
+        #agent_1_info["y_ob"] = z_current_1[2, zvars.index('posy')]
+        #agent_2_info["phi_ob"] = z_current_2[1, zvars.index('phi')]
+        #agent_2_info["x_ob"] = z_current_2[1, zvars.index('posx')]
+        #agent_2_info["y_ob"] = z_current_2[1, zvars.index('posy')]
 
         z_current_1 = agent_1.update(agent_2_info)
         z_current_2 = agent_2.update(agent_1_info)
-
+        '''
         trk_plt.plot_static_obstacle(agent_1_info["x_ob"],\
                                      agent_1_info["y_ob"],\
                                      agent_1_info["phi_ob"],\
@@ -157,12 +158,14 @@ def main():
                                      2*agent_2_info["l_ob"],\
                                      2*agent_2_info["w_ob"]
                                     )
+
         trk_plt.plot_agents(z_current_1, z_current_2)
+
         plt.pause(0.01)
-        #input("press ENTER")
+        input("press ENTER")
         trk_plt.clear_agents()
         trk_plt.clear_obstacles()
-
+        '''
     ###############################/SIMULATION##################################
     #trk_plt.animate_result(z_data,N,Tf, 'test.gif')
     zinit_vals_1, z_data_full_1 = agent_1.return_sim_data()
@@ -174,7 +177,20 @@ def main():
                     "zdata": z_data_full_2}
 
     simdata = {"agent1": agent_1_data,
-               "agent2": agent_2_data}
+               "agent2": agent_2_data,
+               "smax" :  smax,
+               "lencar": lencar,
+               "track" : trackname,
+               "r" : r}
+
+    now = datetime.now()
+    # dd/mm/YY H:M:S
+    dt_string = now.strftime("%m_%d_%H_%M_%S")
+    name_data = "2_agent_race_"+dt_string+".pkl"
+    root = Path(".")
+    full_path = root / "simdata" / name_data
+    with open(full_path,'wb') as f:
+        pickle.dump(simdata, f)
 
     trk_plt.plot_traj(zinit_vals_1[:,3:])
     plt.show()

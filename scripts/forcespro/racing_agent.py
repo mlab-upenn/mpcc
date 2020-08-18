@@ -255,10 +255,12 @@ class racer():
                    "all_parameters": all_parameters.reshape(-1,)}
         #solve problem
         output, exitflag, info = self.solver.solve(problem)
-
+        print("exitflag = ",exitflag)
+        print("xinit ", self.xinit)
         #extract solution
         idx_sol = 0
         for key in output:
+            #print(key)
             zsol = output[key]
             self.z_current[idx_sol, :] = zsol
             idx_sol = idx_sol+1
@@ -266,21 +268,28 @@ class racer():
         #simulate dynaics
         u = self.z_current[0,:3]
         xtrue = self.dynamics.tick(u) #self.z_current[1, 3:] #
-        self.z_current[0,3:] = xtrue
+
+        #shift horizon for next warmstart and instert the new "measured position"
+        self.z_current[1,3:] = xtrue
+        self.z_current = np.roll(self.z_current,-1, axis = 0)
+        self.z_current[-1,:] = self.z_current[-2,:]
+        #advance the last prediction for theta
+        self.z_current[-1,self.zvars.index('theta')] += 0.1
 
         #log solution
         self.z_data[self.simidx,:,:] = self.z_current
-
-
-
-        print("theta: ", xtrue[self.xvars.index('theta')])
-        print("vx: ", xtrue[self.xvars.index('vx')])
-        print("vy: ", xtrue[self.xvars.index('vy')])
-        print("omega: ", xtrue[self.xvars.index('omega')])
-        print("phi: ", xtrue[self.xvars.index('phi')]*180/3.1415)
-        print("d: ", xtrue[self.xvars.index('d')])
-        print("delta: ", xtrue[self.xvars.index('delta')])
+        self.zinit = self.z_current[0,:]
+        self.xinit = self.zinit[3:]
+        self.zinit_vals[self.simidx,:] = self.zinit
         '''
+        print("theta: ", zinit[self.zvars.index('theta')])
+        print("vx: ", zinit[self.zvars.index('vx')])
+        print("vy: ", zinit[self.zvars.index('vy')])
+        print("omega: ", zinit[self.zvars.index('omega')])
+        print("phi: ", zinit[self.zvars.index('phi')]*180/3.1415)
+        print("d: ", zinit[self.zvars.index('d')])
+        print("delta: ", zinit[self.zvars.index('delta')])
+
         vx = zinit[self.zvars.index('vx')]
         vy = zinit[self.zvars.index('vy')]
         delta = zinit[self.zvars.index('delta')]
@@ -297,12 +306,6 @@ class racer():
         print("Frx: ", Frx)
         '''
         self.theta_current = self.z_current[:,self.zvars.index('theta')]
-        self.zinit = self.z_current[0,:]
-        self.xinit = self.zinit[3:]
-        self.zinit_vals[self.simidx,:] = self.zinit
-
-        #preparation for next timestep
-        self.theta_current = np.hstack((self.z_current[1:, self.zvars.index('theta')], self.z_current[-1, self.zvars.index('theta')]+0.1))
 
         if self.theta_current[0] > self.smax :
             print("#################################RESET###############################")
