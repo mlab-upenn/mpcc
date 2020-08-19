@@ -4,7 +4,11 @@ import numpy as np
 import forcespro.nlp
 
 
-def get_sw_col_avoid_solver( solverparams = "solverparams.yaml", modelparams = "modelparams.yaml", name = "col_avoid_solver"):
+def get_sw_col_avoid_solver( solverparams = "solverparams.yaml", modelparams = "modelparams.yaml", name = "col_avoid_solver", generatesolver = 1):
+    if generatesolver == 0:
+        print("[SOLVERINFO] Loading solver from directory")
+        solver = forcespro.nlp.Solver.from_directory("./"+name)
+        return solver
     #load global constant model parameters
     with open(modelparams) as file:
         params = yaml.load(file, Loader= yaml.FullLoader)
@@ -207,7 +211,7 @@ def get_sw_col_avoid_solver( solverparams = "solverparams.yaml", modelparams = "
         #tighten constraint with car length/width
         a = np.sqrt(2)*(l_ob/2 + lencar/2)
         b = np.sqrt(2)*(w_ob/2 + widthcar/2)
-        
+
         #implicit ellipse value ielval = 1 defines obstacle ellipse
         ielval = (1/a**2)*(c*dx+s*dy)*(c*dx+s*dy) + (1/b**2)*(s*dx-c*dy)*(s*dx-c*dy)
         #cosntraint value squished constraint obsval>0.5 -> outside

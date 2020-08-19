@@ -1,9 +1,9 @@
 #solverparameters for constfunction
 N: 35 # horizon steps
 Tf: 1.0 # horizon length [s]
-Qc: 0.1 # cost for contouring error
+Qc: 0.01 # cost for contouring error
 Ql:  1000.0 # lag error cost
-Q_theta: 100 # advancing parameter reward
+Q_theta: 10 # advancing parameter reward
 R_d: 0.01
 R_delta: 0.01
 
@@ -29,8 +29,8 @@ thetadot_max : 5 # maximum adv param speed [m/s]
 theta_min : 0.00  # minimum adv param [m]
 theta_max : 1000 # maximum adv param  [m]
 
-vx_max : 2.7 # max long vel [m/s]
+vx_max : 3 # max long vel [m/s]
 vx_min : -0.5 #0.05 # min long vel [m/s]
 
-vy_max : 3 # max lat vel [m/s]
-vy_min : -3 # min lat vel [m/s]
+vy_max : 3.5 # max lat vel [m/s]
+vy_min : -3.5 # min lat vel [m/s]

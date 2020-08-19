@@ -146,7 +146,7 @@ def generatelookuptable(track):
 
     table = np.array(table)
     #plot_track(table)
-    print("Variables stored in following order = ", names_table)
+    #print("Variables stored in following order = ", names_table)
     np.savetxt(str(track) + '_lutab.csv', table, delimiter = ', ')
 
     dict = {'smax': float(smax), 'ppm' : lutable_density}

@@ -34,7 +34,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-def main():
+def main(generatesolvers):
     np.set_printoptions(precision=6)
     np.set_printoptions(threshold=sys.maxsize)
 
@@ -42,6 +42,7 @@ def main():
     trackvars = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
     zvars = ['ddot', 'deltadot', 'thetadot', 'posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
     xvars = ['posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
+    debug_colors = ['b','g','r','c','m','y']
 
     # parameters for both agents
     modelparams_1 = "parameters/modelparams_1.yaml"
@@ -52,12 +53,12 @@ def main():
     #sim parameters
     with open(solverparams_1) as file:
         params = yaml.load(file, Loader= yaml.FullLoader)
-    Tsim = 10
+    Tsim = 15
     Tf = params['Tf']
     N = params['N']
     Nsim = np.int(np.floor(N/Tf*Tsim))
 
-    trackname = "slider"
+    trackname = "indi500xd"
     track_lu_table, smax = InterpolateTrack.generatelookuptable("tracks/"+trackname)
     r = 0.2 #trackwidth
     track = {"track_lu_table": track_lu_table,
@@ -75,31 +76,34 @@ def main():
     trk_plt.plot_track()
     plt.pause(0.1)
     #initialize both agents
-    agent_1 = racer(track, Tsim, "agent_1", modelparams_1, solverparams_1)
-    agent_1_info = {"phi_ob": 0,
+    agent_1 = racer(track, Tsim, "agent_1", modelparams_1, solverparams_1, generatesolvers)
+    agent_1_info = {"const_dactive": 0,
+                    "phi_ob": 0,
                     "x_ob": 0,
                     "y_ob": 0,
-                    "l_ob": lencar,
-                    "w_ob": widthcar}
-    agent_2 = racer(track, Tsim, "agent_2", modelparams_2, solverparams_2)
-    agent_2_info = {"phi_ob": 0,
+                    "l_ob": lencar*1.2,
+                    "w_ob": widthcar*1.2}
+
+    agent_2 = racer(track, Tsim, "agent_2", modelparams_2, solverparams_2, generatesolvers)
+    agent_2_info = {"const_dactive": 0,
+                    "phi_ob": 0,
                     "x_ob": 0,
                     "y_ob": 0,
-                    "l_ob": lencar,
-                    "w_ob": widthcar}
+                    "l_ob": lencar*1.2,
+                    "w_ob": widthcar*1.2}
 
     #agent 1 trajecotry initialization
     #starting position in track startidx = theta0[m] * 100 [pts/m]
-    startidx_1 = 400
+    startidx_1 = 1000
     xt0 = track_lu_table[startidx_1,trackvars.index('xtrack')]
     yt0 = track_lu_table[startidx_1,trackvars.index('ytrack')]
     phit0 = track_lu_table[startidx_1,trackvars.index('phitrack')]
     theta_hat0 = track_lu_table[startidx_1,trackvars.index('sval')]
     #initial condition
     xinit_1 = np.array([xt0, yt0, phit0, 0.2, 0.0, 0, 0, 0, theta_hat0])
-    agent_1_info["phi_ob"] = xinit_1[xvars.index('phi')]
-    agent_1_info["x_ob"] = xinit_1[xvars.index('posx')]
-    agent_1_info["y_ob"] = xinit_1[xvars.index('posy')]
+    agent_1_info["phi_ob"] = np.tile(xinit_1[xvars.index('phi')],(N,))
+    agent_1_info["x_ob"] = np.tile(xinit_1[xvars.index('posx')],(N,))
+    agent_1_info["y_ob"] = np.tile(xinit_1[xvars.index('posy')],(N,))
 
     #agent 2  trajectory initialization
     startidx_2 = 600
@@ -109,26 +113,28 @@ def main():
     theta_hat0 = track_lu_table[startidx_2,trackvars.index('sval')]
     #initial condition
     xinit_2 = np.array([xt0, yt0, phit0, 0.2, 0.0, 0, 0, 0, theta_hat0])
-    agent_2_info["phi_ob"] = xinit_2[xvars.index('phi')]
-    agent_2_info["x_ob"] = xinit_2[xvars.index('posx')]
-    agent_2_info["y_ob"] = xinit_2[xvars.index('posy')]
+    agent_2_info["phi_ob"] = np.tile(xinit_2[xvars.index('phi')],(N,))
+    agent_2_info["x_ob"] = np.tile(xinit_2[xvars.index('posx')],(N,))
+    agent_2_info["y_ob"] = np.tile(xinit_2[xvars.index('posy')],(N,))
 
     #compute trajectory init
     z_current_1 = agent_1.initialize_trajectory(xinit_1, agent_2_info, startidx_1)
     z_current_2 = agent_2.initialize_trajectory(xinit_2, agent_1_info, startidx_2)
 
     trk_plt.plot_agents(z_current_1, z_current_2)
-    trk_plt.plot_static_obstacle(agent_1_info["x_ob"],\
-                                 agent_1_info["y_ob"],\
-                                 agent_1_info["phi_ob"],\
+    trk_plt.plot_static_obstacle(agent_1_info["x_ob"][0],\
+                                 agent_1_info["y_ob"][0],\
+                                 agent_1_info["phi_ob"][0],\
                                  2*agent_1_info["l_ob"],\
-                                 2*agent_1_info["w_ob"]
+                                 2*agent_1_info["w_ob"],\
+                                 debug_colors[np.mod(0,7)]
                                 )
-    trk_plt.plot_static_obstacle(agent_2_info["x_ob"],\
-                                 agent_2_info["y_ob"],\
-                                 agent_2_info["phi_ob"],\
+    trk_plt.plot_static_obstacle(agent_2_info["x_ob"][0],\
+                                 agent_2_info["y_ob"][0],\
+                                 agent_2_info["phi_ob"][0],\
                                  2*agent_2_info["l_ob"],\
-                                 2*agent_2_info["w_ob"]
+                                 2*agent_2_info["w_ob"],\
+                                 debug_colors[np.mod(0,7)]
                                 )
     plt.pause(0.1)
     input("press ENTER")
@@ -136,28 +142,45 @@ def main():
     trk_plt.clear_obstacles()
     ##########################SIMULATION#######################################
     for simidx in range(Nsim):
-        #agent_1_info["phi_ob"] = z_current_1[2, zvars.index('phi')]
-        #agent_1_info["x_ob"] = z_current_1[2, zvars.index('posx')]
-        #agent_1_info["y_ob"] = z_current_1[2, zvars.index('posy')]
-        #agent_2_info["phi_ob"] = z_current_2[1, zvars.index('phi')]
-        #agent_2_info["x_ob"] = z_current_2[1, zvars.index('posx')]
-        #agent_2_info["y_ob"] = z_current_2[1, zvars.index('posy')]
-
+        agent_1_info["phi_ob"] = z_current_1[:, zvars.index('phi')]
+        agent_1_info["x_ob"] = z_current_1[:, zvars.index('posx')]
+        agent_1_info["y_ob"] = z_current_1[:, zvars.index('posy')]
+        agent_2_info["phi_ob"] = z_current_2[:, zvars.index('phi')]
+        agent_2_info["x_ob"] = z_current_2[:, zvars.index('posx')]
+        agent_2_info["y_ob"] = z_current_2[:, zvars.index('posy')]
+        #activate constraints
+        agent_1_info["const_dactive"] = 0
+        agent_2_info["const_dactive"] = 0
+        '''
+        dist = np.sqrt(np.sum(np.square(z_current_1[0, zvars.index('posx'):zvars.index('posy')+1]\
+                -z_current_2[0, zvars.index('posx'):zvars.index('posy')+1])))
+        print("[INFO] Distance",dist)
+        if dist>0.5:
+            #deactivate constraints
+            agent_1_info["const_dactive"] = 1
+            agent_2_info["const_dactive"] = 1
+        else:
+        '''
         z_current_1 = agent_1.update(agent_2_info)
         z_current_2 = agent_2.update(agent_1_info)
+
+
         '''
-        trk_plt.plot_static_obstacle(agent_1_info["x_ob"],\
-                                     agent_1_info["y_ob"],\
-                                     agent_1_info["phi_ob"],\
-                                     2*agent_1_info["l_ob"],\
-                                     2*agent_1_info["w_ob"]
-                                    )
-        trk_plt.plot_static_obstacle(agent_2_info["x_ob"],\
-                                     agent_2_info["y_ob"],\
-                                     agent_2_info["phi_ob"],\
-                                     2*agent_2_info["l_ob"],\
-                                     2*agent_2_info["w_ob"]
-                                    )
+        for stageidx in range(N):
+            trk_plt.plot_static_obstacle(agent_1_info["x_ob"][stageidx],\
+                                         agent_1_info["y_ob"][stageidx],\
+                                         agent_1_info["phi_ob"][stageidx],\
+                                         0.5*agent_1_info["l_ob"],\
+                                         0.5*agent_1_info["w_ob"],\
+                                         debug_colors[np.mod(stageidx,6)]
+                                        )
+            trk_plt.plot_static_obstacle(agent_2_info["x_ob"][stageidx],\
+                                         agent_2_info["y_ob"][stageidx],\
+                                         agent_2_info["phi_ob"][stageidx],\
+                                         0.5*agent_2_info["l_ob"],\
+                                         0.5*agent_2_info["w_ob"],\
+                                         debug_colors[np.mod(stageidx,6)]
+                                        )
 
         trk_plt.plot_agents(z_current_1, z_current_2)
 
@@ -199,5 +222,11 @@ def main():
     return 0
 
 if __name__ == "__main__":
-
-    main()
+    options = sys.argv[1]
+    print("[INFO] Use the argument gen to generate solvers newly")
+    if options == "gen":
+        print("[INFO] REGENERATING SOLVERS")
+        main(1)
+    else :
+        print("[INFO] LOADING OLD SOLVERS")
+        main(0)

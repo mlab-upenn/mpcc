@@ -16,8 +16,13 @@ def main_1ag(filename):
     r = data['r']
     zinit = data['zinit']
     zdata = data['zdata']
+    laptimes = data['laptimes']
     track_name = "tracks/"+data['track']+"_lutab.csv"
     zvars = ['ddot', 'deltadot', 'thetadot', 'posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
+    theta_vals = zinit[:,zvars.index('theta')]
+    #indexes = np.where(0<zinit<0.01)
+    laptimes = np.delete(laptimes, laptimes.argmin())
+    print("laptimes: ", laptimes)
 
     # load array
     track_lu_table = np.loadtxt(track_name, delimiter=',')
@@ -58,6 +63,7 @@ def main_2ag(filename):
     track_name = "tracks/"+data['track']+"_lutab.csv"
     zvars = ['ddot', 'deltadot', 'thetadot', 'posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
 
+    plt.plot(np.arange(len(zdata_1[:,0,0])),zdata_1[:,0,zvars.index('theta')])
     # load array
     track_lu_table = np.loadtxt(track_name, delimiter=',')
     print("Experiment with N = ", zdata_1.shape[0]," samples loaded")

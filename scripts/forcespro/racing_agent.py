@@ -94,6 +94,8 @@ class racer():
         #sim step trackign
         self.simidx = 0
         self.laps = 0
+        self.laptimer = 0
+        self.laptimes = []
 
     def initialize_trajectory(self, xinit, enemyinfo, startidx):
         x_ob = enemyinfo['x_ob']
@@ -310,6 +312,8 @@ class racer():
         if self.theta_current[0] > self.smax :
             print("#################################RESET###############################")
             self.laps = self.laps + 1
+            self.laptimes.append(self.simidx - self.laptimer)
+            self.laptimer = self.simidx
             print("lap:", self.laps)
             self.theta_current = self.theta_current - self.smax
             self.z_current[:,self.zvars.index('theta')] = self.theta_current
@@ -319,4 +323,4 @@ class racer():
         return self.z_current
 
     def return_sim_data(self):
-        return self.zinit_vals, self.z_data
+        return self.zinit_vals, self.z_data, np.array(self.laptimes)

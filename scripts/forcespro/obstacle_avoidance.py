@@ -54,7 +54,7 @@ def main():
     #sim parameters
     with open(solverparams) as file:
         params = yaml.load(file, Loader= yaml.FullLoader)
-    Tsim = 20
+    Tsim = 40
     Tf = params['Tf']
     N = params['N']
     Nsim = np.int(np.floor(N/Tf*Tsim))
@@ -75,7 +75,7 @@ def main():
 
     #starting position in track startidx = theta0[m] * 100 [pts/m]
     trackvars = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
-    startidx = 300
+    startidx = 2400
     xt0 = track_lu_table[startidx,trackvars.index('xtrack')]
     yt0 = track_lu_table[startidx,trackvars.index('ytrack')]
     phit0 = track_lu_table[startidx,trackvars.index('phitrack')]
@@ -83,13 +83,13 @@ def main():
     #initial condition
     zvars = ['ddot', 'deltadot', 'thetadot', 'posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
     xvars = ['posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
-    xinit = np.array([xt0, yt0, phit0, 0.2, 0.0, 0, 0, 0, theta_hat0])
+    xinit = np.array([xt0, yt0, phit0, 0.8, 0.0, 0, 0, 0, theta_hat0])
 
     #static obstacle
     ob_idx = 1050
     phi_ob = track_lu_table[ob_idx, trackvars.index('phitrack')]
-    x_ob = track_lu_table[ob_idx,trackvars.index('xtrack')] - 0.5 * r * np.sin(phi_ob)
-    y_ob = track_lu_table[ob_idx,trackvars.index('ytrack')] + 0.5 * r * np.cos(phi_ob)
+    x_ob = track_lu_table[ob_idx,trackvars.index('xtrack')] + 1.5 * r * np.sin(phi_ob)
+    y_ob = track_lu_table[ob_idx,trackvars.index('ytrack')] - 1.5 * r * np.cos(phi_ob)
     l_ob = lencar*2
     w_ob = l_ob*2
     obstacleinfo = {"phi_ob": phi_ob,
@@ -121,13 +121,14 @@ def main():
         '''
     ###############################/SIMULATION##################################
 
-    zinit_vals, z_data = agent.return_sim_data()
+    zinit_vals, z_data, laptimes = agent.return_sim_data()
     agent_data = {  "smax" :  smax,
                     "lencar": lencar,
                     "track" : trackname,
                     "r" : r,
                     "zinit": zinit_vals,
-                    "zdata": z_data}
+                    "zdata": z_data,
+                    "laptimes": laptimes}
 
     now = datetime.now()
     # dd/mm/YY H:M:S

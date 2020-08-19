@@ -224,8 +224,8 @@ class plotter():
         self.ax2.set_ylim([min-0.1,max+0.1])
         self.fig2.canvas.draw()
 
-    def plot_static_obstacle(self, x, y, phi, l, w):
-        obstacle = patches.Ellipse((x, y), l, w, angle = phi * 180/3.14159 ,linewidth=1,edgecolor='k',facecolor='k')
+    def plot_static_obstacle(self, x, y, phi, l, w, color):
+        obstacle = patches.Ellipse((x, y), l, w, angle = phi * 180/3.14159 ,linewidth=1,edgecolor= color,facecolor='None')
         obs = self.ax.add_patch(obstacle)
         self.static_obstacles.append(obs)
         self.fig.canvas.draw()

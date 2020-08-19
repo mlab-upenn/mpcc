@@ -25,7 +25,7 @@
 import numpy as np
 from generate_sw_col_avoid_solver import get_sw_col_avoid_solver
 import forcespro.nlp
-from python_sim_utils import   plotter, plot_pajecka, compute_objective
+from python_sim_utils import  plotter, plot_pajecka, compute_objective
 import matplotlib.pyplot as plt
 import yaml
 import sys
@@ -34,7 +34,7 @@ from dynamics import dynamics_simulator
 
 class racer():
 
-    def __init__(self, track, Tsim, name = "default_racer", modelparams = "modelparams.yaml", solverparams = "solverparams"):
+    def __init__(self, track, Tsim, name = "default_racer", modelparams = "modelparams.yaml", solverparams = "solverparams", generatesolver = 0):
 
         self.name = name
         self.modelparams = modelparams
@@ -75,7 +75,7 @@ class racer():
         self.smax = track['smax']
         self.track_lu_table = track['track_lu_table']
 
-        self.solver = get_sw_col_avoid_solver(solverparams, modelparams, self.name+"_solver")
+        self.solver = get_sw_col_avoid_solver(solverparams, modelparams, self.name+"_solver", generatesolver)
 
         self.trackvars = ['sval', 'tval', 'xtrack', 'ytrack', 'phitrack', 'cos(phi)', 'sin(phi)', 'g_upper', 'g_lower']
         self.xvars = ['posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
@@ -85,7 +85,7 @@ class racer():
 
         self.z_current = np.zeros((self.N, len(self.zvars) ))
         self.theta_current = np.zeros((self.N,))
-        self.obstacle_stages = [0, 1, 2, 3, 4, 5, 6, 7]
+        self.obstacle_stages = np.arange(self.N) #[0, 1, 2, 3, 4, 5, 6, 7]
 
         #list to store all visited states
         self.zinit_vals = np.zeros((self.Nsim, len(self.zvars)))
@@ -144,9 +144,9 @@ class racer():
                                     self.R_d,
                                     self.R_delta,
                                     self.r,
-                                    x_ob,
-                                    y_ob,
-                                    phi_ob,
+                                    x_ob[stageidx],
+                                    y_ob[stageidx],
+                                    phi_ob[stageidx],
                                     l_ob,
                                     w_ob,
                                     1.0     #deactivate obstacle by default
@@ -194,6 +194,7 @@ class racer():
         phi_ob = enemyinfo['phi_ob']
         l_ob = enemyinfo['l_ob']
         w_ob = enemyinfo['w_ob']
+        const_dactive = enemyinfo['const_dactive']
 
         all_parameters = []
 
@@ -219,12 +220,12 @@ class racer():
                                 self.R_d,
                                 self.R_delta,
                                 self.r,
-                                x_ob,
-                                y_ob,
-                                phi_ob,
+                                x_ob[stageidx],
+                                y_ob[stageidx],
+                                phi_ob[stageidx],
                                 l_ob,
                                 w_ob,
-                                1.0     #deactivate obstacle by default
+                                const_dactive     #deactivate obstacle by default
                                 ])
             #create parameter matrix
             all_parameters.append(p_val)
@@ -243,18 +244,18 @@ class racer():
                             self.R_d,
                             self.R_delta,
                             self.r,
-                            x_ob,
-                            y_ob,
-                            phi_ob,
+                            x_ob[stageidx],
+                            y_ob[stageidx],
+                            phi_ob[stageidx],
                             l_ob,
                             w_ob,
-                            1.0     #deactivate obstacle by default
+                            const_dactive     #deactivate obstacle by default
                             ])
         all_parameters.append(p_val)
         all_parameters = np.array(all_parameters)
 
-        for idx in self.obstacle_stages:
-            all_parameters[idx,-1] = 0 #explicitly activate obstacle constraint
+        #for idx in self.obstacle_stages:
+            #all_parameters[idx,-1] = 0 #explicitly activate obstacle constraint
         #last state of z_current is already copied.
 
         #######################################################################
