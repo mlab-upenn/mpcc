@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2020.7.1)  13 AUG 2020 21:19
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2020.7.1)  21 AUG 2020 13:02
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -976,35 +976,37 @@ File: fig/race_car.png Graphic file (type png)
 <use fig/race_car.png>
 Package pdftex.def Info: fig/race_car.png  used on input line 30.
 (pdftex.def)             Requested size: 18.78703pt x 18.78656pt.
-) [2 <./fig/race_car.png>] [3]
-Overfull \hbox (46.81834pt too wide) detected at line 175
+) [2 <./fig/race_car.png>] (./fig/model.tex
+File: fig/race_car.png Graphic file (type png)
+<use fig/race_car.png>
+Package pdftex.def Info: fig/race_car.png  used on input line 68.
+(pdftex.def)             Requested size: 234.8775pt x 234.91327pt.
+) [3]
+[4]
+Overfull \hbox (46.81834pt too wide) detected at line 204
 []
  []
 
-<fig/cost_bump.png, id=69, 1211.9679pt x 1019.007pt>
+<fig/cost_bump.png, id=87, 1211.9679pt x 1019.007pt>
 File: fig/cost_bump.png Graphic file (type png)
 <use fig/cost_bump.png>
-Package pdftex.def Info: fig/cost_bump.png  used on input line 190.
+Package pdftex.def Info: fig/cost_bump.png  used on input line 219.
 (pdftex.def)             Requested size: 234.8775pt x 197.46944pt.
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-(./root.bbl) [4]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 197.
- [5 <./fig/cost_bump.png>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 197.
+[5] (./root.bbl) [6 <./fig/cost_bump.png>]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 226.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 226.
  (./root.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 197.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 197.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 226.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 226.
 Package rerunfilecheck Info: File `root.out' has not changed.
 (rerunfilecheck)             Checksum: 25C5E947691EF4249D769D3F8361ECC4;208.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 197.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 226.
  ) 
 Here is how much of TeX's memory you used:
- 18575 strings out of 492982
- 339354 string characters out of 6134897
- 404282 words of memory out of 5000000
- 21800 multiletter control sequences out of 15000+600000
+ 18721 strings out of 492982
+ 341993 string characters out of 6134897
+ 405282 words of memory out of 5000000
+ 21927 multiletter control sequences out of 15000+600000
  14649 words of font info for 56 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  55i,20n,54p,625b,781s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1021,10 +1023,10 @@ ts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/c
 mr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pf
 b></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr
 /share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb>
-Output written on root.pdf (5 pages, 560082 bytes).
+Output written on root.pdf (6 pages, 568759 bytes).
 PDF statistics:
- 143 PDF objects out of 1000 (max. 8388607)
- 115 compressed objects within 2 object streams
- 30 named destinations out of 1000 (max. 500000)
+ 167 PDF objects out of 1000 (max. 8388607)
+ 138 compressed objects within 2 object streams
+ 46 named destinations out of 1000 (max. 500000)
  55 words of extra memory for PDF output out of 10000 (max. 10000000)
 

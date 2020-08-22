@@ -225,7 +225,7 @@ class racer():
                                 phi_ob[stageidx],
                                 l_ob,
                                 w_ob,
-                                const_dactive     #deactivate obstacle by default
+                                const_dactive     
                                 ])
             #create parameter matrix
             all_parameters.append(p_val)
@@ -249,7 +249,7 @@ class racer():
                             phi_ob[stageidx],
                             l_ob,
                             w_ob,
-                            const_dactive     #deactivate obstacle by default
+                            const_dactive
                             ])
         all_parameters.append(p_val)
         all_parameters = np.array(all_parameters)
