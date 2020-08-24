@@ -187,6 +187,13 @@ class racer():
             self.xinit = self.z_current[0,3:]
         return self.z_current
 
+    def reinitialize(self,):
+        theta = self.z_current[:, self.zvars.index('theta')]
+        index_lin_points = 100 * theta
+        index_lin_points = index_lin_points.astype(np.int32)
+        track_lin_points = self.track_lu_table[index_lin_points,:]
+        self.z_current[1:,self.zvars.index('posx'):self.zvars.index('phi')+1] = track_lin_points[1:,self.trackvars.index('xtrack'):self.trackvars.index('phitrack')+1]
+
     def update(self, enemyinfo):
 
         x_ob = enemyinfo['x_ob']
@@ -225,7 +232,7 @@ class racer():
                                 phi_ob[stageidx],
                                 l_ob,
                                 w_ob,
-                                const_dactive     
+                                const_dactive
                                 ])
             #create parameter matrix
             all_parameters.append(p_val)
@@ -266,6 +273,7 @@ class racer():
         #solve problem
         output, exitflag, info = self.solver.solve(problem)
         print("exitflag = ",exitflag)
+
         print("xinit ", self.xinit)
         #extract solution
         idx_sol = 0
@@ -286,11 +294,13 @@ class racer():
         #advance the last prediction for theta
         self.z_current[-1,self.zvars.index('theta')] += 0.1
 
+
         #log solution
         self.z_data[self.simidx,:,:] = self.z_current
         self.zinit = self.z_current[0,:]
         self.xinit = self.zinit[3:]
         self.zinit_vals[self.simidx,:] = self.zinit
+
         '''
         print("theta: ", zinit[self.zvars.index('theta')])
         print("vx: ", zinit[self.zvars.index('vx')])
@@ -326,7 +336,13 @@ class racer():
             print("lap:", self.laps)
             self.theta_current = self.theta_current - self.smax
             self.z_current[:,self.zvars.index('theta')] = self.theta_current
+            wrapdir = self.dynamics.wrap_phi()
+            self.z_current[:,self.zvars.index('phi')] = self.z_current[:,self.zvars.index('phi')] - (wrapdir)*2*3.14159
             self.dynamics.set_theta(self.theta_current[0])
+
+        if exitflag == -7:
+            print("#################################################reinitialize#######################################################")
+            self.reinitialize()
 
         self.simidx = self.simidx + 1
         return self.z_current

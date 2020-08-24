@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2020.7.1)  21 AUG 2020 13:02
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2020.7.1)  24 AUG 2020 08:46
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -980,7 +980,7 @@ Package pdftex.def Info: fig/race_car.png  used on input line 30.
 File: fig/race_car.png Graphic file (type png)
 <use fig/race_car.png>
 Package pdftex.def Info: fig/race_car.png  used on input line 68.
-(pdftex.def)             Requested size: 234.8775pt x 234.91327pt.
+(pdftex.def)             Requested size: 281.85587pt x 281.94249pt.
 ) [3]
 [4]
 Overfull \hbox (46.81834pt too wide) detected at line 204
@@ -1003,10 +1003,10 @@ Package rerunfilecheck Info: File `root.out' has not changed.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 226.
  ) 
 Here is how much of TeX's memory you used:
- 18721 strings out of 492982
- 341993 string characters out of 6134897
+ 18723 strings out of 492982
+ 342043 string characters out of 6134897
  405282 words of memory out of 5000000
- 21927 multiletter control sequences out of 15000+600000
+ 21929 multiletter control sequences out of 15000+600000
  14649 words of font info for 56 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  55i,20n,54p,625b,781s stack positions out of 5000i,500n,10000p,200000b,80000s

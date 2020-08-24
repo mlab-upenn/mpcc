@@ -96,6 +96,16 @@ class dynamics_simulator():
     def set_theta(self, theta):
         self.x[self.xvars.index('theta')] = theta
 
+    def wrap_phi(self):
+        if self.x[self.xvars.index('phi')] > 2 * 3.14159:
+            self.x[self.xvars.index('phi')] -= 2 * 3.14159
+            wrapdir = 1
+        elif self.x[self.xvars.index('phi')] < -2 * 3.14159:
+            self.x[self.xvars.index('phi')] += 2 * 3.14159
+            wrapdir = -1
+        else:
+             wrapdir = 0
+        return wrapdir
     #RK4 integration
     def _integrate(self, Ts, u):
 

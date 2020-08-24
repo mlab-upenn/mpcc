@@ -149,8 +149,8 @@ def main(generatesolvers):
         agent_2_info["x_ob"] = z_current_2[:, zvars.index('posx')]
         agent_2_info["y_ob"] = z_current_2[:, zvars.index('posy')]
         #activate constraints
-        agent_1_info["const_dactive"] = 0
-        agent_2_info["const_dactive"] = 0
+        agent_1_info["const_dactive"] = 1
+        agent_2_info["const_dactive"] = 1
         '''
         dist = np.sqrt(np.sum(np.square(z_current_1[0, zvars.index('posx'):zvars.index('posy')+1]\
                 -z_current_2[0, zvars.index('posx'):zvars.index('posy')+1])))

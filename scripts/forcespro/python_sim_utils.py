@@ -358,6 +358,7 @@ class replay_plotter():
         self.lencar = lencar
         self.smax = smax
         maxidx = np.floor(smax * 100).astype(np.int32)
+
         #downsample
         self.downsampling = 2
         self.coords_full = table[:, 2:4]
@@ -378,8 +379,13 @@ class replay_plotter():
         #input and state plot
         #self.fig2, (self.ax1, self.ax2) = plt.subplots(nrows = 2, ncols = 1, figsize=(10,10))
         #trackplot
-        plotsize = 15
-        self.fig, self.ax = plt.subplots(1, figsize=(plotsize,ratio*plotsize))
+        figwidth = 15
+        self.fig = plt.figure(figsize=(figwidth*2, ratio*figwidth))
+        grid = plt.GridSpec(2, 2, hspace=0.25, wspace=0.25)
+
+        self.ax = self.fig.add_subplot(grid[:, 0]) #trackax
+        self.ag1ax = self.fig.add_subplot(grid[0, 1] )
+        self.ag2ax = self.fig.add_subplot(grid[1, 1] )
         self.track_xbounds = [-0.1-np.max(r)+np.min(self.coords_full[:,0]),np.max(self.coords_full[:,0])+np.max(r)+0.1]
         self.track_ybounds = [-0.1-np.max(r)+np.min(self.coords_full[:,1]),np.max(self.coords_full[:,1])+np.max(r)+0.1]
         self.static_obstacles = []
@@ -512,34 +518,35 @@ class replay_plotter():
         self.fig.canvas.draw()
         plt.show(block = False)
         plt.pause(0.01)
-    '''
-    def plot_input_state_traj(self, zval, varnames):
 
-        uval = zval[:,:3]
+    def plot_input_state_traj(self, z1, z2, zvars):
+        #vars2plot = ['ddot', 'deltadot', 'thetadot','phi', 'omega', 'd', 'delta']
+        vars2plot = ['ddot', 'deltadot', 'thetadot', 'posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
+
+        indx = []
         #state trajectories
-        N = len(zval)
+        N = len(z1[:,0])
         time = np.arange(N)
-        for idx in range(zval.shape[1]-3):
-            temp = self.ax1.step(time, zval[:,idx + 3], label = varnames[idx + 3], where='post')
-            self.trajplots.append(temp)
-        self.ax1.legend()
-        self.ax1.set_title("State Trajectories")
-        self.ax1.set_xlabel("time [t/Ts]")
-        max = np.max(zval[:,3:])
-        min = np.min(zval[:,3:])
-        self.ax1.set_ylim([min-0.1,max+0.1])
+        for var in vars2plot:
+            indx.append(zvars.index(var))
+            temp1 = self.ag1ax.step(time, z1[:,indx[-1]], label = var, where='post')
+            temp2 = self.ag2ax.step(time, z2[:,indx[-1]], label = var, where='post')
+            self.trajplots.append(temp1)
+            self.trajplots.append(temp2)
 
-        for idx in range(3):
-            temp = self.ax2.step(time, uval[:,idx], label = varnames[idx], where='post')
-            self.trajplots.append(temp)
-        self.ax2.legend()
-        self.ax2.set_title("Input Trajectories")
-        self.ax2.set_xlabel("time [t/Ts]")
-        max = np.max(uval)
-        min = np.min(uval)
-        self.ax2.set_ylim([min-0.1,max+0.1])
-        self.fig2.canvas.draw()
-        '''
+        self.ag1ax.legend()
+        max = np.max(z1[:,indx])
+        min = np.min(z1[:,indx])
+        self.ag1ax.set_ylim([min-0.1,max+0.1])
+        
+        self.ag2ax.legend()
+        self.ag2ax.set_xlabel("time [t/Ts]")
+        max = np.max(z2[:,indx])
+        min = np.min(z2[:,indx])
+        self.ag2ax.set_ylim([min-0.1,max+0.1])
+
+        self.fig.canvas.draw()
+
     def plot_static_obstacle(self, x, y, phi, l, w):
         obstacle = patches.Ellipse((x, y), l, w, angle = phi * 180/3.14159 ,linewidth=1,edgecolor='k',facecolor='k')
         obs = self.ax.add_patch(obstacle)
@@ -561,7 +568,7 @@ class replay_plotter():
         for idxtraj in range(nrtraj):
             self.trajplots[idxtraj][0].remove()
         self.trajplots = []
-        self.fig2.canvas.draw()
+        self.fig.canvas.draw()
 
     def clear_obstacles(self):
 
