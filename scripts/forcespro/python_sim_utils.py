@@ -538,7 +538,7 @@ class replay_plotter():
         max = np.max(z1[:,indx])
         min = np.min(z1[:,indx])
         self.ag1ax.set_ylim([min-0.1,max+0.1])
-        
+
         self.ag2ax.legend()
         self.ag2ax.set_xlabel("time [t/Ts]")
         max = np.max(z2[:,indx])
@@ -569,6 +569,7 @@ class replay_plotter():
             self.trajplots[idxtraj][0].remove()
         self.trajplots = []
         self.fig.canvas.draw()
+        #plt.pause(0.0001)
 
     def clear_obstacles(self):
 

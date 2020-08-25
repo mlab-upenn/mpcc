@@ -25,7 +25,7 @@
 import numpy as np
 from racing_agent_obs import racer
 import forcespro.nlp
-from python_sim_utils import   plotter, plot_pajecka, compute_objective
+from python_sim_utils import   plotter, plot_pajecka
 import matplotlib.pyplot as plt
 import InterpolateTrack
 import yaml
@@ -58,7 +58,7 @@ def main(generatesolvers):
     N = params['N']
     Nsim = np.int(np.floor(N/Tf*Tsim))
 
-    trackname = "indi500xd"
+    trackname = "slider"
     track_lu_table, smax = InterpolateTrack.generatelookuptable("tracks/"+trackname)
     r = 0.2 #trackwidth
     track = {"track_lu_table": track_lu_table,
@@ -94,7 +94,7 @@ def main(generatesolvers):
 
     #agent 1 trajecotry initialization
     #starting position in track startidx = theta0[m] * 100 [pts/m]
-    startidx_1 = 1000
+    startidx_1 = 400
     xt0 = track_lu_table[startidx_1,trackvars.index('xtrack')]
     yt0 = track_lu_table[startidx_1,trackvars.index('ytrack')]
     phit0 = track_lu_table[startidx_1,trackvars.index('phitrack')]
@@ -149,8 +149,8 @@ def main(generatesolvers):
         agent_2_info["x_ob"] = z_current_2[:, zvars.index('posx')]
         agent_2_info["y_ob"] = z_current_2[:, zvars.index('posy')]
         #activate constraints
-        agent_1_info["const_dactive"] = 1
-        agent_2_info["const_dactive"] = 1
+        agent_1_info["const_dactive"] = 0
+        agent_2_info["const_dactive"] = 0
         '''
         dist = np.sqrt(np.sum(np.square(z_current_1[0, zvars.index('posx'):zvars.index('posy')+1]\
                 -z_current_2[0, zvars.index('posx'):zvars.index('posy')+1])))
@@ -170,15 +170,15 @@ def main(generatesolvers):
             trk_plt.plot_static_obstacle(agent_1_info["x_ob"][stageidx],\
                                          agent_1_info["y_ob"][stageidx],\
                                          agent_1_info["phi_ob"][stageidx],\
-                                         0.5*agent_1_info["l_ob"],\
-                                         0.5*agent_1_info["w_ob"],\
+                                         agent_1_info["l_ob"],\
+                                         agent_1_info["w_ob"],\
                                          debug_colors[np.mod(stageidx,6)]
                                         )
             trk_plt.plot_static_obstacle(agent_2_info["x_ob"][stageidx],\
                                          agent_2_info["y_ob"][stageidx],\
                                          agent_2_info["phi_ob"][stageidx],\
-                                         0.5*agent_2_info["l_ob"],\
-                                         0.5*agent_2_info["w_ob"],\
+                                         agent_2_info["l_ob"],\
+                                         agent_2_info["w_ob"],\
                                          debug_colors[np.mod(stageidx,6)]
                                         )
 
