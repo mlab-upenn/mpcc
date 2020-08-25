@@ -53,12 +53,12 @@ def main(generatesolvers):
     #sim parameters
     with open(solverparams_1) as file:
         params = yaml.load(file, Loader= yaml.FullLoader)
-    Tsim = 15
+    Tsim = 20
     Tf = params['Tf']
     N = params['N']
     Nsim = np.int(np.floor(N/Tf*Tsim))
 
-    trackname = "slider"
+    trackname = "levine"
     track_lu_table, smax = InterpolateTrack.generatelookuptable("tracks/"+trackname)
     r = 0.2 #trackwidth
     track = {"track_lu_table": track_lu_table,
@@ -94,7 +94,7 @@ def main(generatesolvers):
 
     #agent 1 trajecotry initialization
     #starting position in track startidx = theta0[m] * 100 [pts/m]
-    startidx_1 = 400
+    startidx_1 = 20
     xt0 = track_lu_table[startidx_1,trackvars.index('xtrack')]
     yt0 = track_lu_table[startidx_1,trackvars.index('ytrack')]
     phit0 = track_lu_table[startidx_1,trackvars.index('phitrack')]
@@ -106,7 +106,7 @@ def main(generatesolvers):
     agent_1_info["y_ob"] = np.tile(xinit_1[xvars.index('posy')],(N,))
 
     #agent 2  trajectory initialization
-    startidx_2 = 600
+    startidx_2 = 220
     xt0 = track_lu_table[startidx_2,trackvars.index('xtrack')]
     yt0 = track_lu_table[startidx_2,trackvars.index('ytrack')]
     phit0 = track_lu_table[startidx_2,trackvars.index('phitrack')]

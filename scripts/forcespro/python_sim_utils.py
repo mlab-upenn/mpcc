@@ -380,12 +380,15 @@ class replay_plotter():
         #self.fig2, (self.ax1, self.ax2) = plt.subplots(nrows = 2, ncols = 1, figsize=(10,10))
         #trackplot
         figwidth = 15
+
         self.fig = plt.figure(figsize=(figwidth*2, ratio*figwidth))
         grid = plt.GridSpec(2, 2, hspace=0.25, wspace=0.25)
 
         self.ax = self.fig.add_subplot(grid[:, 0]) #trackax
         self.ag1ax = self.fig.add_subplot(grid[0, 1] )
         self.ag2ax = self.fig.add_subplot(grid[1, 1] )
+
+        #self.fig, self.ax = plt.subplots(nrows = 1, ncols = 1, figsize=(figwidth,ratio*figwidth))
         self.track_xbounds = [-0.1-np.max(r)+np.min(self.coords_full[:,0]),np.max(self.coords_full[:,0])+np.max(r)+0.1]
         self.track_ybounds = [-0.1-np.max(r)+np.min(self.coords_full[:,1]),np.max(self.coords_full[:,1])+np.max(r)+0.1]
         self.static_obstacles = []
@@ -521,7 +524,7 @@ class replay_plotter():
 
     def plot_input_state_traj(self, z1, z2, zvars):
         #vars2plot = ['ddot', 'deltadot', 'thetadot','phi', 'omega', 'd', 'delta']
-        vars2plot = ['ddot', 'deltadot', 'thetadot', 'posx', 'posy', 'phi', 'vx', 'vy', 'omega', 'd', 'delta', 'theta']
+        vars2plot = ['vx', 'delta']
 
         indx = []
         #state trajectories
@@ -546,6 +549,7 @@ class replay_plotter():
         self.ag2ax.set_ylim([min-0.1,max+0.1])
 
         self.fig.canvas.draw()
+
 
     def plot_static_obstacle(self, x, y, phi, l, w):
         obstacle = patches.Ellipse((x, y), l, w, angle = phi * 180/3.14159 ,linewidth=1,edgecolor='k',facecolor='k')

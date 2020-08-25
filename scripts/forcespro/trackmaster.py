@@ -118,10 +118,14 @@ class Window(QMainWindow):
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
-            self.drawing = True
+            #self.drawing = True
             self.lastPoint = event.pos()
             self.waypoints.append([self.lastPoint.x(), self.lastPoint.y()])
-            #print([self.lastPoint.x(), self.lastPoint.y()])
+            painter = QPainter(self.image)
+            painter.setPen(QPen(self.brushColor, self.brushSize, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+            painter.drawPoint(self.lastPoint)
+            self.update()
+            print([self.lastPoint.x(), self.lastPoint.y()])
             #print(self.lastPoint)
 
 
@@ -136,7 +140,6 @@ class Window(QMainWindow):
 
 
     def mouseReleaseEvent(self, event):
-
         if event.button() == Qt.LeftButton:
             self.drawing = False
 
@@ -162,7 +165,7 @@ class Window(QMainWindow):
         fig, ax1= plt.subplots(nrows = 1, ncols = 1, figsize=(10,10))
         points = 1/self.px_p_meter*np.array(self.waypoints)
         points[:,0] = points[:,0] - np.mean(points[:,0])
-        points[:,1] = points[:,1] - np.mean(points[:,1])
+        points[:,1] = -points[:,1] + np.mean(points[:,1])
         ax1.scatter(points[:,0], points[:,1])
         plt.show()
         name = QFileDialog.getSaveFileName(self, "Save Waypoints", "", "CSV(*.csv)")
