@@ -53,12 +53,12 @@ def main(generatesolvers):
     #sim parameters
     with open(solverparams_1) as file:
         params = yaml.load(file, Loader= yaml.FullLoader)
-    Tsim = 20
+    Tsim = 5
     Tf = params['Tf']
     N = params['N']
     Nsim = np.int(np.floor(N/Tf*Tsim))
 
-    trackname = "levine"
+    trackname = "silly"
     track_lu_table, smax = InterpolateTrack.generatelookuptable("tracks/"+trackname)
     r = 0.2 #trackwidth
     track = {"track_lu_table": track_lu_table,
