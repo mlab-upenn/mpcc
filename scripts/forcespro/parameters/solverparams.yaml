@@ -1,7 +1,7 @@
 #solverparameters for constfunction
 N: 35 # horizon steps
 Tf: 1.0 # horizon length [s]
-Qc: 0.01 # cost for contouring error
+Qc: 15000.0 # cost for contouring error
 Ql:  1000.0 # lag error cost
 Q_theta: 10 # advancing parameter reward
 R_d: 0.01

@@ -54,7 +54,7 @@ def main():
     #sim parameters
     with open(solverparams) as file:
         params = yaml.load(file, Loader= yaml.FullLoader)
-    Tsim = 40
+    Tsim = 50
     Tf = params['Tf']
     N = params['N']
     Nsim = np.int(np.floor(N/Tf*Tsim))
@@ -90,15 +90,15 @@ def main():
     phi_ob = track_lu_table[ob_idx, trackvars.index('phitrack')]
     x_ob = track_lu_table[ob_idx,trackvars.index('xtrack')] + 1.5 * r * np.sin(phi_ob)
     y_ob = track_lu_table[ob_idx,trackvars.index('ytrack')] - 1.5 * r * np.cos(phi_ob)
-    l_ob = lencar*2
-    w_ob = l_ob*2
+    l_ob = 0*lencar*2
+    w_ob = 0*l_ob*2
     obstacleinfo = {"phi_ob": phi_ob,
                     "x_ob": x_ob,
                     "y_ob": y_ob,
                     "l_ob": l_ob,
                     "w_ob": w_ob}
 
-    trk_plt.plot_static_obstacle(x_ob, y_ob, phi_ob, l_ob, w_ob)
+    #trk_plt.plot_static_obstacle(x_ob, y_ob, phi_ob, l_ob, w_ob)
     z_current = agent.initialize_trajectory(xinit, obstacleinfo, startidx)
     trk_plt.plot_horizon(z_current[:,zvars.index('theta')], z_current[:, 3:6])
     plt.pause(0.1)

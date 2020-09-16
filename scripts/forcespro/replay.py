@@ -7,7 +7,7 @@ import sys
 
 
 def main_1ag(filename):
-    print("[INFO] Move slider at the bottom of the window to advance time")
+    print("[INFO] Move slider at the bottom of the window to advance time!")
     with open(filename, 'rb') as handle:
         data = pickle.load(handle)
 
