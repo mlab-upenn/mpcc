@@ -33,7 +33,7 @@
 \input defs.tex
 \bibliographystyle{alpha}
 
-\title{MPCC Docs}
+\title{MPCC Documentation}
 \author{Peter Werner}
 
 
@@ -119,9 +119,9 @@ These approximations are especially good if $\epsilon_l\approx0$ and $\hat\theta
 \end{figure}
 
 Taking a step back we see that MPCC basically is optimizing to move the position of a virtual point given by $\theta(t)$ as far along the track as possible while steering the model of the system to keep the contouring and lag errors small. The solver then discretizes this problem and finds approximate solutions.
-\section{Dynamic Model}
+\section{Models}
 
-For now the model from \cite{liniger2015optimization} is implemented with adapted parameters. It is a single track bicycle model with pajecka tire forces. 
+The simulation is built around the dynamic model from \cite{liniger2015optimization} is implemented with adapted parameters. It is a single track bicycle model with pajecka tire forces. 
 \begin{figure}[h!]
 	\vspace{-1 cm}
 	\centering
@@ -178,48 +178,12 @@ u_{\dot{ \theta}}
 
 The inputs we optimize for are chosen to be the derivatives of the commandable inputs to the system such that we can penalize their smoothness.
 
+\bigskip
+(For now only a the standard kinematic single track model is working with the ACADOS solver.)
+
 \section{Track Parametrization}
 
 For the track the centerline is given in waypoints. To implement MPCC we need an arclenght parametrization $\Phi$. This is realized by interpolating the waypoints using cubic splines (previously bezier curves) with a cyclic boundary condition, and creating a dense lookup table with the track location and the linearization parameters. Note that in the optimization it is not practical to pass the  full parametrization since it contains functions that the used solver has dificulties dealing with such as floor and modulo. Instead the linearization parameters are precomputed offline and passed at every stage.   
-
-\section{Overtaking Idea}
-Instead of trying to exactly figure out what positions the adversary will be at in the future and designing a corridor along the track for overtaking as done in \cite{liniger2015optimization}, we could try to augment the cost function as follows. 
-\begin{align}
-\begin{aligned}
-&\minz &&\int_{0}^{T}\begin{bmatrix}
-\epsilon_c^{lin}(t)&&\epsilon_l^{lin}(t)
-\end{bmatrix}
-\begin{bmatrix}
-Qc&&0\\0&&Ql
-\end{bmatrix}
-\begin{bmatrix}
-\epsilon_c^{lin}(t)\\
-\epsilon_l^{lin}(t)
-\end{bmatrix} - Q_{\theta}\dot{\theta}(t) + u^T(t) R u(t) + O(t,x(t), \hat{x}_{adv}(t))dt\\
-&\st  &&\dot{x} = f(x,u,\Phi)\\
-&&& b_{lower}\preceq x(t) \preceq b_{upper}\\
-&&& l_{lower}\preceq u(t) \preceq l_{upper}\\
-&&& h(x, \Phi) \leq 0
-\end{aligned}
-\end{align}
-
-with 
-\begin{align}\label{eqn:bump}
-O(t, x, \hat{x}_{adv}) =\sum_{i = 0}^{1} \alpha_i(t)e^{-(x_{pos}(t)-\hat{x}_{adv, pos}(t)-\mu_i)^TA_i(t)(x_{pos}(t)-\hat{x}_{adv, pos}(t)-\mu_i)}
-\end{align}
-and
-\begin{align}
-\alpha_0 > 0\\
-\alpha_1<0
-\end{align}
-
-The idea is that instead of imposing hard collision avoidance constraints along the entire horizon, we can place these "cost bumps" around the predicted position of the adversary. Furthermore, since our certainty of the opponents behavior decreases along our prediction horizon, these cost bumps could be widened by changing the scaling matrices $A_i$ and coefficients $\alpha_i$. 
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width = 0.5\linewidth]{fig/cost_bump.png}
-	\caption{Example of cost bump as described in eqn \ref{eqn:bump}. Here we would imagine the adversary moving from left to right along the x axis.  }
-\end{figure}
-Additionally cutting off or blocking the opponent could be incentivized by adding a "trough" right in front of the cost peak around predicted position of the adversary.  This leaves the question open about how to place these "cost bumps". Currently I am considering RL.
 
 \bibliographystyle{ieeetr}
 \bibliography{sample}
