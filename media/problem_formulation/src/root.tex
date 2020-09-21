@@ -33,7 +33,7 @@
 \input defs.tex
 \bibliographystyle{alpha}
 
-\title{MPCC Docs}
+\title{MPCC Documentation}
 \author{Peter Werner}
 
 
@@ -81,7 +81,7 @@ u_{model}\\\dot\theta
 
 The track boundary constraint is realized as a convex disk constraint.
 \begin{align}
-h(x,\Phi) = (x-x_t^{lin}(\theta))^2 + (y-y_t^{lin}(\theta))^2 - r_{\Phi}(\hat{\theta})
+h(x,\Phi) = (x-x_t^{lin}(\theta))^2 + (y-y_t^{lin}(\theta))^2 - r_{\Phi}(\hat{\theta})^2
 \end{align}
 Here $r_{\Phi}(\hat{\theta})$ is the half-width of the track at the last predicted arc length.
 \newpage
@@ -119,9 +119,38 @@ These approximations are especially good if $\epsilon_l\approx0$ and $\hat\theta
 \end{figure}
 
 Taking a step back we see that MPCC basically is optimizing to move the position of a virtual point given by $\theta(t)$ as far along the track as possible while steering the model of the system to keep the contouring and lag errors small. The solver then discretizes this problem and finds approximate solutions.
-\section{Dynamic Model}
+\section{Models}
 
-For now the model from \cite{liniger2015optimization} is implemented with adapted parameters. In the code the state is arranged in the following way
+The simulation is built around the dynamic model from \cite{liniger2015optimization} is implemented with adapted parameters. It is a single track bicycle model with pajecka tire forces. 
+\begin{figure}[h!]
+	\vspace{-1 cm}
+	\centering
+	\input{fig/model.tex}
+	\caption{A single track model with pajecka tire forces is used as dynamic model for the controller.}
+\end{figure}
+
+The dynamics read 
+\begin{align}
+\dot{X} &= v_x\cos(\phi)-vy\sin(\phi)\\
+\dot{Y} &= v_x\sin(\phi)+vy\cos(\phi)\\
+\dot{\phi} &= \omega\\
+\dot{v}_x &= \frac{1}{m}(F_{rx}-F_{fy}\sin(\delta)+mv_y\omega) \\
+\dot{v}_x &= \frac{1}{m}(F_{ry}+F_{fy}\cos(\delta)-mv_x\omega) \\
+\dot{\omega} &= \frac{1}{I_z}(F_{fy}l_f\cos(\delta)-F_{ry}l_r)\\
+\dot{d} &= u_{\dot{d}}\\
+\dot{\delta} &= u_{\dot{\delta}}\\
+\dot{\theta} &= u_{\dot{ \theta}}
+\end{align}
+
+with
+\begin{align}
+\alpha_f &= -\arctan\Big(\frac{\omega l_f+v_y}{v_x}\Big)+\delta\\
+\alpha_r &= \arctan\Big(\frac{\omega l_r-v_y}{v_x}\Big)\\
+F_{fy} &= D_f\sin(C_f\arctan(B_f\alpha_f))\\	
+F_{ry} &= D_r\sin(C_r\arctan(B_r\alpha_r))\\
+F_{rx} &= (C_{m1}- C_{m2}v_x)d-C_{roll}-C_dv_x^2
+\end{align}
+In the code the state is arranged in the following way
 
 \begin{align}
 x = \begin{bmatrix}
@@ -141,18 +170,20 @@ where $x$, $y$ are the position of the center of gravity, $\phi$ is the yaw angl
 The input $u$ is arranged as
 \begin{align}
 u = \begin{bmatrix}
-\dot{d}\\
-\dot\delta\\
-\dot\theta
+u_{\dot{d}}\\
+u_{\dot{\delta}}\\
+u_{\dot{ \theta}}
 \end{bmatrix}
 \end{align} 
 
 The inputs we optimize for are chosen to be the derivatives of the commandable inputs to the system such that we can penalize their smoothness.
 
+\bigskip
+(For now only a the standard kinematic single track model is working with the ACADOS solver.)
+
 \section{Track Parametrization}
 
-For the track the centerline is given in waypoints. To implement MPCC we need an arclenght parametrization $\Phi$. This is realized by interpolating the waypoints using cubic bezier curves (with a cyclic boundary condition) and creating a dense lookup table with the track location and the linearization parameters. Note that in the optimization it is not practical to pass the  full bezier curve since it contains functions that the used solver has dificulties dealing with such as floor and modulo. Instead the linearization parameters are passed at every stage.   
-
+For the track the centerline is given in waypoints. To implement MPCC we need an arclenght parametrization $\Phi$. This is realized by interpolating the waypoints using cubic splines (previously bezier curves) with a cyclic boundary condition, and creating a dense lookup table with the track location and the linearization parameters. Note that in the optimization it is not practical to pass the  full parametrization since it contains functions that the used solver has dificulties dealing with such as floor and modulo. Instead the linearization parameters are precomputed offline and passed at every stage.   
 
 \bibliographystyle{ieeetr}
 \bibliography{sample}

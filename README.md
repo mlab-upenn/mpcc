@@ -1,10 +1,10 @@
 # Model Predictive Contouring Control
 
-This repo contains an inprogress implementation of model predictive contouring control (MPCC) based on the ACADOS (kinematic model only) and forces PRO solver (both models).  A registered licence for forces PRO is required to run this part of the repo. 
+This repo contains an inprogress implementation of model predictive contouring control (MPCC) based on the ACADOS (kinematic model only) and forces PRO solver (both models).  A registered licence for forces PRO is required to run this part of the repo.
 
-## Problem Formulation
-[The mathematical formulation can be found here.](media/problem_formulation/problem_formulation.pdf) The resulting controller using the forces PRO solver with the dynamic model is shown below.
-![Resulting Controller](media/sample_track.gif)
+## Problem formulation
+[The mathematical formulation can be found here.](media/problem_formulation/problem_formulation.pdf) The resulting controller is shown below.
+![Resulting Controller](media/slider.gif)
 ![heatmap](media/heatmap.png)
 ## ACADOS Setup
 
@@ -21,7 +21,7 @@ This repo contains an inprogress implementation of model predictive contouring c
  > then build it
  ```shell
  mkdir -p build
- cd build 
+ cd build
  cmake ..  
  make install
  ```
@@ -47,12 +47,12 @@ Note: I ended up putting the last two commands into my .bashrc
 >Test installation:
    ```shell
    cd <acados_root>/examples/acados_python/getting_started
-   python3 minimal_example_closed_loop.py 
+   python3 minimal_example_closed_loop.py
    ```
 3.  All set up!
     Currently, I am working in mpcc/scripts/acados
-    try running "$python3 python_sim.py kin" or "$python3 python_sim.py dyn" 
-    
+    try running "$python3 python_sim.py kin" or "$python3 python_sim.py dyn"
+
 ## Debug
 
 Currently there are issues with the dynamic model. The solver is reporting error code 3, which corresponds to the minimal step size in the QP solver being reached.

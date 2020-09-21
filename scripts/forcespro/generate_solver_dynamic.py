@@ -4,7 +4,7 @@ import numpy as np
 import forcespro.nlp
 
 
-def get_forces_solver_dynamic(N, Tf, modelparams = "modelparams.yaml"):
+def get_forces_solver_dynamic(N, Tf, modelparams = "modelparams.yaml", name = "dynamic_solver"):
     #load global constant model parameters
     with open(modelparams) as file:
         params = yaml.load(file, Loader= yaml.FullLoader)
@@ -180,7 +180,7 @@ def get_forces_solver_dynamic(N, Tf, modelparams = "modelparams.yaml"):
     theta_min = 0.00  # minimum adv param [m]
     theta_max = 1000 # maximum adv param  [m]
 
-    vx_max = 3.5 # max long vel [m/s]
+    vx_max = 8 # max long vel [m/s]
     vx_min = -0.5 #0.05 # min long vel [m/s]
 
     vy_max = 3 # max lat vel [m/s]
